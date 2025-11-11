@@ -264,19 +264,8 @@ export default function LandingPage(): JSX.Element {
     }
   };
 
-  // Add scroll event listener for performance
-  React.useEffect(() => {
-    // Add passive scroll listener for better performance
-    const handleScroll = () => {
-      // You can add scroll-based animations here if needed
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+  // Optimized scroll handling - removed empty listener for better performance
+  // If you need scroll-based animations later, use IntersectionObserver instead
 
   // Structured data for SEO
   const structuredData = {
@@ -313,15 +302,14 @@ export default function LandingPage(): JSX.Element {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="relative min-h-screen overflow-x-hidden bg-slate-950 text-slate-100">
+      <div className="relative bg-slate-950 text-slate-100">
         <div
           className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
           aria-hidden
         />
         <div className="pointer-events-none absolute inset-x-0 top-[-40rem] h-[60rem] bg-[radial-gradient(circle_at_center,_rgba(253,224,71,0.22)_0%,_rgba(8,47,73,0)_65%)]" />
-        <div className="pointer-events-none absolute bottom-[-30rem] left-1/2 h-[48rem] w-[48rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.18),_rgba(15,23,42,0))] blur-3xl" />
 
-        <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 pb-24 pt-12 sm:px-12 lg:px-16">
+        <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col px-6 pb-24 pt-12 sm:px-12 lg:px-16">
           <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <Link href="/" className="group inline-flex items-center gap-3">
               <div className="relative">
@@ -837,7 +825,7 @@ export default function LandingPage(): JSX.Element {
             </section>
           </main>
 
-          <footer className="mt-16 flex flex-col items-center gap-4 border-t border-white/10 pt-8 text-center text-xs text-slate-400">
+          <footer className="mt-16 flex flex-col items-center gap-4 border-t border-white/10 pb-16 pt-8 text-center text-xs text-slate-400">
             <p>
               Making learning personal and teaching efficient, one student at a
               time.
