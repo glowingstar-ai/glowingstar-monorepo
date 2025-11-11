@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,12 @@ import {
   GraduationCap,
   Palette,
   LucideIcon,
+  Camera,
+  Upload,
+  Brain,
+  Heart,
+  BookOpen,
+  CheckCircle2,
 } from "lucide-react";
 
 type NavigationItem = {
@@ -35,128 +41,154 @@ type GlowTile = {
 };
 
 const navigation: NavigationItem[] = [
-  { label: "Platform", href: "#features" },
-  { label: "Why Glowing", href: "#why-glowing" },
-  { label: "Experiences", href: "#experiences" },
+  { label: "Features", href: "#features" },
+  { label: "Why GlowingStar", href: "#why-glowing" },
 ];
 
-const featureCards = [
+const studentFeatures = [
   {
-    name: "Emotion Console",
+    name: "Personal AI Tutor",
     description:
-      "Monitor real-time multimodal cues from your conversations with responsive visual analytics.",
+      "Your tutor that actually gets you. It notices when you&apos;re frustrated and slows down, celebrates when you&apos;re excited, and adapts explanations to how you learn best—all in real-time.",
+    href: "/tutor-mode",
+    icon: Brain,
+    accent: "from-amber-300 via-amber-200 to-amber-400",
+    pill: "AI Tutor",
+  },
+  {
+    name: "Learning Insights",
+    description:
+      "Understand your learning journey like never before. See how your emotions, focus, and engagement affect your progress, and discover patterns that help you study smarter.",
     href: "/emotion-console",
     icon: Activity,
-    accent: "from-amber-300 via-amber-200 to-amber-400",
-    pill: "Live Analysis",
+    accent: "from-emerald-300/80 to-teal-400/80",
+    pill: "Insights",
   },
   {
-    name: "Realtime Assistant",
+    name: "Instant Homework Help",
     description:
-      "Step into a live co-pilot that blends voice, context, and automation into a single responsive teammate.",
+      "Stuck on a problem? Get step-by-step guidance instantly. Our AI understands context, shows you where you went wrong, and helps you learn from mistakes—not just get the answer.",
     href: "/realtime-assistant",
     icon: Star,
-    accent: "from-emerald-300/80 to-teal-400/80",
-    pill: "Live Copilot",
-  },
-  {
-    name: "Notes Workspace",
-    description:
-      "Capture notes, record follow-ups, and let GPT-5 surface annotations from your synced meeting context.",
-    href: "/notes",
-    icon: NotebookPen,
     accent: "from-sky-300 via-indigo-200 to-indigo-400",
-    pill: "Voice Notes",
-  },
-  {
-    name: "Tutor Mode Studio",
-    description:
-      "Design an adaptive teaching blueprint tailored to your learner's goals, modalities, and context.",
-    href: "/tutor-mode",
-    icon: GraduationCap,
-    accent: "from-violet-300/80 to-fuchsia-400/80",
-    pill: "Tutor Plans",
-  },
-  {
-    name: "Evening Journal Studio",
-    description:
-      "Release the day with mood-driven prompts, breathwork cues, and affirmations from a guided journaling ritual.",
-    href: "/journal",
-    icon: Feather,
-    accent: "from-rose-400/80 to-amber-400/70",
-    pill: "Guided Ritual",
-  },
-  {
-    name: "Research Explorer",
-    description:
-      "Describe the paper you need and watch GPT-5 orchestrate an arXiv deep dive in real time.",
-    href: "/research-explorer",
-    icon: Sparkles,
-    accent: "from-cyan-400/80 to-blue-500/80",
-    pill: "Live RAG",
-  },
-  {
-    name: "Generative UI Studio",
-    description:
-      "Pair a PDF brief with a GPT-5 co-designer and iterate on palettes, typography, and layout instantly.",
-    href: "/generative-ui",
-    icon: Palette,
-    accent: "from-teal-300 via-cyan-200 to-blue-400",
-    pill: "Live Theming",
+    pill: "24/7 Help",
   },
 ];
 
-const previewHighlights: Highlight[] = [
+const teacherFeatures = [
   {
-    title: "Realtime signal fusion",
+    name: "Photo-to-Grade in Seconds",
     description:
-      "Glowy braids tone, sentiment, and facial cues into a single confidence pulse with adaptive weighting.",
+      "Snap a photo, get a grade. No more late nights with red pens. Our AI reads handwriting, checks answers, and provides detailed feedback—all in under 30 seconds per assignment.",
+    href: "/emotion-console",
+    icon: Camera,
+    accent: "from-violet-300/80 to-fuchsia-400/80",
+    pill: "Instant Grading",
   },
   {
-    title: "Coach moments that matter",
+    name: "Actionable Student Insights",
     description:
-      "Your mascot copilots surface recommendations precisely when empathy or clarity begins to dip.",
+      "See exactly where each student struggles and shines. Get personalized feedback suggestions, identify learning gaps, and track progress across your entire class at a glance.",
+    href: "/notes",
+    icon: CheckCircle2,
+    accent: "from-rose-400/80 to-amber-400/70",
+    pill: "Smart Analytics",
   },
   {
-    title: "Design your own lenses",
+    name: "Grade Entire Classes at Once",
     description:
-      "Compose custom constellations of KPIs to match your team's playbook, then let Glowy spotlight trends.",
+      "Upload a stack of papers or process an entire exam. Our system handles multiple assignments simultaneously, giving you complete results in minutes instead of hours.",
+    href: "/realtime-assistant",
+    icon: Upload,
+    accent: "from-cyan-400/80 to-blue-500/80",
+    pill: "Batch Processing",
+  },
+];
+
+const studentHighlights: Highlight[] = [
+  {
+    title: "Understands how you feel",
+    description:
+      "Frustrated? It slows down and breaks concepts into smaller steps. Excited? It challenges you with advanced problems. Your tutor adapts in real-time.",
+  },
+  {
+    title: "Learns your style",
+    description:
+      "Visual learner? It shows diagrams. Prefer examples? It provides them. The more you interact, the better it understands how you learn best.",
+  },
+  {
+    title: "Always there when you need it",
+    description:
+      "Midnight study session? Weekend homework? Your tutor never sleeps. Get help the moment you need it, wherever you are.",
+  },
+];
+
+const teacherHighlights: Highlight[] = [
+  {
+    title: "Grade in seconds, not hours",
+    description:
+      "What used to take 30 minutes now takes 30 seconds. Snap a photo, get instant grades and feedback—spend your time teaching, not grading.",
+  },
+  {
+    title: "See your class at a glance",
+    description:
+      "Identify struggling students instantly, spot common mistakes across assignments, and track progress trends—all in one dashboard.",
+  },
+  {
+    title: "Reclaim your evenings",
+    description:
+      "Stop taking work home. Grade an entire class in minutes, get detailed insights automatically, and focus on what you love—teaching.",
   },
 ];
 
 const glowTiles: GlowTile[] = [
   {
-    title: "Playful precision",
+    title: "Emotionally intelligent",
     description:
-      "Our joyful interface mirrors the warmth of the Glowing Star—friendly on the surface, deeply capable underneath.",
+      "Learning isn&apos;t just cognitive—it&apos;s emotional. Our AI recognizes when students are struggling, excited, or ready for a challenge, and responds accordingly.",
+    icon: Heart,
+  },
+  {
+    title: "Lightning fast",
+    description:
+      "Students get help instantly. Teachers get grades in seconds. No waiting, no delays—just results exactly when you need them.",
     icon: Sparkles,
   },
   {
-    title: "Signal clarity",
+    title: "Built for you",
     description:
-      "Cosmic gradients guide your eye to the next best action while keeping complex data feeling approachable.",
-    icon: Radar,
-  },
-  {
-    title: "AI-native workflows",
-    description:
-      "Automations light up the customer journey so your team always knows which constellation to follow next.",
-    icon: Activity,
+      "Every student learns uniquely. Every teacher has different workflows. Our platform adapts to how you work, not the other way around.",
+    icon: BookOpen,
   },
 ];
 
-const heroStats = [
+const studentStats = [
   {
-    label: "Signals captured",
-    value: "12M+",
+    label: "Students helped",
+    value: "50K+",
   },
   {
-    label: "Coaching boosts",
-    value: "4.8×",
+    label: "24/7 availability",
+    value: "Always on",
   },
   {
-    label: "Avg. response",
+    label: "Response time",
     value: "<1s",
+  },
+];
+
+const teacherStats = [
+  {
+    label: "Assignments graded",
+    value: "100K+",
+  },
+  {
+    label: "Time saved",
+    value: "10hrs/week",
+  },
+  {
+    label: "Grading speed",
+    value: "<30s",
   },
 ];
 
@@ -207,6 +239,8 @@ const logoList = [
 ];
 
 export default function LandingPage(): JSX.Element {
+  const [pageView, setPageView] = useState<"student" | "teacher">("teacher");
+
   // Smooth scroll utility function
   const smoothScrollTo = (elementId: string) => {
     const element = document.getElementById(elementId);
@@ -250,7 +284,7 @@ export default function LandingPage(): JSX.Element {
     "@type": "SoftwareApplication",
     name: "GlowingStar",
     description:
-      "The World's First Emotion-Aware AI Tutor. We believe every learner is a glowing star. Our mission is to empower 8 billion people worldwide to discover their full potential.",
+      "AI-powered personalized tutoring for students that adapts to emotions and learning style. Instant photo-based grading for teachers. Making education personal and efficient.",
     url: "https://glowingstar.ai",
     applicationCategory: "EducationalApplication",
     operatingSystem: "Web",
@@ -265,10 +299,10 @@ export default function LandingPage(): JSX.Element {
       url: "https://glowingstar.ai",
     },
     featureList: [
-      "Memory Distillation",
-      "Generative UI",
-      "Agentic AI Loop",
-      "Affective AI",
+      "Personalized AI Tutoring",
+      "Emotion-Aware Learning",
+      "Photo-Based Grading",
+      "Instant Feedback",
     ],
     screenshot: "https://glowingstar.ai/logo.png",
   };
@@ -306,7 +340,7 @@ export default function LandingPage(): JSX.Element {
                   Glowingstar.ai
                 </span>
                 <span className="text-xl font-semibold text-slate-50">
-                  Experience Studio
+                  AI-Powered Education
                 </span>
               </div>
             </Link>
@@ -325,12 +359,43 @@ export default function LandingPage(): JSX.Element {
             </nav>
 
             <div className="flex items-center gap-3">
+              {/* Toggle Switch */}
+              <div className="flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 p-1">
+                <button
+                  onClick={() => setPageView("student")}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                    pageView === "student"
+                      ? "bg-amber-300 text-slate-950 shadow-lg"
+                      : "text-slate-300 hover:text-slate-100"
+                  }`}
+                >
+                  <Star className="h-4 w-4" />
+                  Student
+                </button>
+                <button
+                  onClick={() => setPageView("teacher")}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                    pageView === "teacher"
+                      ? "bg-amber-300 text-slate-950 shadow-lg"
+                      : "text-slate-300 hover:text-slate-100"
+                  }`}
+                >
+                  <GraduationCap className="h-4 w-4" />
+                  Teacher
+                </button>
+              </div>
               <Button
                 variant="ghost"
                 asChild
                 className="border border-white/10 bg-white/5 text-slate-100 hover:border-amber-200/60 hover:bg-white/10 hover:text-amber-100"
               >
-                <Link href="/emotion-console">Launch console</Link>
+                <Link
+                  href={
+                    pageView === "student" ? "/tutor-mode" : "/emotion-console"
+                  }
+                >
+                  Get Started
+                </Link>
               </Button>
             </div>
           </header>
@@ -338,82 +403,128 @@ export default function LandingPage(): JSX.Element {
           <main className="mt-16 flex flex-1 flex-col gap-24 pb-12">
             <section className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center">
               <div className="space-y-8">
-                <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/60 bg-amber-200/15 px-4 py-1 text-sm font-medium text-amber-100">
-                  <Sparkles className="h-4 w-4" />
-                  Meet Glowy, your luminous copilot
-                </span>
-                <h1 className="text-4xl font-semibold leading-tight text-slate-50 sm:text-5xl lg:text-6xl">
-                  The World&apos;s First Emotion-Aware AI Tutor
-                </h1>
-                <p className="max-w-xl text-lg text-slate-200">
-                  We believe every learner is a glowing star. Our mission is to
-                  empower{" "}
-                  <span className="relative inline-block">
-                    <span className="relative z-10 text-amber-200">
-                      8 billion
+                {pageView === "student" ? (
+                  <>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/60 bg-amber-200/15 px-4 py-1 text-sm font-medium text-amber-100">
+                      <Sparkles className="h-4 w-4" />
+                      AI that understands how you learn
                     </span>
-                    <svg
-                      className="absolute -bottom-1 left-0 w-full h-3 text-amber-400"
-                      viewBox="0 0 100 20"
-                      preserveAspectRatio="none"
-                    >
-                      <path
-                        d="M2 15 Q25 5, 50 15 T98 15"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>{" "}
-                  people worldwide to discover their full potential.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <Button
-                    size="lg"
-                    asChild
-                    className="bg-amber-300 text-slate-950 shadow-[0_0_32px_rgba(253,224,71,0.45)] hover:bg-amber-200"
-                  >
-                    <Link
-                      href="/emotion-console"
-                      className="flex items-center gap-2"
-                    >
-                      Start live session
-                      <ArrowUpRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    asChild
-                    className="border-slate-700 bg-slate-900/60 text-slate-200 transition hover:border-amber-200/50 hover:bg-slate-900/80 hover:text-amber-100"
-                  >
-                    <a
-                      href="#features"
-                      onClick={(e) => handleNavClick(e, "#features")}
-                      className="flex items-center gap-2"
-                    >
-                      Discover the suite
-                      <Radar className="h-4 w-4" />
-                    </a>
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-6">
-                  {heroStats.map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="min-w-[120px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-inner shadow-amber-200/10"
-                    >
-                      <p className="text-2xl font-semibold text-amber-200">
-                        {stat.value}
-                      </p>
-                      <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
-                        {stat.label}
-                      </p>
+                    <h1 className="text-4xl font-semibold leading-tight text-slate-50 sm:text-5xl lg:text-6xl">
+                      Learning That Adapts to You
+                    </h1>
+                    <p className="max-w-xl text-lg text-slate-200">
+                      Get a personal AI tutor that recognizes when you&apos;re
+                      stuck, celebrates your breakthroughs, and adjusts to your
+                      learning style in real-time. Available 24/7, whenever you
+                      need help.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <Button
+                        size="lg"
+                        asChild
+                        className="bg-amber-300 text-slate-950 shadow-[0_0_32px_rgba(253,224,71,0.45)] hover:bg-amber-200"
+                      >
+                        <Link
+                          href="/tutor-mode"
+                          className="flex items-center gap-2"
+                        >
+                          Start Learning
+                          <ArrowUpRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        asChild
+                        className="border-slate-700 bg-slate-900/60 text-slate-200 transition hover:border-amber-200/50 hover:bg-slate-900/80 hover:text-amber-100"
+                      >
+                        <a
+                          href="#features"
+                          onClick={(e) => handleNavClick(e, "#features")}
+                          className="flex items-center gap-2"
+                        >
+                          See Features
+                          <Radar className="h-4 w-4" />
+                        </a>
+                      </Button>
                     </div>
-                  ))}
-                </div>
+                    <div className="flex flex-wrap gap-6">
+                      {studentStats.map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="min-w-[120px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-inner shadow-amber-200/10"
+                        >
+                          <p className="text-2xl font-semibold text-amber-200">
+                            {stat.value}
+                          </p>
+                          <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
+                            {stat.label}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/60 bg-amber-200/15 px-4 py-1 text-sm font-medium text-amber-100">
+                      <Camera className="h-4 w-4" />
+                      Grade in seconds, not hours
+                    </span>
+                    <h1 className="text-4xl font-semibold leading-tight text-slate-50 sm:text-5xl lg:text-6xl">
+                      Reclaim Your Time for Teaching
+                    </h1>
+                    <p className="max-w-xl text-lg text-slate-200">
+                      Grade assignments in seconds, not hours. Simply snap a
+                      photo of student work and get instant, detailed feedback.
+                      Focus on what matters most—your students.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <Button
+                        size="lg"
+                        asChild
+                        className="bg-amber-300 text-slate-950 shadow-[0_0_32px_rgba(253,224,71,0.45)] hover:bg-amber-200"
+                      >
+                        <Link
+                          href="/emotion-console"
+                          className="flex items-center gap-2"
+                        >
+                          Start Grading
+                          <ArrowUpRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        asChild
+                        className="border-slate-700 bg-slate-900/60 text-slate-200 transition hover:border-amber-200/50 hover:bg-slate-900/80 hover:text-amber-100"
+                      >
+                        <a
+                          href="#features"
+                          onClick={(e) => handleNavClick(e, "#features")}
+                          className="flex items-center gap-2"
+                        >
+                          See Features
+                          <Radar className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-6">
+                      {teacherStats.map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="min-w-[120px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-inner shadow-amber-200/10"
+                        >
+                          <p className="text-2xl font-semibold text-amber-200">
+                            {stat.value}
+                          </p>
+                          <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
+                            {stat.label}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
               <div className="relative">
                 <div className="absolute inset-0 -translate-y-6 rounded-[2.5rem] bg-gradient-to-br from-amber-200/30 via-amber-500/10 to-transparent blur-3xl" />
@@ -443,45 +554,130 @@ export default function LandingPage(): JSX.Element {
                           >
                             <span className="absolute left-0 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-white/80 shadow-[0_0_8px_rgba(253,224,71,0.45)]" />
                           </span>
-                          <Star className="relative h-5 w-5 animate-glow-float text-amber-200 drop-shadow-[0_0_12px_rgba(253,224,71,0.65)] transition-transform duration-500 motion-reduce:animate-none group-hover:-rotate-6 group-hover:scale-110" />
+                          {pageView === "student" ? (
+                            <Star className="relative h-5 w-5 animate-glow-float text-amber-200 drop-shadow-[0_0_12px_rgba(253,224,71,0.65)] transition-transform duration-500 motion-reduce:animate-none group-hover:-rotate-6 group-hover:scale-110" />
+                          ) : (
+                            <GraduationCap className="relative h-5 w-5 animate-glow-float text-amber-200 drop-shadow-[0_0_12px_rgba(253,224,71,0.65)] transition-transform duration-500 motion-reduce:animate-none group-hover:-rotate-6 group-hover:scale-110" />
+                          )}
                         </span>
-                        Glow dashboard
+                        {pageView === "student"
+                          ? "Learning Dashboard"
+                          : "Grading Dashboard"}
                       </span>
                       <span className="inline-flex items-center gap-2 text-amber-100">
                         <Activity className="h-4 w-4" />
                         Stable
                       </span>
                     </div>
-                    <div className="relative grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-4">
-                      <div className="absolute -top-20 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(253,224,71,0.6),_rgba(2,6,23,0))] opacity-70 blur-3xl" />
-                      <Image
-                        src="/glowingstar-logo.png"
-                        alt="Glowy the Glowing Star mascot"
-                        width={160}
-                        height={160}
-                        className="relative mx-auto h-32 w-32 drop-shadow-[0_0_45px_rgba(253,224,71,0.45)]"
-                      />
-                      <p className="text-center text-sm text-amber-50">
-                        &ldquo;Glowy here—sentiment is shining at 92%. I&apos;ve
-                        highlighted two moments to celebrate with your
-                        team.&rdquo;
-                      </p>
-                    </div>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      {previewHighlights.map((item) => (
-                        <div
-                          key={item.title}
-                          className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm text-slate-300"
-                        >
-                          <p className="font-semibold text-amber-100">
-                            {item.title}
-                          </p>
-                          <p className="mt-2 text-xs text-slate-400">
-                            {item.description}
-                          </p>
+                    {pageView === "student" ? (
+                      <>
+                        {/* Student Dashboard - More Visual */}
+                        <div className="relative grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
+                          <div className="absolute -top-20 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(253,224,71,0.6),_rgba(2,6,23,0))] opacity-70 blur-3xl" />
+                          <Image
+                            src="/glowingstar-logo.png"
+                            alt="Glowy the Glowing Star mascot"
+                            width={120}
+                            height={120}
+                            className="relative mx-auto h-24 w-24 drop-shadow-[0_0_45px_rgba(253,224,71,0.45)]"
+                          />
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                              <span className="text-xs font-medium text-emerald-300">
+                                Learning in progress
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-center gap-4 text-xs">
+                              <div className="flex items-center gap-1.5">
+                                <Heart className="h-3.5 w-3.5 text-rose-400" />
+                                <span className="text-slate-300">Engaged</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Brain className="h-3.5 w-3.5 text-amber-400" />
+                                <span className="text-slate-300">Focused</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      ))}
-                    </div>
+                        <div className="grid gap-2 sm:grid-cols-3">
+                          {studentHighlights.map((item, index) => {
+                            const icons = [Heart, Sparkles, Star];
+                            const Icon = icons[index] || Star;
+                            return (
+                              <div
+                                key={item.title}
+                                className="rounded-xl border border-white/10 bg-slate-900/60 p-3 min-w-0"
+                              >
+                                <div className="flex items-start gap-2">
+                                  <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center mt-0.5">
+                                    <Icon className="h-4 w-4 text-amber-200" />
+                                  </div>
+                                  <p className="font-semibold text-xs text-amber-100 leading-tight">
+                                    {item.title}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* Teacher Dashboard - More Visual */}
+                        <div className="relative grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
+                          <div className="absolute -top-20 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(253,224,71,0.6),_rgba(2,6,23,0))] opacity-70 blur-3xl" />
+                          <Image
+                            src="/glowingstar-logo.png"
+                            alt="Glowy the Glowing Star mascot"
+                            width={120}
+                            height={120}
+                            className="relative mx-auto h-24 w-24 drop-shadow-[0_0_45px_rgba(253,224,71,0.45)]"
+                          />
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                              <span className="text-xs font-medium text-emerald-300">
+                                25 assignments graded
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-center gap-4 text-xs">
+                              <div className="flex items-center gap-1.5">
+                                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                                <span className="text-slate-300">12 min</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Camera className="h-3.5 w-3.5 text-amber-400" />
+                                <span className="text-slate-300">
+                                  3 flagged
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid gap-2 sm:grid-cols-3">
+                          {teacherHighlights.map((item, index) => {
+                            const icons = [CheckCircle2, Activity, Sparkles];
+                            const Icon = icons[index] || CheckCircle2;
+                            return (
+                              <div
+                                key={item.title}
+                                className="rounded-xl border border-white/10 bg-slate-900/60 p-3 min-w-0"
+                              >
+                                <div className="flex items-start gap-2">
+                                  <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center mt-0.5">
+                                    <Icon className="h-4 w-4 text-amber-200" />
+                                  </div>
+                                  <p className="font-semibold text-xs text-amber-100 leading-tight">
+                                    {item.title}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -493,55 +689,106 @@ export default function LandingPage(): JSX.Element {
               <LogoCarousel logos={logoList} />
             </section>
 
+            {/* Features Section - Dynamic based on view */}
             <section id="features" className="space-y-8">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-sm uppercase tracking-[0.35em] text-amber-200/80">
-                    Navigation
-                  </p>
-                  <h2 className="mt-2 text-3xl font-semibold text-slate-50">
-                    Choose your next constellation
-                  </h2>
-                </div>
-                <p className="max-w-md text-sm text-slate-400">
-                  Each workspace is crafted to highlight the nuance of emotional
-                  intelligence—pick the module that matches the moment and
-                  follow the glow.
-                </p>
-              </div>
-              <div
-                className="grid gap-6 md:grid-cols-2 xl:grid-cols-3"
-                id="experiences"
-              >
-                {featureCards.map((feature) => (
-                  <Link
-                    key={feature.name}
-                    href={feature.href as any}
-                    className="group"
-                  >
-                    <div className="h-full rounded-3xl border border-white/10 bg-slate-950/60 p-6 shadow-lg shadow-amber-200/5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-amber-300/30">
-                      <div
-                        className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${feature.accent} px-4 py-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-950`}
-                      >
-                        {feature.pill}
-                      </div>
-                      <div className="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/70 text-amber-200">
-                        <feature.icon className="h-6 w-6" />
-                      </div>
-                      <h3 className="mt-6 text-2xl font-semibold text-slate-50">
-                        {feature.name}
-                      </h3>
-                      <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                        {feature.description}
+              {pageView === "student" ? (
+                <>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-sm uppercase tracking-[0.35em] text-amber-200/80">
+                        Features
                       </p>
-                      <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-amber-100">
-                        Enter experience
-                        <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </div>
+                      <h2 className="mt-2 text-3xl font-semibold text-slate-50">
+                        A Tutor That Actually Gets You
+                      </h2>
                     </div>
-                  </Link>
-                ))}
-              </div>
+                    <p className="max-w-md text-sm text-slate-400">
+                      Get personalized help that adapts to your emotions,
+                      learning style, and pace. When you&apos;re stuck, it slows
+                      down. When you&apos;re ready, it challenges you. Available
+                      24/7.
+                    </p>
+                  </div>
+                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {studentFeatures.map((feature) => (
+                      <Link
+                        key={feature.name}
+                        href={feature.href as any}
+                        className="group"
+                      >
+                        <div className="h-full rounded-3xl border border-white/10 bg-slate-950/60 p-6 shadow-lg shadow-amber-200/5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-amber-300/30">
+                          <div
+                            className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${feature.accent} px-4 py-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-950`}
+                          >
+                            {feature.pill}
+                          </div>
+                          <div className="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/70 text-amber-200">
+                            <feature.icon className="h-6 w-6" />
+                          </div>
+                          <h3 className="mt-6 text-2xl font-semibold text-slate-50">
+                            {feature.name}
+                          </h3>
+                          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                            {feature.description}
+                          </p>
+                          <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-amber-100">
+                            Learn more
+                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-sm uppercase tracking-[0.35em] text-amber-200/80">
+                        Features
+                      </p>
+                      <h2 className="mt-2 text-3xl font-semibold text-slate-50">
+                        Grade in Seconds, Not Hours
+                      </h2>
+                    </div>
+                    <p className="max-w-md text-sm text-slate-400">
+                      Snap a photo of student work and get instant grades,
+                      detailed feedback, and class-wide insights. Reclaim hours
+                      every week to focus on teaching instead of grading.
+                    </p>
+                  </div>
+                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {teacherFeatures.map((feature) => (
+                      <Link
+                        key={feature.name}
+                        href={feature.href as any}
+                        className="group"
+                      >
+                        <div className="h-full rounded-3xl border border-white/10 bg-slate-950/60 p-6 shadow-lg shadow-amber-200/5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-amber-300/30">
+                          <div
+                            className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${feature.accent} px-4 py-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-950`}
+                          >
+                            {feature.pill}
+                          </div>
+                          <div className="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/70 text-amber-200">
+                            <feature.icon className="h-6 w-6" />
+                          </div>
+                          <h3 className="mt-6 text-2xl font-semibold text-slate-50">
+                            {feature.name}
+                          </h3>
+                          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                            {feature.description}
+                          </p>
+                          <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-amber-100">
+                            Learn more
+                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
             </section>
 
             <section
@@ -550,61 +797,55 @@ export default function LandingPage(): JSX.Element {
             >
               <div className="space-y-6">
                 <p className="text-sm uppercase tracking-[0.4em] text-amber-200/80">
-                  Why teams choose A Glowing Star
+                  Why GlowingStar
                 </p>
                 <h2 className="text-3xl font-semibold text-slate-50">
-                  Purpose-built for leaders who choreograph luminous customer
-                  journeys.
+                  Education That Adapts, Not the Other Way Around
                 </h2>
-                <p className="text-sm leading-relaxed text-slate-300">
-                  We combine advanced signal processing with playful,
-                  human-centered design so your team can see, feel, and respond
-                  to every emotional beat.
-                </p>
                 <div className="grid gap-4 sm:grid-cols-3">
                   {glowTiles.map((tile) => (
                     <div
                       key={tile.title}
-                      className="rounded-2xl border border-white/10 bg-slate-950/60 p-5"
+                      className="rounded-2xl border border-white/10 bg-slate-950/60 p-6 flex flex-col items-center text-center"
                     >
-                      <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-200/20 text-amber-100">
-                        <tile.icon className="h-5 w-5" />
+                      <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-200/30 to-amber-400/20 text-amber-100 mb-4">
+                        <tile.icon className="h-8 w-8" />
                       </div>
-                      <p className="mt-3 text-base font-semibold text-slate-50">
+                      <p className="text-base font-semibold text-slate-50">
                         {tile.title}
-                      </p>
-                      <p className="mt-2 text-xs text-slate-400">
-                        {tile.description}
                       </p>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="flex flex-col justify-between gap-6 rounded-3xl border border-white/10 bg-slate-950/60 p-6">
-                <div className="flex items-center gap-3 text-sm text-amber-100">
+              <div className="flex flex-col justify-center gap-6 rounded-3xl border border-white/10 bg-slate-950/60 p-8">
+                <div className="flex items-center gap-3 text-sm text-amber-100 mb-2">
                   <Radar className="h-5 w-5" />
-                  Always-on signal clarity
+                  Our Mission
                 </div>
-                <p className="text-lg font-semibold text-slate-50">
-                  &ldquo;Every learner is a glowing star. Our job is to help
-                  them shine—by noticing when they&apos;re stuck, encouraging
-                  them when they&apos;re close, and challenging them when
-                  they&apos;re ready.&rdquo;
+                <p className="text-xl font-semibold text-slate-50 leading-relaxed">
+                  &ldquo;Every student is a glowing star. Our job is to help
+                  them shine.&rdquo;
                 </p>
-                <div className="space-y-1 text-sm text-slate-400">
-                  <p>Chenyu Zhang</p>
-                  <p>Founder and CEO, GlowingStar.AI</p>
+                <div className="pt-4 border-t border-white/10">
+                  <p className="text-sm font-medium text-slate-300">
+                    Chenyu Zhang
+                  </p>
+                  <p className="text-xs text-slate-400">Founder & CEO</p>
                 </div>
               </div>
             </section>
           </main>
 
           <footer className="mt-16 flex flex-col items-center gap-4 border-t border-white/10 pt-8 text-center text-xs text-slate-400">
-            <p>Building motionally intelligent AI.</p>
+            <p>
+              Making learning personal and teaching efficient, one student at a
+              time.
+            </p>
             <div className="flex items-center gap-4 text-[0.7rem] uppercase tracking-[0.4em] text-slate-500">
               <span>Privacy-first</span>
-              <span>Inclusive design</span>
-              <span>Realtime ready</span>
+              <span>Student-focused</span>
+              <span>Teacher-friendly</span>
             </div>
           </footer>
         </div>
