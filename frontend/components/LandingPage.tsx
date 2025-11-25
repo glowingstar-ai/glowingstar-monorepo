@@ -22,6 +22,10 @@ import {
   Heart,
   BookOpen,
   CheckCircle2,
+  Building2,
+  Users,
+  BarChart3,
+  Shield,
 } from "lucide-react";
 
 type NavigationItem = {
@@ -105,6 +109,36 @@ const teacherFeatures = [
   },
 ];
 
+const schoolFeatures = [
+  {
+    name: "District-Wide Analytics",
+    description:
+      "Get comprehensive insights across all schools, classes, and students. Track learning outcomes, identify trends, and make data-driven decisions that improve education at scale.",
+    href: "/emotion-console",
+    icon: BarChart3,
+    accent: "from-blue-300/80 to-indigo-400/80",
+    pill: "Analytics",
+  },
+  {
+    name: "Unified Infrastructure",
+    description:
+      "Deploy AI-native education tools across your entire district. One platform that scales from individual classrooms to thousands of students, with enterprise-grade security and compliance.",
+    href: "/notes",
+    icon: Building2,
+    accent: "from-purple-300/80 to-pink-400/80",
+    pill: "Infrastructure",
+  },
+  {
+    name: "Personalized Learning at Scale",
+    description:
+      "Enable personalized education for every student in your district. Our AI adapts to each learner while providing administrators with the insights needed to support teachers and improve outcomes.",
+    href: "/realtime-assistant",
+    icon: Users,
+    accent: "from-emerald-300/80 to-teal-400/80",
+    pill: "Scale",
+  },
+];
+
 const studentHighlights: Highlight[] = [
   {
     title: "Understands how you feel",
@@ -138,6 +172,24 @@ const teacherHighlights: Highlight[] = [
     title: "Reclaim your evenings",
     description:
       "Stop taking work home. Grade an entire class in minutes, get detailed insights automatically, and focus on what you love—teaching.",
+  },
+];
+
+const schoolHighlights: Highlight[] = [
+  {
+    title: "AI infrastructure built for education",
+    description:
+      "Deploy personalized learning across your entire district. Our platform scales from single classrooms to thousands of students with enterprise security and compliance.",
+  },
+  {
+    title: "Data-driven decision making",
+    description:
+      "Get district-wide insights that help you identify what's working, where students need support, and how to allocate resources for maximum impact.",
+  },
+  {
+    title: "Empower every teacher and student",
+    description:
+      "Give teachers powerful tools to personalize instruction while ensuring every student gets the support they need to succeed—all on one unified platform.",
   },
 ];
 
@@ -192,6 +244,21 @@ const teacherStats = [
   },
 ];
 
+const schoolStats = [
+  {
+    label: "Schools supported",
+    value: "500+",
+  },
+  {
+    label: "Students reached",
+    value: "250K+",
+  },
+  {
+    label: "Uptime",
+    value: "99.9%",
+  },
+];
+
 const LOGOS = {
   light: {
     harvard: "/logos/harvard-logo-light.svg",
@@ -239,7 +306,7 @@ const logoList = [
 ];
 
 export default function LandingPage(): JSX.Element {
-  const [pageView, setPageView] = useState<"student" | "teacher">("teacher");
+  const [pageView, setPageView] = useState<"student" | "teacher" | "school">("teacher");
 
   // Smooth scroll utility function
   const smoothScrollTo = (elementId: string) => {
@@ -371,6 +438,17 @@ export default function LandingPage(): JSX.Element {
                   <GraduationCap className="h-4 w-4" />
                   Teacher
                 </button>
+                <button
+                  onClick={() => setPageView("school")}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                    pageView === "school"
+                      ? "bg-amber-300 text-slate-950 shadow-lg"
+                      : "text-slate-300 hover:text-slate-100"
+                  }`}
+                >
+                  <Building2 className="h-4 w-4" />
+                  School
+                </button>
               </div>
               <Button
                 variant="ghost"
@@ -379,7 +457,11 @@ export default function LandingPage(): JSX.Element {
               >
                 <Link
                   href={
-                    pageView === "student" ? "/tutor-mode" : "/emotion-console"
+                    pageView === "student"
+                      ? "/tutor-mode"
+                      : pageView === "teacher"
+                      ? "/emotion-console"
+                      : "/emotion-console"
                   }
                 >
                   Get Started
@@ -452,7 +534,7 @@ export default function LandingPage(): JSX.Element {
                       ))}
                     </div>
                   </>
-                ) : (
+                ) : pageView === "teacher" ? (
                   <>
                     <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/60 bg-amber-200/15 px-4 py-1 text-sm font-medium text-amber-100">
                       <Camera className="h-4 w-4" />
@@ -512,6 +594,64 @@ export default function LandingPage(): JSX.Element {
                       ))}
                     </div>
                   </>
+                ) : (
+                  <>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/60 bg-amber-200/15 px-4 py-1 text-sm font-medium text-amber-100">
+                      <Building2 className="h-4 w-4" />
+                      AI native infrastructure for personalized education
+                    </span>
+                    <h1 className="text-4xl font-semibold leading-tight text-slate-50 sm:text-5xl lg:text-6xl">
+                      Scale Personalized Learning Across Your District
+                    </h1>
+                    <p className="max-w-xl text-lg text-slate-200">
+                      Deploy AI-powered education infrastructure that adapts to every student while giving administrators the insights needed to support teachers and improve outcomes district-wide.
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                      <Button
+                        size="lg"
+                        asChild
+                        className="bg-amber-300 text-slate-950 shadow-[0_0_32px_rgba(253,224,71,0.45)] hover:bg-amber-200"
+                      >
+                        <Link
+                          href="/emotion-console"
+                          className="flex items-center gap-2"
+                        >
+                          Get Started
+                          <ArrowUpRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        asChild
+                        className="border-slate-700 bg-slate-900/60 text-slate-200 transition hover:border-amber-200/50 hover:bg-slate-900/80 hover:text-amber-100"
+                      >
+                        <a
+                          href="#features"
+                          onClick={(e) => handleNavClick(e, "#features")}
+                          className="flex items-center gap-2"
+                        >
+                          See Features
+                          <Radar className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-6">
+                      {schoolStats.map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="min-w-[120px] rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-inner shadow-amber-200/10"
+                        >
+                          <p className="text-2xl font-semibold text-amber-200">
+                            {stat.value}
+                          </p>
+                          <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
+                            {stat.label}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
               <div className="relative">
@@ -544,13 +684,17 @@ export default function LandingPage(): JSX.Element {
                           </span>
                           {pageView === "student" ? (
                             <Star className="relative h-5 w-5 animate-glow-float text-amber-200 drop-shadow-[0_0_12px_rgba(253,224,71,0.65)] transition-transform duration-500 motion-reduce:animate-none group-hover:-rotate-6 group-hover:scale-110" />
-                          ) : (
+                          ) : pageView === "teacher" ? (
                             <GraduationCap className="relative h-5 w-5 animate-glow-float text-amber-200 drop-shadow-[0_0_12px_rgba(253,224,71,0.65)] transition-transform duration-500 motion-reduce:animate-none group-hover:-rotate-6 group-hover:scale-110" />
+                          ) : (
+                            <Building2 className="relative h-5 w-5 animate-glow-float text-amber-200 drop-shadow-[0_0_12px_rgba(253,224,71,0.65)] transition-transform duration-500 motion-reduce:animate-none group-hover:-rotate-6 group-hover:scale-110" />
                           )}
                         </span>
                         {pageView === "student"
                           ? "Learning Dashboard"
-                          : "Grading Dashboard"}
+                          : pageView === "teacher"
+                          ? "Grading Dashboard"
+                          : "District Dashboard"}
                       </span>
                       <span className="inline-flex items-center gap-2 text-amber-100">
                         <Activity className="h-4 w-4" />
@@ -610,7 +754,7 @@ export default function LandingPage(): JSX.Element {
                           })}
                         </div>
                       </>
-                    ) : (
+                    ) : pageView === "teacher" ? (
                       <>
                         {/* Teacher Dashboard - More Visual */}
                         <div className="relative grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
@@ -647,6 +791,59 @@ export default function LandingPage(): JSX.Element {
                           {teacherHighlights.map((item, index) => {
                             const icons = [CheckCircle2, Activity, Sparkles];
                             const Icon = icons[index] || CheckCircle2;
+                            return (
+                              <div
+                                key={item.title}
+                                className="rounded-xl border border-white/10 bg-slate-900/60 p-3 min-w-0"
+                              >
+                                <div className="flex items-start gap-2">
+                                  <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center mt-0.5">
+                                    <Icon className="h-4 w-4 text-amber-200" />
+                                  </div>
+                                  <p className="font-semibold text-xs text-amber-100 leading-tight">
+                                    {item.title}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {/* School Dashboard - More Visual */}
+                        <div className="relative grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
+                          <div className="absolute -top-20 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(253,224,71,0.6),_rgba(2,6,23,0))] opacity-70 blur-3xl" />
+                          <Image
+                            src="/glowingstar-logo.png"
+                            alt="Glowy the Glowing Star mascot"
+                            width={120}
+                            height={120}
+                            className="relative mx-auto h-24 w-24 drop-shadow-[0_0_45px_rgba(253,224,71,0.45)]"
+                          />
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                              <span className="text-xs font-medium text-emerald-300">
+                                12 schools active
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-center gap-4 text-xs">
+                              <div className="flex items-center gap-1.5">
+                                <Users className="h-3.5 w-3.5 text-blue-400" />
+                                <span className="text-slate-300">5.2K students</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <BarChart3 className="h-3.5 w-3.5 text-emerald-400" />
+                                <span className="text-slate-300">+12% engagement</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="grid gap-2 sm:grid-cols-3">
+                          {schoolHighlights.map((item, index) => {
+                            const icons = [Building2, BarChart3, Users];
+                            const Icon = icons[index] || Building2;
                             return (
                               <div
                                 key={item.title}
@@ -728,7 +925,7 @@ export default function LandingPage(): JSX.Element {
                     ))}
                   </div>
                 </>
-              ) : (
+              ) : pageView === "teacher" ? (
                 <>
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
@@ -747,6 +944,52 @@ export default function LandingPage(): JSX.Element {
                   </div>
                   <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                     {teacherFeatures.map((feature) => (
+                      <Link
+                        key={feature.name}
+                        href={feature.href as any}
+                        className="group"
+                      >
+                        <div className="h-full rounded-3xl border border-white/10 bg-slate-950/60 p-6 shadow-lg shadow-amber-200/5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-amber-300/30">
+                          <div
+                            className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${feature.accent} px-4 py-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-950`}
+                          >
+                            {feature.pill}
+                          </div>
+                          <div className="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/70 text-amber-200">
+                            <feature.icon className="h-6 w-6" />
+                          </div>
+                          <h3 className="mt-6 text-2xl font-semibold text-slate-50">
+                            {feature.name}
+                          </h3>
+                          <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                            {feature.description}
+                          </p>
+                          <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-amber-100">
+                            Learn more
+                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-sm uppercase tracking-[0.35em] text-amber-200/80">
+                        Features
+                      </p>
+                      <h2 className="mt-2 text-3xl font-semibold text-slate-50">
+                        AI Native Infrastructure for Personalized Education
+                      </h2>
+                    </div>
+                    <p className="max-w-md text-sm text-slate-400">
+                      Deploy personalized learning across your entire district with enterprise-grade infrastructure that scales from individual classrooms to thousands of students.
+                    </p>
+                  </div>
+                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    {schoolFeatures.map((feature) => (
                       <Link
                         key={feature.name}
                         href={feature.href as any}
