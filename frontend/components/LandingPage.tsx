@@ -306,7 +306,9 @@ const logoList = [
 ];
 
 export default function LandingPage(): JSX.Element {
-  const [pageView, setPageView] = useState<"student" | "teacher" | "school">("teacher");
+  const [pageView, setPageView] = useState<"student" | "teacher" | "school">(
+    "teacher"
+  );
 
   // Smooth scroll utility function
   const smoothScrollTo = (elementId: string) => {
@@ -377,9 +379,12 @@ export default function LandingPage(): JSX.Element {
         <div className="pointer-events-none absolute inset-x-0 top-[-40rem] h-[60rem] bg-[radial-gradient(circle_at_center,_rgba(253,224,71,0.22)_0%,_rgba(8,47,73,0)_65%)]" />
 
         <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col px-6 pb-24 pt-12 sm:px-12 lg:px-16">
-          <header className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <Link href="/" className="group inline-flex items-center gap-3">
-              <div className="relative">
+          <header className="flex flex-col items-center gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-3 min-w-fit shrink-0 xl:self-start"
+            >
+              <div className="relative shrink-0">
                 <div className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-amber-300/40 via-yellow-100/30 to-transparent blur-lg transition-opacity duration-500 group-hover:opacity-100" />
                 <Image
                   src="/glowingstar-logo.png"
@@ -400,33 +405,29 @@ export default function LandingPage(): JSX.Element {
               </div>
             </Link>
 
-            <nav className="flex items-center gap-4 text-sm text-slate-300">
+            <nav className="flex items-center justify-center gap-2 xl:justify-start xl:gap-4 text-sm text-slate-300">
               {navigation.map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
                   onClick={(e) => handleNavClick(e, item.href)}
-                  className="rounded-full border border-transparent px-3 py-1.5 font-medium transition hover:border-amber-200/50 hover:text-amber-100"
+                  className="whitespace-nowrap rounded-full border border-transparent px-2.5 py-1.5 font-medium transition hover:border-amber-200/50 hover:text-amber-100 xl:px-3"
                 >
-                  {item.label}
+                  {item.label === "Why GlowingStar" ? (
+                    <>
+                      <span className="xl:hidden">Why</span>
+                      <span className="hidden xl:inline">Why GlowingStar</span>
+                    </>
+                  ) : (
+                    item.label
+                  )}
                 </a>
               ))}
             </nav>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3 xl:justify-start">
               {/* Toggle Switch */}
               <div className="flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 p-1">
-                <button
-                  onClick={() => setPageView("student")}
-                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                    pageView === "student"
-                      ? "bg-amber-300 text-slate-950 shadow-lg"
-                      : "text-slate-300 hover:text-slate-100"
-                  }`}
-                >
-                  <Star className="h-4 w-4" />
-                  Student
-                </button>
                 <button
                   onClick={() => setPageView("teacher")}
                   className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
@@ -437,6 +438,17 @@ export default function LandingPage(): JSX.Element {
                 >
                   <GraduationCap className="h-4 w-4" />
                   Teacher
+                </button>
+                <button
+                  onClick={() => setPageView("student")}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                    pageView === "student"
+                      ? "bg-amber-300 text-slate-950 shadow-lg"
+                      : "text-slate-300 hover:text-slate-100"
+                  }`}
+                >
+                  <Star className="h-4 w-4" />
+                  Student
                 </button>
                 <button
                   onClick={() => setPageView("school")}
@@ -460,8 +472,8 @@ export default function LandingPage(): JSX.Element {
                     pageView === "student"
                       ? "/tutor-mode"
                       : pageView === "teacher"
-                      ? "/emotion-console"
-                      : "/emotion-console"
+                        ? "/emotion-console"
+                        : "/emotion-console"
                   }
                 >
                   Get Started
@@ -604,7 +616,10 @@ export default function LandingPage(): JSX.Element {
                       Scale Personalized Learning Across Your District
                     </h1>
                     <p className="max-w-xl text-lg text-slate-200">
-                      Deploy AI-powered education infrastructure that adapts to every student while giving administrators the insights needed to support teachers and improve outcomes district-wide.
+                      Deploy AI-powered education infrastructure that adapts to
+                      every student while giving administrators the insights
+                      needed to support teachers and improve outcomes
+                      district-wide.
                     </p>
                     <div className="flex flex-wrap gap-4">
                       <Button
@@ -693,8 +708,8 @@ export default function LandingPage(): JSX.Element {
                         {pageView === "student"
                           ? "Learning Dashboard"
                           : pageView === "teacher"
-                          ? "Grading Dashboard"
-                          : "District Dashboard"}
+                            ? "Grading Dashboard"
+                            : "District Dashboard"}
                       </span>
                       <span className="inline-flex items-center gap-2 text-amber-100">
                         <Activity className="h-4 w-4" />
@@ -831,11 +846,15 @@ export default function LandingPage(): JSX.Element {
                             <div className="flex items-center justify-center gap-4 text-xs">
                               <div className="flex items-center gap-1.5">
                                 <Users className="h-3.5 w-3.5 text-blue-400" />
-                                <span className="text-slate-300">5.2K students</span>
+                                <span className="text-slate-300">
+                                  5.2K students
+                                </span>
                               </div>
                               <div className="flex items-center gap-1.5">
                                 <BarChart3 className="h-3.5 w-3.5 text-emerald-400" />
-                                <span className="text-slate-300">+12% engagement</span>
+                                <span className="text-slate-300">
+                                  +12% engagement
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -985,7 +1004,9 @@ export default function LandingPage(): JSX.Element {
                       </h2>
                     </div>
                     <p className="max-w-md text-sm text-slate-400">
-                      Deploy personalized learning across your entire district with enterprise-grade infrastructure that scales from individual classrooms to thousands of students.
+                      Deploy personalized learning across your entire district
+                      with enterprise-grade infrastructure that scales from
+                      individual classrooms to thousands of students.
                     </p>
                   </div>
                   <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
