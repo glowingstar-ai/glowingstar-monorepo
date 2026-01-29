@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -111,31 +111,40 @@ const teacherFeatures = [
 
 const schoolFeatures = [
   {
-    name: "District-Wide Analytics",
+    name: "Self-Optimizing Courses",
     description:
-      "Get comprehensive insights across all schools, classes, and students. Track learning outcomes, identify trends, and make data-driven decisions that improve education at scale.",
+      "Intelligent systems continuously adapt course content, pacing, and difficulty to each student&apos;s learning style and progress. Every course evolves in real-time to maximize engagement and outcomes.",
     href: "/emotion-console",
-    icon: BarChart3,
+    icon: BookOpen,
     accent: "from-blue-300/80 to-indigo-400/80",
-    pill: "Analytics",
+    pill: "Courses",
   },
   {
-    name: "Unified Infrastructure",
+    name: "AI-Powered Advising",
     description:
-      "Deploy AI-native education tools across your entire district. One platform that scales from individual classrooms to thousands of students, with enterprise-grade security and compliance.",
+      "Personalized academic advising that understands each student&apos;s goals, strengths, and challenges. Get real-time recommendations for course selection, career paths, and support resources.",
     href: "/notes",
-    icon: Building2,
+    icon: Brain,
     accent: "from-purple-300/80 to-pink-400/80",
-    pill: "Infrastructure",
+    pill: "Advising",
   },
   {
-    name: "Personalized Learning at Scale",
+    name: "Intelligent Assessment",
     description:
-      "Enable personalized education for every student in your district. Our AI adapts to each learner while providing administrators with the insights needed to support teachers and improve outcomes.",
+      "Assessment systems that adapt to student performance in real-time, providing immediate feedback and adjusting difficulty dynamically. No more one-size-fits-all exams—every assessment is personalized.",
     href: "/realtime-assistant",
-    icon: Users,
+    icon: CheckCircle2,
     accent: "from-emerald-300/80 to-teal-400/80",
-    pill: "Scale",
+    pill: "Assessment",
+  },
+  {
+    name: "Automated Operations",
+    description:
+      "Self-optimizing university operations that handle scheduling, resource allocation, and administrative tasks automatically. Focus on education while AI manages the infrastructure.",
+    href: "/emotion-console",
+    icon: Building2,
+    accent: "from-amber-300/80 to-orange-400/80",
+    pill: "Operations",
   },
 ];
 
@@ -177,19 +186,19 @@ const teacherHighlights: Highlight[] = [
 
 const schoolHighlights: Highlight[] = [
   {
-    title: "AI infrastructure built for education",
+    title: "Self-optimizing in real-time",
     description:
-      "Deploy personalized learning across your entire district. Our platform scales from single classrooms to thousands of students with enterprise security and compliance.",
+      "Every course, advising session, and assessment adapts continuously based on student performance and engagement. The university learns and improves itself automatically.",
   },
   {
-    title: "Data-driven decision making",
+    title: "Personalization at scale",
     description:
-      "Get district-wide insights that help you identify what's working, where students need support, and how to allocate resources for maximum impact.",
+      "Intelligent systems personalize courses, advising, assessment, and operations for every student simultaneously—no compromises, no trade-offs.",
   },
   {
-    title: "Empower every teacher and student",
+    title: "The first AI-native university",
     description:
-      "Give teachers powerful tools to personalize instruction while ensuring every student gets the support they need to succeed—all on one unified platform.",
+      "Built from the ground up as an intelligent, self-optimizing learning institution where AI doesn&apos;t just assist—it continuously evolves the entire educational experience.",
   },
 ];
 
@@ -246,15 +255,15 @@ const teacherStats = [
 
 const schoolStats = [
   {
-    label: "Schools supported",
-    value: "500+",
+    label: "Real-time optimization",
+    value: "24/7",
   },
   {
-    label: "Students reached",
-    value: "250K+",
+    label: "Personalization depth",
+    value: "100%",
   },
   {
-    label: "Uptime",
+    label: "System uptime",
     value: "99.9%",
   },
 ];
@@ -309,29 +318,6 @@ export default function LandingPage(): JSX.Element {
   const [pageView, setPageView] = useState<"student" | "teacher" | "school">(
     "teacher"
   );
-
-  // Smooth scroll utility function
-  const smoothScrollTo = (elementId: string) => {
-    const element = document.getElementById(elementId);
-    if (element) {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-        inline: "nearest",
-      });
-    }
-  };
-
-  // Handle navigation clicks
-  const handleNavClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    href: string
-  ) => {
-    e.preventDefault();
-    if (href.startsWith("#")) {
-      smoothScrollTo(href.substring(1));
-    }
-  };
 
   // Optimized scroll handling - removed empty listener for better performance
   // If you need scroll-based animations later, use IntersectionObserver instead
@@ -410,7 +396,6 @@ export default function LandingPage(): JSX.Element {
                 <a
                   key={item.label}
                   href={item.href}
-                  onClick={(e) => handleNavClick(e, item.href)}
                   className="whitespace-nowrap rounded-full border border-transparent px-2.5 py-1.5 font-medium transition hover:border-amber-200/50 hover:text-amber-100 xl:px-3"
                 >
                   {item.label === "Why GlowingStar" ? (
@@ -522,7 +507,6 @@ export default function LandingPage(): JSX.Element {
                       >
                         <a
                           href="#features"
-                          onClick={(e) => handleNavClick(e, "#features")}
                           className="flex items-center gap-2"
                         >
                           See Features
@@ -582,7 +566,6 @@ export default function LandingPage(): JSX.Element {
                       >
                         <a
                           href="#features"
-                          onClick={(e) => handleNavClick(e, "#features")}
                           className="flex items-center gap-2"
                         >
                           See Features
@@ -610,16 +593,16 @@ export default function LandingPage(): JSX.Element {
                   <>
                     <span className="inline-flex items-center gap-2 rounded-full border border-amber-200/60 bg-amber-200/15 px-4 py-1 text-sm font-medium text-amber-100">
                       <Building2 className="h-4 w-4" />
-                      AI native infrastructure for personalized education
+                      The first AI-native university
                     </span>
                     <h1 className="text-4xl font-semibold leading-tight text-slate-50 sm:text-5xl lg:text-6xl">
-                      Scale Personalized Learning Across Your District
+                      A Self-Optimizing Learning Institution
                     </h1>
                     <p className="max-w-xl text-lg text-slate-200">
-                      Deploy AI-powered education infrastructure that adapts to
-                      every student while giving administrators the insights
-                      needed to support teachers and improve outcomes
-                      district-wide.
+                      Intelligent systems continuously personalize courses,
+                      advising, assessment, and operations in real-time. Every
+                      aspect of the university adapts and improves
+                      automatically—the future of higher education, built today.
                     </p>
                     <div className="flex flex-wrap gap-4">
                       <Button
@@ -643,7 +626,6 @@ export default function LandingPage(): JSX.Element {
                       >
                         <a
                           href="#features"
-                          onClick={(e) => handleNavClick(e, "#features")}
                           className="flex items-center gap-2"
                         >
                           See Features
@@ -709,7 +691,7 @@ export default function LandingPage(): JSX.Element {
                           ? "Learning Dashboard"
                           : pageView === "teacher"
                             ? "Grading Dashboard"
-                            : "District Dashboard"}
+                            : "University Dashboard"}
                       </span>
                       <span className="inline-flex items-center gap-2 text-amber-100">
                         <Activity className="h-4 w-4" />
@@ -840,20 +822,20 @@ export default function LandingPage(): JSX.Element {
                             <div className="flex items-center justify-center gap-2">
                               <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                               <span className="text-xs font-medium text-emerald-300">
-                                12 schools active
+                                Self-optimizing active
                               </span>
                             </div>
                             <div className="flex items-center justify-center gap-4 text-xs">
                               <div className="flex items-center gap-1.5">
-                                <Users className="h-3.5 w-3.5 text-blue-400" />
+                                <Brain className="h-3.5 w-3.5 text-blue-400" />
                                 <span className="text-slate-300">
-                                  5.2K students
+                                  Real-time AI
                                 </span>
                               </div>
                               <div className="flex items-center gap-1.5">
-                                <BarChart3 className="h-3.5 w-3.5 text-emerald-400" />
+                                <Activity className="h-3.5 w-3.5 text-emerald-400" />
                                 <span className="text-slate-300">
-                                  +12% engagement
+                                  Continuous learning
                                 </span>
                               </div>
                             </div>
@@ -861,8 +843,8 @@ export default function LandingPage(): JSX.Element {
                         </div>
                         <div className="grid gap-2 sm:grid-cols-3">
                           {schoolHighlights.map((item, index) => {
-                            const icons = [Building2, BarChart3, Users];
-                            const Icon = icons[index] || Building2;
+                            const icons = [Activity, Brain, Sparkles];
+                            const Icon = icons[index] || Activity;
                             return (
                               <div
                                 key={item.title}
@@ -1000,13 +982,14 @@ export default function LandingPage(): JSX.Element {
                         Features
                       </p>
                       <h2 className="mt-2 text-3xl font-semibold text-slate-50">
-                        AI Native Infrastructure for Personalized Education
+                        The First AI-Native University
                       </h2>
                     </div>
                     <p className="max-w-md text-sm text-slate-400">
-                      Deploy personalized learning across your entire district
-                      with enterprise-grade infrastructure that scales from
-                      individual classrooms to thousands of students.
+                      Intelligent systems continuously personalize courses,
+                      advising, assessment, and operations in real-time. A
+                      self-optimizing learning institution that evolves
+                      automatically.
                     </p>
                   </div>
                   <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
