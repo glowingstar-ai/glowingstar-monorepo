@@ -13,20 +13,14 @@ html {
   /* Enable hardware acceleration for smooth scrolling */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  will-change: scroll-position; /* Optimize scroll performance */
-  /* Prevent scroll chaining for smoother experience */
-  overscroll-behavior-y: contain;
 }
 
 body {
   min-height: 100vh;
   background-color: #020617; /* Default to dark background */
   overflow-x: hidden; /* Prevent horizontal scroll */
-  /* Optimize for smooth scrolling */
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  transform: translateZ(0); /* Force hardware acceleration */
-  /* Prevent scroll chaining */
-  overscroll-behavior-y: none;
   font-family:
     var(--font-inter),
     system-ui,

@@ -319,6 +319,32 @@ export default function LandingPage(): JSX.Element {
     "teacher"
   );
 
+  const smoothScrollTo = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    const prefersReducedMotion = window.matchMedia?.(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const headerOffset = 96;
+    const top =
+      element.getBoundingClientRect().top + window.scrollY - headerOffset;
+
+    window.scrollTo({ top, behavior: prefersReducedMotion ? "auto" : "smooth" });
+  };
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    if (!href.startsWith("#")) return;
+    e.preventDefault();
+
+    const targetId = href.substring(1);
+    smoothScrollTo(targetId);
+    window.history.replaceState(null, "", href);
+  };
+
   // Optimized scroll handling - removed empty listener for better performance
   // If you need scroll-based animations later, use IntersectionObserver instead
 
@@ -365,11 +391,12 @@ export default function LandingPage(): JSX.Element {
         <div className="pointer-events-none absolute inset-x-0 top-[-40rem] h-[60rem] bg-[radial-gradient(circle_at_center,_rgba(253,224,71,0.22)_0%,_rgba(8,47,73,0)_65%)]" />
 
         <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col px-6 pb-24 pt-12 sm:px-12 lg:px-16">
-          <header className="flex flex-col items-center gap-6 xl:flex-row xl:items-center xl:justify-between">
-            <Link
-              href="/"
-              className="group inline-flex items-center gap-3 min-w-fit shrink-0 xl:self-start"
-            >
+          <header className="fixed inset-x-0 top-0 z-30 border-b border-white/10 bg-slate-950/40 backdrop-blur-xl">
+            <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-6 px-6 py-4 sm:px-12 lg:px-16 xl:flex-row xl:items-center xl:justify-between">
+              <Link
+                href="/"
+                className="group inline-flex items-center gap-3 min-w-fit shrink-0 xl:self-start"
+              >
               <div className="relative shrink-0">
                 <div className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-amber-300/40 via-yellow-100/30 to-transparent blur-lg transition-opacity duration-500 group-hover:opacity-100" />
                 <Image
@@ -389,83 +416,86 @@ export default function LandingPage(): JSX.Element {
                   AI-Powered Education
                 </span>
               </div>
-            </Link>
+              </Link>
 
-            <nav className="flex items-center justify-center gap-2 xl:justify-start xl:gap-4 text-sm text-slate-300">
-              {navigation.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="whitespace-nowrap rounded-full border border-transparent px-2.5 py-1.5 font-medium transition hover:border-amber-200/50 hover:text-amber-100 xl:px-3"
-                >
-                  {item.label === "Why GlowingStar" ? (
-                    <>
-                      <span className="xl:hidden">Why</span>
-                      <span className="hidden xl:inline">Why GlowingStar</span>
-                    </>
-                  ) : (
-                    item.label
-                  )}
-                </a>
-              ))}
-            </nav>
+              <nav className="flex items-center justify-center gap-2 xl:justify-start xl:gap-4 text-sm text-slate-300">
+                {navigation.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    className="whitespace-nowrap rounded-full border border-transparent px-2.5 py-1.5 font-medium transition hover:border-amber-200/50 hover:text-amber-100 xl:px-3"
+                  >
+                    {item.label === "Why GlowingStar" ? (
+                      <>
+                        <span className="xl:hidden">Why</span>
+                        <span className="hidden xl:inline">Why GlowingStar</span>
+                      </>
+                    ) : (
+                      item.label
+                    )}
+                  </a>
+                ))}
+              </nav>
 
-            <div className="flex items-center justify-center gap-3 xl:justify-start">
-              {/* Toggle Switch */}
-              <div className="flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 p-1">
-                <button
-                  onClick={() => setPageView("teacher")}
-                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                    pageView === "teacher"
-                      ? "bg-amber-300 text-slate-950 shadow-lg"
-                      : "text-slate-300 hover:text-slate-100"
-                  }`}
+              <div className="flex items-center justify-center gap-3 xl:justify-start">
+                {/* Toggle Switch */}
+                <div className="flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/60 p-1">
+                  <button
+                    onClick={() => setPageView("teacher")}
+                    className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      pageView === "teacher"
+                        ? "bg-amber-300 text-slate-950 shadow-lg"
+                        : "text-slate-300 hover:text-slate-100"
+                    }`}
+                  >
+                    <GraduationCap className="h-4 w-4" />
+                    Teacher
+                  </button>
+                  <button
+                    onClick={() => setPageView("student")}
+                    className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      pageView === "student"
+                        ? "bg-amber-300 text-slate-950 shadow-lg"
+                        : "text-slate-300 hover:text-slate-100"
+                    }`}
+                  >
+                    <Star className="h-4 w-4" />
+                    Student
+                  </button>
+                  <button
+                    onClick={() => setPageView("school")}
+                    className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      pageView === "school"
+                        ? "bg-amber-300 text-slate-950 shadow-lg"
+                        : "text-slate-300 hover:text-slate-100"
+                    }`}
+                  >
+                    <Building2 className="h-4 w-4" />
+                    School
+                  </button>
+                </div>
+                <Button
+                  variant="ghost"
+                  asChild
+                  className="border border-white/10 bg-white/5 text-slate-100 hover:border-amber-200/60 hover:bg-white/10 hover:text-amber-100"
                 >
-                  <GraduationCap className="h-4 w-4" />
-                  Teacher
-                </button>
-                <button
-                  onClick={() => setPageView("student")}
-                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                    pageView === "student"
-                      ? "bg-amber-300 text-slate-950 shadow-lg"
-                      : "text-slate-300 hover:text-slate-100"
-                  }`}
-                >
-                  <Star className="h-4 w-4" />
-                  Student
-                </button>
-                <button
-                  onClick={() => setPageView("school")}
-                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                    pageView === "school"
-                      ? "bg-amber-300 text-slate-950 shadow-lg"
-                      : "text-slate-300 hover:text-slate-100"
-                  }`}
-                >
-                  <Building2 className="h-4 w-4" />
-                  School
-                </button>
+                  <Link
+                    href={
+                      pageView === "student"
+                        ? "/tutor-mode"
+                        : pageView === "teacher"
+                          ? "/emotion-console"
+                          : "/emotion-console"
+                    }
+                  >
+                    Get Started
+                  </Link>
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                asChild
-                className="border border-white/10 bg-white/5 text-slate-100 hover:border-amber-200/60 hover:bg-white/10 hover:text-amber-100"
-              >
-                <Link
-                  href={
-                    pageView === "student"
-                      ? "/tutor-mode"
-                      : pageView === "teacher"
-                        ? "/emotion-console"
-                        : "/emotion-console"
-                  }
-                >
-                  Get Started
-                </Link>
-              </Button>
             </div>
           </header>
+          <div className="h-24" aria-hidden />
 
           <main className="mt-16 flex flex-1 flex-col gap-24 pb-12">
             <section className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center">
@@ -507,6 +537,7 @@ export default function LandingPage(): JSX.Element {
                       >
                         <a
                           href="#features"
+                          onClick={(e) => handleNavClick(e, "#features")}
                           className="flex items-center gap-2"
                         >
                           See Features
@@ -566,6 +597,7 @@ export default function LandingPage(): JSX.Element {
                       >
                         <a
                           href="#features"
+                          onClick={(e) => handleNavClick(e, "#features")}
                           className="flex items-center gap-2"
                         >
                           See Features
@@ -626,6 +658,7 @@ export default function LandingPage(): JSX.Element {
                       >
                         <a
                           href="#features"
+                          onClick={(e) => handleNavClick(e, "#features")}
                           className="flex items-center gap-2"
                         >
                           See Features
