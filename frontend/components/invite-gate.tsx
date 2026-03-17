@@ -42,7 +42,7 @@ const storeInvite = (value: StoredInvite | null) => {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
 };
 
-const UNPROTECTED_PATHS = new Set<string>(["/"]);
+const UNPROTECTED_PATHS = new Set<string>(["/", "/northeastern/ict6480"]);
 
 export function InviteGate({ children }: InviteGateProps) {
   const pathname = usePathname();
