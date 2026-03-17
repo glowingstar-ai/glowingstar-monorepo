@@ -14,11 +14,11 @@ export default function NortheasternICT6480Page(): JSX.Element {
         <div className="w-full max-w-2xl rounded-[2rem] border border-white/10 bg-black/30 px-8 py-12 text-center shadow-2xl shadow-black/30 backdrop-blur-xl sm:px-12">
           <div className="inline-flex rounded-2xl bg-white px-5 py-4">
             <Image
-              src="/logos/northeastern-primary.svg"
+              src="/logos/northeastern-university-logo.png"
               alt="Northeastern University"
-              width={280}
-              height={64}
-              className="h-10 w-auto"
+              width={320}
+              height={74}
+              className="h-12 w-auto"
               priority
             />
           </div>
