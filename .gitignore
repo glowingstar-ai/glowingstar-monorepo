@@ -6,6 +6,7 @@ out/
 .pnp.loader.mjs
 yarn.lock
 package-lock.json
+!frontend/package-lock.json
 pnpm-lock.yaml
 
 # Logs
