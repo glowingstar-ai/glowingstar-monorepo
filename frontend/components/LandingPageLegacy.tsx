@@ -10,11 +10,8 @@ import {
   Sparkles,
   Radar,
   ArrowUpRight,
-  NotebookPen,
-  Feather,
   Star,
   GraduationCap,
-  Palette,
   LucideIcon,
   Camera,
   Upload,
@@ -23,9 +20,6 @@ import {
   BookOpen,
   CheckCircle2,
   Building2,
-  Users,
-  BarChart3,
-  Shield,
 } from "lucide-react";
 
 type NavigationItem = {
@@ -45,108 +39,10 @@ type GlowTile = {
 };
 
 const navigation: NavigationItem[] = [
-  { label: "Features", href: "#features" },
   { label: "Why GlowingStar", href: "#why-glowing" },
 ];
 
-const studentFeatures = [
-  {
-    name: "Personal AI Tutor",
-    description:
-      "Your tutor that actually gets you. It notices when you&apos;re frustrated and slows down, celebrates when you&apos;re excited, and adapts explanations to how you learn best—all in real-time.",
-    href: "/tutor-mode",
-    icon: Brain,
-    accent: "from-amber-300 via-amber-200 to-amber-400",
-    pill: "AI Tutor",
-  },
-  {
-    name: "Learning Insights",
-    description:
-      "Understand your learning journey like never before. See how your emotions, focus, and engagement affect your progress, and discover patterns that help you study smarter.",
-    href: "/emotion-console",
-    icon: Activity,
-    accent: "from-emerald-300/80 to-teal-400/80",
-    pill: "Insights",
-  },
-  {
-    name: "Instant Homework Help",
-    description:
-      "Stuck on a problem? Get step-by-step guidance instantly. Our AI understands context, shows you where you went wrong, and helps you learn from mistakes—not just get the answer.",
-    href: "/realtime-assistant",
-    icon: Star,
-    accent: "from-sky-300 via-indigo-200 to-indigo-400",
-    pill: "24/7 Help",
-  },
-];
-
-const teacherFeatures = [
-  {
-    name: "Photo-to-Grade in Seconds",
-    description:
-      "Snap a photo, get a grade. No more late nights with red pens. Our AI reads handwriting, checks answers, and provides detailed feedback—all in under 30 seconds per assignment.",
-    href: "/emotion-console",
-    icon: Camera,
-    accent: "from-violet-300/80 to-fuchsia-400/80",
-    pill: "Instant Grading",
-  },
-  {
-    name: "Actionable Student Insights",
-    description:
-      "See exactly where each student struggles and shines. Get personalized feedback suggestions, identify learning gaps, and track progress across your entire class at a glance.",
-    href: "/notes",
-    icon: CheckCircle2,
-    accent: "from-rose-400/80 to-amber-400/70",
-    pill: "Smart Analytics",
-  },
-  {
-    name: "Grade Entire Classes at Once",
-    description:
-      "Upload a stack of papers or process an entire exam. Our system handles multiple assignments simultaneously, giving you complete results in minutes instead of hours.",
-    href: "/realtime-assistant",
-    icon: Upload,
-    accent: "from-cyan-400/80 to-blue-500/80",
-    pill: "Batch Processing",
-  },
-];
-
-const schoolFeatures = [
-  {
-    name: "Self-Optimizing Courses",
-    description:
-      "Intelligent systems continuously adapt course content, pacing, and difficulty to each student&apos;s learning style and progress. Every course evolves in real-time to maximize engagement and outcomes.",
-    href: "/emotion-console",
-    icon: BookOpen,
-    accent: "from-blue-300/80 to-indigo-400/80",
-    pill: "Courses",
-  },
-  {
-    name: "AI-Powered Advising",
-    description:
-      "Personalized academic advising that understands each student&apos;s goals, strengths, and challenges. Get real-time recommendations for course selection, career paths, and support resources.",
-    href: "/notes",
-    icon: Brain,
-    accent: "from-purple-300/80 to-pink-400/80",
-    pill: "Advising",
-  },
-  {
-    name: "Intelligent Assessment",
-    description:
-      "Assessment systems that adapt to student performance in real-time, providing immediate feedback and adjusting difficulty dynamically. No more one-size-fits-all exams—every assessment is personalized.",
-    href: "/realtime-assistant",
-    icon: CheckCircle2,
-    accent: "from-emerald-300/80 to-teal-400/80",
-    pill: "Assessment",
-  },
-  {
-    name: "Automated Operations",
-    description:
-      "Self-optimizing university operations that handle scheduling, resource allocation, and administrative tasks automatically. Focus on education while AI manages the infrastructure.",
-    href: "/emotion-console",
-    icon: Building2,
-    accent: "from-amber-300/80 to-orange-400/80",
-    pill: "Operations",
-  },
-];
+const WAITLIST_URL = "https://forms.gle/jVB2LjuMHgYGP1wo7";
 
 const studentHighlights: Highlight[] = [
   {
@@ -345,6 +241,59 @@ export default function LandingPage(): JSX.Element {
     window.history.replaceState(null, "", href);
   };
 
+  const renderPrivateBetaCta = () => (
+    <div className="space-y-4">
+      <div className="max-w-xl rounded-3xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-amber-200/10 backdrop-blur">
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-amber-200/80">
+          Private beta
+        </p>
+        <p className="mt-3 text-sm leading-6 text-slate-200 sm:text-base">
+          We&apos;re currently in private beta. Email us for access or join the
+          waitlist and we&apos;ll reach out as new spots open up.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-4">
+        <Button
+          size="lg"
+          asChild
+          className="h-auto min-h-14 bg-amber-300 px-6 py-4 text-slate-950 shadow-[0_0_32px_rgba(253,224,71,0.45)] hover:bg-amber-200"
+        >
+          <a
+            href={WAITLIST_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-3"
+          >
+            <span className="flex flex-col items-start text-left">
+              <span className="text-base font-semibold">Join the waitlist</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-950/70">
+                Currently in private beta
+              </span>
+            </span>
+            <ArrowUpRight className="h-4 w-4 shrink-0" />
+          </a>
+        </Button>
+
+        <Button
+          variant="outline"
+          size="lg"
+          asChild
+          className="border-slate-700 bg-slate-900/60 text-slate-200 transition hover:border-amber-200/50 hover:bg-slate-900/80 hover:text-amber-100"
+        >
+          <a
+            href="#why-glowing"
+            onClick={(e) => handleNavClick(e, "#why-glowing")}
+            className="flex items-center gap-2"
+          >
+            Why GlowingStar
+            <Radar className="h-4 w-4" />
+          </a>
+        </Button>
+      </div>
+    </div>
+  );
+
   // Optimized scroll handling - removed empty listener for better performance
   // If you need scroll-based animations later, use IntersectionObserver instead
 
@@ -480,17 +429,13 @@ export default function LandingPage(): JSX.Element {
                   asChild
                   className="border border-white/10 bg-white/5 text-slate-100 hover:border-amber-200/60 hover:bg-white/10 hover:text-amber-100"
                 >
-                  <Link
-                    href={
-                      pageView === "student"
-                        ? "/tutor-mode"
-                        : pageView === "teacher"
-                          ? "/emotion-console"
-                          : "/emotion-console"
-                    }
+                  <a
+                    href={WAITLIST_URL}
+                    target="_blank"
+                    rel="noreferrer"
                   >
-                    Get Started
-                  </Link>
+                    Join Waitlist
+                  </a>
                 </Button>
               </div>
             </div>
@@ -515,36 +460,7 @@ export default function LandingPage(): JSX.Element {
                       learning style in real-time. Available 24/7, whenever you
                       need help.
                     </p>
-                    <div className="flex flex-wrap gap-4">
-                      <Button
-                        size="lg"
-                        asChild
-                        className="bg-amber-300 text-slate-950 shadow-[0_0_32px_rgba(253,224,71,0.45)] hover:bg-amber-200"
-                      >
-                        <Link
-                          href="/tutor-mode"
-                          className="flex items-center gap-2"
-                        >
-                          Start Learning
-                          <ArrowUpRight className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        asChild
-                        className="border-slate-700 bg-slate-900/60 text-slate-200 transition hover:border-amber-200/50 hover:bg-slate-900/80 hover:text-amber-100"
-                      >
-                        <a
-                          href="#features"
-                          onClick={(e) => handleNavClick(e, "#features")}
-                          className="flex items-center gap-2"
-                        >
-                          See Features
-                          <Radar className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    </div>
+                    {renderPrivateBetaCta()}
                     <div className="flex flex-wrap gap-6">
                       {studentStats.map((stat) => (
                         <div
@@ -575,36 +491,7 @@ export default function LandingPage(): JSX.Element {
                       photo of student work and get instant, detailed feedback.
                       Focus on what matters most—your students.
                     </p>
-                    <div className="flex flex-wrap gap-4">
-                      <Button
-                        size="lg"
-                        asChild
-                        className="bg-amber-300 text-slate-950 shadow-[0_0_32px_rgba(253,224,71,0.45)] hover:bg-amber-200"
-                      >
-                        <Link
-                          href="/emotion-console"
-                          className="flex items-center gap-2"
-                        >
-                          Start Grading
-                          <ArrowUpRight className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        asChild
-                        className="border-slate-700 bg-slate-900/60 text-slate-200 transition hover:border-amber-200/50 hover:bg-slate-900/80 hover:text-amber-100"
-                      >
-                        <a
-                          href="#features"
-                          onClick={(e) => handleNavClick(e, "#features")}
-                          className="flex items-center gap-2"
-                        >
-                          See Features
-                          <Radar className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    </div>
+                    {renderPrivateBetaCta()}
                     <div className="flex flex-wrap gap-6">
                       {teacherStats.map((stat) => (
                         <div
@@ -636,36 +523,7 @@ export default function LandingPage(): JSX.Element {
                       aspect of the university adapts and improves
                       automatically—the future of higher education, built today.
                     </p>
-                    <div className="flex flex-wrap gap-4">
-                      <Button
-                        size="lg"
-                        asChild
-                        className="bg-amber-300 text-slate-950 shadow-[0_0_32px_rgba(253,224,71,0.45)] hover:bg-amber-200"
-                      >
-                        <Link
-                          href="/emotion-console"
-                          className="flex items-center gap-2"
-                        >
-                          Get Started
-                          <ArrowUpRight className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        asChild
-                        className="border-slate-700 bg-slate-900/60 text-slate-200 transition hover:border-amber-200/50 hover:bg-slate-900/80 hover:text-amber-100"
-                      >
-                        <a
-                          href="#features"
-                          onClick={(e) => handleNavClick(e, "#features")}
-                          className="flex items-center gap-2"
-                        >
-                          See Features
-                          <Radar className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    </div>
+                    {renderPrivateBetaCta()}
                     <div className="flex flex-wrap gap-6">
                       {schoolStats.map((stat) => (
                         <div
@@ -906,157 +764,6 @@ export default function LandingPage(): JSX.Element {
             <section className="flex flex-col items-center py-8">
               <span className="text-sm text-slate-400 mb-4">Team From</span>
               <LogoCarousel logos={logoList} />
-            </section>
-
-            {/* Features Section - Dynamic based on view */}
-            <section id="features" className="space-y-8">
-              {pageView === "student" ? (
-                <>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.35em] text-amber-200/80">
-                        Features
-                      </p>
-                      <h2 className="mt-2 text-3xl font-semibold text-slate-50">
-                        A Tutor That Actually Gets You
-                      </h2>
-                    </div>
-                    <p className="max-w-md text-sm text-slate-400">
-                      Get personalized help that adapts to your emotions,
-                      learning style, and pace. When you&apos;re stuck, it slows
-                      down. When you&apos;re ready, it challenges you. Available
-                      24/7.
-                    </p>
-                  </div>
-                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    {studentFeatures.map((feature) => (
-                      <Link
-                        key={feature.name}
-                        href={feature.href as any}
-                        className="group"
-                      >
-                        <div className="h-full rounded-3xl border border-white/10 bg-slate-950/60 p-6 shadow-lg shadow-amber-200/5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-amber-300/30">
-                          <div
-                            className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${feature.accent} px-4 py-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-950`}
-                          >
-                            {feature.pill}
-                          </div>
-                          <div className="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/70 text-amber-200">
-                            <feature.icon className="h-6 w-6" />
-                          </div>
-                          <h3 className="mt-6 text-2xl font-semibold text-slate-50">
-                            {feature.name}
-                          </h3>
-                          <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                            {feature.description}
-                          </p>
-                          <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-amber-100">
-                            Learn more
-                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              ) : pageView === "teacher" ? (
-                <>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.35em] text-amber-200/80">
-                        Features
-                      </p>
-                      <h2 className="mt-2 text-3xl font-semibold text-slate-50">
-                        Grade in Seconds, Not Hours
-                      </h2>
-                    </div>
-                    <p className="max-w-md text-sm text-slate-400">
-                      Snap a photo of student work and get instant grades,
-                      detailed feedback, and class-wide insights. Reclaim hours
-                      every week to focus on teaching instead of grading.
-                    </p>
-                  </div>
-                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    {teacherFeatures.map((feature) => (
-                      <Link
-                        key={feature.name}
-                        href={feature.href as any}
-                        className="group"
-                      >
-                        <div className="h-full rounded-3xl border border-white/10 bg-slate-950/60 p-6 shadow-lg shadow-amber-200/5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-amber-300/30">
-                          <div
-                            className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${feature.accent} px-4 py-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-950`}
-                          >
-                            {feature.pill}
-                          </div>
-                          <div className="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/70 text-amber-200">
-                            <feature.icon className="h-6 w-6" />
-                          </div>
-                          <h3 className="mt-6 text-2xl font-semibold text-slate-50">
-                            {feature.name}
-                          </h3>
-                          <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                            {feature.description}
-                          </p>
-                          <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-amber-100">
-                            Learn more
-                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="text-sm uppercase tracking-[0.35em] text-amber-200/80">
-                        Features
-                      </p>
-                      <h2 className="mt-2 text-3xl font-semibold text-slate-50">
-                        The First AI-Native University
-                      </h2>
-                    </div>
-                    <p className="max-w-md text-sm text-slate-400">
-                      Intelligent systems continuously personalize courses,
-                      advising, assessment, and operations in real-time. A
-                      self-optimizing learning institution that evolves
-                      automatically.
-                    </p>
-                  </div>
-                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                    {schoolFeatures.map((feature) => (
-                      <Link
-                        key={feature.name}
-                        href={feature.href as any}
-                        className="group"
-                      >
-                        <div className="h-full rounded-3xl border border-white/10 bg-slate-950/60 p-6 shadow-lg shadow-amber-200/5 transition-transform duration-300 group-hover:-translate-y-1 group-hover:shadow-amber-300/30">
-                          <div
-                            className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-r ${feature.accent} px-4 py-1 text-xs font-medium uppercase tracking-[0.25em] text-slate-950`}
-                          >
-                            {feature.pill}
-                          </div>
-                          <div className="mt-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900/70 text-amber-200">
-                            <feature.icon className="h-6 w-6" />
-                          </div>
-                          <h3 className="mt-6 text-2xl font-semibold text-slate-50">
-                            {feature.name}
-                          </h3>
-                          <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                            {feature.description}
-                          </p>
-                          <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-amber-100">
-                            Learn more
-                            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </>
-              )}
             </section>
 
             <section
