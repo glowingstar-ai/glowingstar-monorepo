@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { WAITLIST_URL } from "@/lib/site-content";
 
 const INVITE_CODE = "chenyu";
 const STORAGE_KEY = "glowingstar.invite-code.timestamp";
@@ -106,7 +107,7 @@ export function InviteGate({ children }: InviteGateProps) {
   );
 
   const handleWaitlistClick = useCallback(() => {
-    window.open("https://forms.gle/jVB2LjuMHgYGP1wo7", "_blank");
+    window.open(WAITLIST_URL, "_blank");
   }, []);
 
   const handleBackToLanding = useCallback(() => {

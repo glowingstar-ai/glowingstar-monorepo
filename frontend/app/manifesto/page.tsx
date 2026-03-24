@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
+import { teamLogoList, WAITLIST_URL } from "@/lib/site-content";
 
 type ManifestoSection = {
   heading: string;
@@ -186,6 +189,55 @@ export default function ManifestoPage(): JSX.Element {
               </section>
             ))}
           </div>
+
+          <footer className="space-y-8 border-t border-[#17120f]/10 pt-12">
+            <section className="rounded-[2rem] border border-[#17120f]/10 bg-white/45 px-6 py-8 shadow-[0_20px_60px_rgba(93,66,35,0.08)] backdrop-blur-[2px] sm:px-8">
+              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
+                Team From
+              </p>
+              <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {teamLogoList.map((logo) => (
+                  <div
+                    key={logo.alt}
+                    className="flex h-16 items-center justify-center rounded-2xl border border-[#17120f]/8 bg-white/55 px-4"
+                  >
+                    <Image
+                      src={logo.src}
+                      alt={logo.alt}
+                      width={120}
+                      height={48}
+                      loading="eager"
+                      className={`max-h-10 w-auto object-contain opacity-80 ${logo.className ?? ""}`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] border border-[#17120f]/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.9),rgba(243,234,220,0.92))] px-6 py-8 shadow-[0_24px_70px_rgba(107,79,45,0.08)] sm:px-8">
+              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
+                Private beta
+              </p>
+              <h2 className="mt-4 font-heading text-2xl text-[#17120f] sm:text-[2rem]">
+                Join the waitlist
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-8 text-[#17120f]/72 sm:text-[1.05rem]">
+                We&apos;re currently in private beta. Join the waitlist and
+                we&apos;ll reach out as new spots open up.
+              </p>
+              <div className="mt-6">
+                <a
+                  href={WAITLIST_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-12 items-center gap-3 rounded-full border border-[#17120f]/10 bg-[#17120f] px-6 py-3 text-sm font-semibold text-[#f6efe4] transition hover:bg-[#2b211b]"
+                >
+                  <span>Join the waitlist</span>
+                  <ArrowUpRight className="h-4 w-4 shrink-0" />
+                </a>
+              </div>
+            </section>
+          </footer>
         </article>
       </main>
     </div>
