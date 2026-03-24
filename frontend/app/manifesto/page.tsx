@@ -4,6 +4,6 @@ import ManifestoLandingPage, {
 
 export const metadata = manifestoMetadata;
 
-export default function Home(): JSX.Element {
+export default function ManifestoPage(): JSX.Element {
   return <ManifestoLandingPage />;
 }

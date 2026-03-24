@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { WAITLIST_URL } from "@/lib/site-content";
 
 const INVITE_CODE = "chenyu";
 const STORAGE_KEY = "glowingstar.invite-code.timestamp";
@@ -42,7 +43,12 @@ const storeInvite = (value: StoredInvite | null) => {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
 };
 
-const UNPROTECTED_PATHS = new Set<string>(["/", "/northeastern/ict6480"]);
+const UNPROTECTED_PATHS = new Set<string>([
+  "/",
+  "/manifesto",
+  "/original",
+  "/northeastern/ict6480",
+]);
 
 export function InviteGate({ children }: InviteGateProps) {
   const pathname = usePathname();
@@ -102,7 +108,7 @@ export function InviteGate({ children }: InviteGateProps) {
   );
 
   const handleWaitlistClick = useCallback(() => {
-    window.open("https://forms.gle/jVB2LjuMHgYGP1wo7", "_blank");
+    window.open(WAITLIST_URL, "_blank");
   }, []);
 
   const handleBackToLanding = useCallback(() => {

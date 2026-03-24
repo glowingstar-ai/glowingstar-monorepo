@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import LogoCarousel from "@/components/ui/LogoCarousel";
+import { teamLogoList, WAITLIST_URL } from "@/lib/site-content";
 import {
   Activity,
   Sparkles,
@@ -41,8 +42,6 @@ type GlowTile = {
 const navigation: NavigationItem[] = [
   { label: "Why GlowingStar", href: "#why-glowing" },
 ];
-
-const WAITLIST_URL = "https://forms.gle/jVB2LjuMHgYGP1wo7";
 
 const studentHighlights: Highlight[] = [
   {
@@ -161,52 +160,6 @@ const schoolStats = [
   {
     label: "System uptime",
     value: "99.9%",
-  },
-];
-
-const LOGOS = {
-  light: {
-    harvard: "/logos/harvard-logo-light.svg",
-    adobe: "/logos/adobe-logo-light.svg",
-    block: "/logos/block-logo-light.png",
-    citadel: "/logos/citadel-logo-light.svg",
-    rippling: "/logos/rippling-logo-light.svg",
-  },
-  dark: {
-    harvard: "/logos/harvard-logo-dark.svg",
-    adobe: "/logos/adobe-logo-dark.svg",
-    block: "/logos/block-logo-dark.png",
-    citadel: "/logos/citadel-logo-dark.svg",
-    rippling: "/logos/rippling-logo-dark.svg",
-  },
-  common: {
-    mit: "/logos/mit.svg",
-    cmu: "/logos/cmu.png",
-    chicago: "/logos/chicago.svg",
-    waterloo: "/logos/waterloo.svg",
-    toronto: "/logos/toronto.svg",
-  },
-};
-
-const logoList = [
-  { src: LOGOS.dark.harvard, alt: "Harvard" },
-  { src: LOGOS.dark.block, alt: "Block", className: "max-h-20 max-w-32" },
-  { src: LOGOS.common.mit, alt: "MIT", className: "max-h-8 max-w-12" },
-  { src: LOGOS.common.toronto, alt: "Toronto", className: "max-h-12" },
-  {
-    src: "/logos/stanford-logo.avif",
-    alt: "Stanford",
-    className: "max-h-12 max-w-20",
-  },
-  {
-    src: "/logos/media-lab-logo.webp",
-    alt: "MIT Media Lab",
-    className: "max-h-12 max-w-20",
-  },
-  {
-    src: "/logos/ilab-logo.webp",
-    alt: "iLab",
-    className: "max-h-12 max-w-20",
   },
 ];
 
@@ -763,7 +716,7 @@ export default function LandingPage(): JSX.Element {
             {/* Team From Section */}
             <section className="flex flex-col items-center py-8">
               <span className="text-sm text-slate-400 mb-4">Team From</span>
-              <LogoCarousel logos={logoList} />
+              <LogoCarousel logos={teamLogoList} />
             </section>
 
             <section
