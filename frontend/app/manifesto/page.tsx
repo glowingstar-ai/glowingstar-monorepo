@@ -8,9 +8,6 @@ type ManifestoSection = {
   paragraphs: string[];
 };
 
-const glowingStarMission =
-  "GlowingStar is building AI-native learning experiences designed for the next era of education. Our mission is to give every learner intelligent support that helps them move faster, stay grounded, and build real capability, not just collect credentials.";
-
 const paperTextureSvg = `
   <svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
     <defs>
@@ -227,28 +224,17 @@ export default function ManifestoPage(): JSX.Element {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-[#17120f]/10 bg-[linear-gradient(180deg,rgba(255,251,245,0.92),rgba(246,238,226,0.95))] px-6 py-8 shadow-[0_24px_70px_rgba(107,79,45,0.08)] sm:px-8">
-              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
-                GlowingStar
-              </p>
-              <h2 className="mt-4 font-heading text-2xl text-[#17120f] sm:text-[2rem]">
-                What we are building
-              </h2>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-[#17120f]/72 sm:text-[1.05rem]">
-                {glowingStarMission}
-              </p>
-            </section>
-
             <section className="rounded-[2rem] border border-[#17120f]/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.9),rgba(243,234,220,0.92))] px-6 py-8 shadow-[0_24px_70px_rgba(107,79,45,0.08)] sm:px-8">
               <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
-                Private beta
+                GlowingStar
               </p>
               <h2 className="mt-4 font-heading text-2xl text-[#17120f] sm:text-[2rem]">
                 Join the waitlist
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-8 text-[#17120f]/72 sm:text-[1.05rem]">
-                We&apos;re currently in private beta. Join the waitlist and
-                we&apos;ll reach out as new spots open up.
+                GlowingStar is building AI-native learning experiences designed
+                for the next era of education. Join the waitlist to hear when
+                private beta opens and follow our progress.
               </p>
               <div className="mt-6">
                 <a
