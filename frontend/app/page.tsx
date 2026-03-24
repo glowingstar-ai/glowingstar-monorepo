@@ -1,5 +1,9 @@
-import LandingPage from "@/components/LandingPageLegacy";
+import ManifestoLandingPage, {
+  manifestoMetadata,
+} from "@/components/ManifestoLandingPage";
 
-export default function Home() {
-  return <LandingPage />;
+export const metadata = manifestoMetadata;
+
+export default function Home(): JSX.Element {
+  return <ManifestoLandingPage />;
 }
