@@ -5,6 +5,31 @@ type ManifestoSection = {
   paragraphs: string[];
 };
 
+const paperTextureSvg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+    <filter id="paper-noise">
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.82"
+        numOctaves="2"
+        seed="7"
+        stitchTiles="stitch"
+      />
+      <feColorMatrix type="saturate" values="0" />
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.12" />
+      </feComponentTransfer>
+    </filter>
+    <rect width="320" height="320" filter="url(#paper-noise)" opacity="0.45" />
+  </svg>
+`
+  .trim()
+  .replace(/\s{2,}/g, " ");
+
+const paperTextureDataUri = `url("data:image/svg+xml,${encodeURIComponent(
+  paperTextureSvg
+)}")`;
+
 const sections: ManifestoSection[] = [
   {
     heading: "A New Kind of Institution",
@@ -71,15 +96,23 @@ export const metadata: Metadata = {
 
 export default function ManifestoPage(): JSX.Element {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#ede6d9] text-[#17120f]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.9),transparent_56%),linear-gradient(180deg,#f4efe5_0%,#e9dfcf_100%)]" />
+    <div className="relative min-h-screen overflow-x-hidden bg-[#ede6d9] text-[#17120f]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.92),transparent_54%),linear-gradient(180deg,#f5efe3_0%,#ece2d2_48%,#e7ddce_100%)]" />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-30"
+        className="pointer-events-none absolute inset-0 opacity-70"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(23,18,15,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(23,18,15,0.035) 1px, transparent 1px), radial-gradient(circle at 1px 1px, rgba(23,18,15,0.08) 0.7px, transparent 0)",
-          backgroundSize: "32px 32px, 32px 32px, 18px 18px",
+            "radial-gradient(circle at top left, rgba(255,255,255,0.55), transparent 34%), radial-gradient(circle at bottom right, rgba(154,130,99,0.14), transparent 28%), linear-gradient(180deg, rgba(255,255,255,0.28), rgba(237,230,217,0.08) 46%, rgba(188,168,142,0.12) 100%)",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-35 mix-blend-multiply"
+        style={{
+          backgroundImage: paperTextureDataUri,
+          backgroundRepeat: "repeat",
+          backgroundSize: "320px 320px",
         }}
       />
 
