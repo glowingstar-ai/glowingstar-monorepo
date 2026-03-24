@@ -199,7 +199,7 @@ export default function ManifestoPage(): JSX.Element {
                 {teamLogoList.map((logo) => (
                   <div
                     key={logo.alt}
-                    className="flex h-20 items-center justify-center rounded-2xl border border-white/10 bg-[#2b241f]/94 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_35px_rgba(56,39,24,0.18)]"
+                    className="flex h-20 items-center justify-center rounded-2xl border border-[#17120f]/8 bg-[rgba(255,252,247,0.78)] px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.78),0_18px_35px_rgba(87,63,35,0.08)]"
                   >
                     <Image
                       src={logo.src}
@@ -207,7 +207,7 @@ export default function ManifestoPage(): JSX.Element {
                       width={120}
                       height={48}
                       loading="eager"
-                      className={`max-h-10 w-auto object-contain opacity-95 ${logo.className ?? ""}`}
+                      className={`max-h-10 w-auto object-contain opacity-100 ${logo.className ?? ""} ${"imageClassName" in logo ? logo.imageClassName ?? "" : ""}`}
                     />
                   </div>
                 ))}
