@@ -191,15 +191,15 @@ export default function ManifestoPage(): JSX.Element {
           </div>
 
           <footer className="space-y-8 border-t border-[#17120f]/10 pt-12">
-            <section className="rounded-[2rem] border border-[#17120f]/10 bg-white/45 px-6 py-8 shadow-[0_20px_60px_rgba(93,66,35,0.08)] backdrop-blur-[2px] sm:px-8">
-              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
+            <section className="rounded-[2rem] border border-[#17120f]/12 bg-[linear-gradient(180deg,rgba(252,247,239,0.86),rgba(245,237,225,0.92))] px-6 py-8 shadow-[0_20px_60px_rgba(93,66,35,0.08)] sm:px-8">
+              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/58">
                 Team From
               </p>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {teamLogoList.map((logo) => (
                   <div
                     key={logo.alt}
-                    className="flex h-16 items-center justify-center rounded-2xl border border-[#17120f]/8 bg-white/55 px-4"
+                    className="flex h-20 items-center justify-center rounded-2xl border border-white/10 bg-[#2b241f]/94 px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_18px_35px_rgba(56,39,24,0.18)]"
                   >
                     <Image
                       src={logo.src}
@@ -207,7 +207,7 @@ export default function ManifestoPage(): JSX.Element {
                       width={120}
                       height={48}
                       loading="eager"
-                      className={`max-h-10 w-auto object-contain opacity-80 ${logo.className ?? ""}`}
+                      className={`max-h-10 w-auto object-contain opacity-95 ${logo.className ?? ""}`}
                     />
                   </div>
                 ))}
