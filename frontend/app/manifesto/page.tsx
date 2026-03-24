@@ -164,9 +164,21 @@ export default function ManifestoPage(): JSX.Element {
       <main className="relative mx-auto flex min-h-screen w-full max-w-3xl px-6 py-20 sm:px-10 sm:py-24 lg:py-28">
         <article className="w-full">
           <header className="border-b border-[#17120f]/10 pb-10">
-            <p className="font-heading text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
-              Manifesto
-            </p>
+            <div className="inline-flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#17120f]/8 bg-[rgba(255,251,245,0.78)] shadow-[0_10px_24px_rgba(103,77,42,0.08)]">
+                <Image
+                  src="/logo.png"
+                  alt="GlowingStar"
+                  width={26}
+                  height={26}
+                  priority
+                  className="h-6 w-6 object-contain drop-shadow-[0_2px_10px_rgba(235,179,43,0.16)]"
+                />
+              </div>
+              <p className="font-heading text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
+                Manifesto
+              </p>
+            </div>
             <h1 className="mt-4 font-heading text-4xl leading-tight sm:text-5xl">
               The AI-Native University Manifesto
             </h1>
