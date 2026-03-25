@@ -302,7 +302,7 @@ export default function LandingPage(): JSX.Element {
               <div className="relative shrink-0">
                 <div className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-amber-300/40 via-yellow-100/30 to-transparent blur-lg transition-opacity duration-500 group-hover:opacity-100" />
                 <Image
-                  src="/glowingstar-logo.png"
+                  src="/logo.png"
                   alt="GlowingStar.AI logo"
                   width={52}
                   height={52}
@@ -548,7 +548,7 @@ export default function LandingPage(): JSX.Element {
                         <div className="relative grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
                           <div className="absolute -top-20 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(253,224,71,0.6),_rgba(2,6,23,0))] opacity-70 blur-3xl" />
                           <Image
-                            src="/glowingstar-logo.png"
+                            src="/logo.png"
                             alt="Glowy the Glowing Star mascot"
                             width={120}
                             height={120}
@@ -601,7 +601,7 @@ export default function LandingPage(): JSX.Element {
                         <div className="relative grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
                           <div className="absolute -top-20 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(253,224,71,0.6),_rgba(2,6,23,0))] opacity-70 blur-3xl" />
                           <Image
-                            src="/glowingstar-logo.png"
+                            src="/logo.png"
                             alt="Glowy the Glowing Star mascot"
                             width={120}
                             height={120}
@@ -656,7 +656,7 @@ export default function LandingPage(): JSX.Element {
                         <div className="relative grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-6">
                           <div className="absolute -top-20 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,_rgba(253,224,71,0.6),_rgba(2,6,23,0))] opacity-70 blur-3xl" />
                           <Image
-                            src="/glowingstar-logo.png"
+                            src="/logo.png"
                             alt="Glowy the Glowing Star mascot"
                             width={120}
                             height={120}

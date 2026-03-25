@@ -9,7 +9,7 @@ export default function LandingPage(): JSX.Element {
       <div className="relative mx-auto flex min-h-screen max-w-5xl flex-col items-center justify-center px-6 py-20 text-center">
         <div className="rounded-[2rem] border border-white/10 bg-white/5 px-8 py-10 shadow-2xl shadow-black/40 backdrop-blur-xl sm:px-12 sm:py-14">
           <Image
-            src="/glowingstar-logo.png"
+            src="/logo.png"
             alt="GlowingStar"
             width={80}
             height={80}

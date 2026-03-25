@@ -163,7 +163,7 @@ export default function ManifestoLandingPage(): JSX.Element {
           <header className="border-b border-[#17120f]/10 pb-10">
             <div className="inline-flex items-center gap-3">
               <Image
-                src="/icon.png"
+                src="/logo.png"
                 alt="GlowingStar"
                 width={40}
                 height={40}

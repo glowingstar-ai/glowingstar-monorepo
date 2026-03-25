@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   description:
     "Command center for emotionally intelligent customer experiences—monitor sessions, review insights, and launch guided playbooks.",
   icons: {
-    icon: "/glowingstar-logo.png",
-    shortcut: "/glowingstar-logo.png",
+    icon: "/logo.png",
+    shortcut: "/logo.png",
   },
 };
 
