@@ -2,9 +2,16 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import InviteGate from "@/components/invite-gate";
 import { ThemeProvider } from "@/components/theme-provider";
-import { inter, manrope, plexSans } from "@/lib/fonts";
+import {
+  dmSans,
+  inter,
+  manrope,
+  outfit,
+  playfairDisplay,
+  plexSans,
+  plusJakartaSans,
+} from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: {
@@ -25,12 +32,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`antialiased ${inter.variable} ${manrope.variable} ${plexSans.variable}`}
+      className={`antialiased ${inter.variable} ${manrope.variable} ${plexSans.variable} ${dmSans.variable} ${plusJakartaSans.variable} ${outfit.variable} ${playfairDisplay.variable}`}
       suppressHydrationWarning
     >
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <InviteGate>{children}</InviteGate>
+          {children}
         </ThemeProvider>
       </body>
     </html>

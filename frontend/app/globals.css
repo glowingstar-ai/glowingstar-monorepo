@@ -128,3 +128,61 @@ button:focus-visible {
   outline: 2px solid #fbbf24;
   outline-offset: 2px;
 }
+
+.font-display {
+  font-family:
+    var(--font-plus-jakarta), var(--font-manrope), system-ui, sans-serif;
+}
+
+.font-body {
+  font-family: var(--font-dm-sans), var(--font-inter), system-ui, sans-serif;
+}
+
+.font-playful-display {
+  font-family:
+    var(--font-outfit), var(--font-plus-jakarta), system-ui, sans-serif;
+}
+
+.font-playful-body {
+  font-family:
+    var(--font-plus-jakarta), var(--font-inter), system-ui, sans-serif;
+}
+
+.font-editorial-display {
+  font-family: var(--font-playfair), Georgia, "Times New Roman", serif;
+}
+
+.saint-paul-shell {
+  --pg-bg: #f9f8f6;
+  --pg-foreground: #1a1a1a;
+  --pg-muted-bg: #ebe5de;
+  --pg-muted: #6c6863;
+  --pg-border: rgb(26 26 26 / 0.14);
+  --pg-border-strong: #1a1a1a;
+  --pg-gold: #d4af37;
+  --pg-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.02);
+  --pg-shadow-md: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --pg-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--pg-bg);
+  color: var(--pg-foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.saint-paul-shell ::selection {
+  background: rgb(212 175 55 / 0.35);
+  color: var(--pg-foreground);
+}
+
+.saint-paul-shell a:focus-visible,
+.saint-paul-shell button:focus-visible {
+  outline: 1px solid var(--pg-gold);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saint-paul-shell * {
+    scroll-behavior: auto;
+  }
+}
