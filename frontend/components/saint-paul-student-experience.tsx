@@ -33,7 +33,7 @@ type SaintPaulStudentExperienceProps = {
   topicLabel: string;
 };
 
-type StudentTabId = "pre" | "tutor" | "post" | "complete";
+type StudentTabId = "pre" | "lesson" | "tutor" | "post" | "complete";
 type ObjectiveStatus = "not-started" | "in-progress" | "completed";
 type ChatMessage = {
   id: string;
@@ -344,6 +344,8 @@ export default function SaintPaulStudentExperience({
     useState<AssessmentResponseState>({});
   const [preQuizSubmitted, setPreQuizSubmitted] = useState(false);
   const [postQuizSubmitted, setPostQuizSubmitted] = useState(false);
+  const [lessonInstructionAcknowledged, setLessonInstructionAcknowledged] =
+    useState(false);
   const [preQuizSubmitAttempted, setPreQuizSubmitAttempted] = useState(false);
   const [postQuizSubmitAttempted, setPostQuizSubmitAttempted] = useState(false);
   const [activeObjectiveIndex, setActiveObjectiveIndex] = useState(0);
@@ -439,8 +441,10 @@ export default function SaintPaulStudentExperience({
   const canOpenTutor = hasTutorStage && preQuizSubmitted;
   const canOpenPostQuiz = hasTutorStage
     ? completedObjectiveCount === objectives.length && objectives.length > 0
-    : preQuizSubmitted;
+    : lessonInstructionAcknowledged;
   const hasEnteredPostStage = activeTab === "post" || activeTab === "complete";
+  const isLessonStageCompleted =
+    activeTab === "post" || activeTab === "complete" || lessonInstructionAcknowledged;
 
   const tabs = !hasTutorStage
     ? [
@@ -449,6 +453,12 @@ export default function SaintPaulStudentExperience({
           label: "前測",
           disabled: false,
           completed: preQuizSubmitted,
+        },
+        {
+          id: "lesson" as const,
+          label: "課堂學習",
+          disabled: !preQuizSubmitted || hasEnteredPostStage,
+          completed: isLessonStageCompleted,
         },
         {
           id: "post" as const,
@@ -500,8 +510,13 @@ export default function SaintPaulStudentExperience({
     if (hasTutorStage) {
       setActiveTab("tutor");
     } else {
-      setActiveTab("post");
+      setActiveTab("lesson");
     }
+  };
+
+  const proceedToPostQuiz = () => {
+    setLessonInstructionAcknowledged(true);
+    setActiveTab("post");
   };
 
   const submitPostQuiz = () => {
@@ -1633,6 +1648,40 @@ export default function SaintPaulStudentExperience({
                 </div>
               </div>
             </section>
+          </section>
+        ) : null}
+
+        {activeTab === "lesson" ? (
+          <section className="rounded-[28px] border border-[#DDD7CC] bg-white p-6 shadow-[0_8px_24px_rgba(23,23,23,0.04)] md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6B6A63]">
+              課堂學習
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#171717]">
+              等待上課完成
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57]">
+              你已完成前測。請先依照老師安排完成課堂學習，等上課結束後，再點擊下方按鈕進入後測。
+            </p>
+
+            <div className="mt-6 rounded-3xl border border-[#E7E1D6] bg-[#FCFBF8] p-6">
+              <p className="text-base font-medium text-[#171717]">
+                目前狀態：課堂學習中
+              </p>
+              <p className="mt-2 text-sm leading-7 text-[#5F5D57]">
+                這個階段不需要作答。完成上課後，再繼續後測。
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#EEE9DF] pt-5">
+              <p className="text-sm leading-6 text-[#5F5D57]">
+                上課完成後，點擊右側按鈕即可開始後測。
+              </p>
+
+              <PrimaryButton onClick={proceedToPostQuiz}>
+                前往後測
+                <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
+              </PrimaryButton>
+            </div>
           </section>
         ) : null}
 
