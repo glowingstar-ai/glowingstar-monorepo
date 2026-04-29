@@ -15,6 +15,7 @@ import {
   type Dispatch,
   type ReactNode,
   type SetStateAction,
+  useEffect,
   useState,
 } from "react";
 import type {
@@ -27,10 +28,13 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1";
 
 type SaintPaulStudentExperienceProps = {
+  grade: string;
   lesson: SaintPaulLesson | null;
   mode: string;
   modeLabel: string;
+  subject: string;
   topicLabel: string;
+  version: string;
 };
 
 type StudentTabId = "pre" | "lesson" | "tutor" | "post" | "complete";
@@ -50,6 +54,9 @@ type TutorChatResponse = {
 };
 
 type TutorImageExplanationResponse = {
+  asset_bucket?: string | null;
+  asset_key?: string | null;
+  asset_url?: string | null;
   model: string;
   prompt: string;
   image_data_url: string;
@@ -90,6 +97,17 @@ type TutorQuizResponse = {
   questions: TutorQuizQuestion[];
   source: "openai" | "fallback";
   error: string | null;
+};
+
+type SaintPaulSessionStartResponse = {
+  persistence_enabled: boolean;
+  session_id: string;
+  started_at: string;
+};
+
+type SaintPaulQuizAttemptResponse = {
+  persistence_enabled: boolean;
+  saved_at: string;
 };
 
 function getStudentFacingErrorMessage(
@@ -340,10 +358,13 @@ function renderTextWithInlineMath(text: string): ReactNode {
 }
 
 export default function SaintPaulStudentExperience({
+  grade,
   lesson,
   mode,
   modeLabel,
+  subject,
   topicLabel,
+  version,
 }: Readonly<SaintPaulStudentExperienceProps>): JSX.Element {
   const hasTutorStage = mode === "quiz-plus-ai-tutor";
   const objectives = lesson?.objectives ?? [];
@@ -353,6 +374,10 @@ export default function SaintPaulStudentExperience({
   const [studentIdDraft, setStudentIdDraft] = useState("");
   const [studentId, setStudentId] = useState("");
   const [studentIdSubmitAttempted, setStudentIdSubmitAttempted] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+  const [sessionCompletedAt, setSessionCompletedAt] = useState<string | null>(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+  const [isStartingSession, setIsStartingSession] = useState(false);
   const [activeTab, setActiveTab] = useState<StudentTabId>("pre");
   const [preQuizResponses, setPreQuizResponses] =
     useState<AssessmentResponseState>({});
@@ -464,6 +489,99 @@ export default function SaintPaulStudentExperience({
   const trimmedStudentId = studentIdDraft.trim();
   const hasStudentId = studentId.length > 0;
 
+  const postSaintPaulEvent = async (
+    eventType: string,
+    payload: Record<string, unknown> = {},
+    options?: {
+      objectiveIndex?: number;
+      sessionIdOverride?: string;
+      studentIdOverride?: string;
+      tabOverride?: StudentTabId;
+    },
+  ): Promise<void> => {
+    const targetSessionId = options?.sessionIdOverride ?? sessionId;
+    const targetStudentId = options?.studentIdOverride ?? studentId;
+    if (!targetSessionId || !targetStudentId) {
+      return;
+    }
+
+    try {
+      await fetch(`${API_BASE}/saintpaul/session/event`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          session_id: targetSessionId,
+          student_id: targetStudentId,
+          event_type: eventType,
+          tab: options?.tabOverride ?? activeTab,
+          objective_index: options?.objectiveIndex,
+          client_timestamp: new Date().toISOString(),
+          payload,
+        }),
+      });
+    } catch (error) {
+      console.error("無法記錄 Saint Paul 事件", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!sessionId || !studentId) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      void fetch(`${API_BASE}/saintpaul/session/snapshot`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          student_id: studentId,
+          subject,
+          version,
+          grade,
+          mode,
+          topic: lesson?.topic ?? "",
+          objectives,
+          current_tab: activeTab,
+          active_objective_index: activeObjectiveIndex,
+          objective_statuses: objectiveStatuses,
+          lesson_instruction_acknowledged: lessonInstructionAcknowledged,
+          pre_quiz_submitted: preQuizSubmitted,
+          post_quiz_submitted: postQuizSubmitted,
+          pre_quiz_responses: preQuizResponses,
+          post_quiz_responses: postQuizResponses,
+          completed_at: sessionCompletedAt,
+        }),
+      }).catch((error) => {
+        console.error("無法儲存 Saint Paul session snapshot", error);
+      });
+    }, 350);
+
+    return () => window.clearTimeout(timeout);
+  }, [
+    activeObjectiveIndex,
+    activeTab,
+    grade,
+    lesson?.topic,
+    lessonInstructionAcknowledged,
+    mode,
+    objectiveStatuses,
+    objectives,
+    postQuizResponses,
+    postQuizSubmitted,
+    preQuizResponses,
+    preQuizSubmitted,
+    sessionCompletedAt,
+    sessionId,
+    studentId,
+    subject,
+    version,
+  ]);
+
   const tabs = !hasTutorStage
     ? [
         {
@@ -519,42 +637,108 @@ export default function SaintPaulStudentExperience({
       ];
 
   const submitPreQuiz = () => {
+    void postSaintPaulEvent("button_clicked", {
+      button_id: "submit_pre_quiz",
+    });
     setPreQuizSubmitAttempted(true);
     if (preQuizHasErrors) {
+      void postSaintPaulEvent("pre_quiz_submit_blocked", {
+        reason: "validation_error",
+      });
       return;
     }
 
     setPreQuizSubmitted(true);
+    void postSaintPaulEvent("pre_quiz_submitted", {
+      response_count: Object.keys(preQuizResponses).length,
+    });
     if (hasTutorStage) {
       setActiveTab("tutor");
+      void postSaintPaulEvent(
+        "tab_changed",
+        { from_tab: "pre", to_tab: "tutor" },
+        { tabOverride: "tutor" },
+      );
     } else {
       setActiveTab("lesson");
+      void postSaintPaulEvent(
+        "tab_changed",
+        { from_tab: "pre", to_tab: "lesson" },
+        { tabOverride: "lesson" },
+      );
     }
   };
 
   const proceedToPostQuiz = () => {
+    void postSaintPaulEvent("button_clicked", {
+      button_id: "go_to_post_quiz",
+    });
     setLessonInstructionAcknowledged(true);
     setActiveTab("post");
+    void postSaintPaulEvent(
+      "tab_changed",
+      { from_tab: activeTab, to_tab: "post" },
+      { tabOverride: "post" },
+    );
   };
 
   const submitPostQuiz = () => {
+    void postSaintPaulEvent("button_clicked", {
+      button_id: "submit_post_quiz",
+    });
     setPostQuizSubmitAttempted(true);
     if (postQuizHasErrors) {
+      void postSaintPaulEvent("post_quiz_submit_blocked", {
+        reason: "validation_error",
+      });
       return;
     }
 
     setPostQuizSubmitted(true);
+    const completedAt = new Date().toISOString();
+    setSessionCompletedAt(completedAt);
     setActiveTab("complete");
+    void postSaintPaulEvent("post_quiz_submitted", {
+      response_count: Object.keys(postQuizResponses).length,
+    });
+    void postSaintPaulEvent(
+      "session_completed",
+      { completed_at: completedAt },
+      { tabOverride: "complete" },
+    );
   };
 
   const markObjectiveCompleted = () => {
+    const completedObjective = objectives[activeObjectiveIndex] ?? "";
+    void postSaintPaulEvent(
+      "button_clicked",
+      {
+        button_id: "mark_objective_completed",
+        objective: completedObjective,
+      },
+      { objectiveIndex: activeObjectiveIndex },
+    );
     setObjectiveStatuses((current) =>
       current.map((status, index) =>
         index === activeObjectiveIndex ? "completed" : status,
       ),
     );
+    void postSaintPaulEvent(
+      "objective_marked_completed",
+      {
+        objective: completedObjective,
+      },
+      { objectiveIndex: activeObjectiveIndex },
+    );
     if (activeObjectiveIndex < objectives.length - 1) {
       setActiveObjectiveIndex(activeObjectiveIndex + 1);
+      void postSaintPaulEvent(
+        "objective_selected",
+        {
+          objective: objectives[activeObjectiveIndex + 1] ?? "",
+        },
+        { objectiveIndex: activeObjectiveIndex + 1 },
+      );
     }
   };
 
@@ -568,21 +752,83 @@ export default function SaintPaulStudentExperience({
     }
 
     setActiveTab(tabId);
+    void postSaintPaulEvent(
+      "tab_changed",
+      { from_tab: activeTab, to_tab: tabId },
+      { tabOverride: tabId },
+    );
   };
 
-  const handleStudentIdSubmit = () => {
+  const handleObjectiveSelect = (objectiveIndex: number) => {
+    setActiveObjectiveIndex(objectiveIndex);
+    void postSaintPaulEvent(
+      "objective_selected",
+      {
+        objective: objectives[objectiveIndex] ?? "",
+      },
+      { objectiveIndex, tabOverride: "tutor" },
+    );
+  };
+
+  const handleStudentIdSubmit = async () => {
     setStudentIdSubmitAttempted(true);
     if (!trimmedStudentId) {
       return;
     }
 
-    setStudentId(trimmedStudentId);
+    setSessionError(null);
+    setIsStartingSession(true);
+
+    try {
+      const response = await fetch(`${API_BASE}/saintpaul/session/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          student_id: trimmedStudentId,
+          subject,
+          version,
+          grade,
+          mode,
+          topic: lesson?.topic ?? "",
+          objectives,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Saint Paul session start failed");
+      }
+
+      const payload = (await response.json()) as SaintPaulSessionStartResponse;
+      setSessionId(payload.session_id);
+      setStudentId(trimmedStudentId);
+      await postSaintPaulEvent(
+        "student_id_submitted",
+        {
+          persistence_enabled: payload.persistence_enabled,
+          started_at: payload.started_at,
+        },
+        {
+          sessionIdOverride: payload.session_id,
+          studentIdOverride: trimmedStudentId,
+          tabOverride: "pre",
+        },
+      );
+    } catch (error) {
+      console.error(error);
+      setSessionError("目前無法開始作答流程，請稍後再試。");
+    } finally {
+      setIsStartingSession(false);
+    }
   };
 
   const handleAssessmentOptionSelect = (
+    assessmentType: "pre" | "post",
     setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
     questionId: string,
     optionId: string,
+    previousAnswer: string,
   ) => {
     setResponses((current) => ({
       ...current,
@@ -591,12 +837,19 @@ export default function SaintPaulStudentExperience({
         confidence: current[questionId]?.confidence ?? "",
       },
     }));
+    void postSaintPaulEvent(`${assessmentType}_quiz_answer_changed`, {
+      from_value: previousAnswer,
+      question_id: questionId,
+      to_value: optionId,
+    });
   };
 
   const handleAssessmentTextChange = (
+    assessmentType: "pre" | "post",
     setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
     questionId: string,
     value: string,
+    previousAnswer: string,
   ) => {
     setResponses((current) => ({
       ...current,
@@ -605,12 +858,19 @@ export default function SaintPaulStudentExperience({
         confidence: current[questionId]?.confidence ?? "",
       },
     }));
+    void postSaintPaulEvent(`${assessmentType}_quiz_answer_changed`, {
+      from_value: previousAnswer,
+      question_id: questionId,
+      to_value: value,
+    });
   };
 
   const handleAssessmentConfidenceSelect = (
+    assessmentType: "pre" | "post",
     setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
     questionId: string,
     confidence: AssessmentConfidence,
+    previousConfidence: string,
   ) => {
     setResponses((current) => ({
       ...current,
@@ -619,11 +879,17 @@ export default function SaintPaulStudentExperience({
         confidence,
       },
     }));
+    void postSaintPaulEvent(`${assessmentType}_quiz_confidence_changed`, {
+      from_value: previousConfidence,
+      question_id: questionId,
+      to_value: confidence,
+    });
   };
 
   const renderAssessmentQuestion = (
     question: SaintPaulAssessmentQuestion,
     index: number,
+    assessmentType: "pre" | "post",
     responses: AssessmentResponseState,
     setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
     submitted: boolean,
@@ -667,9 +933,11 @@ export default function SaintPaulStudentExperience({
                   type="button"
                   onClick={() =>
                     handleAssessmentOptionSelect(
+                      assessmentType,
                       setResponses,
                       question.id,
                       option.id,
+                      currentResponse.answer,
                     )
                   }
                   disabled={submitted}
@@ -706,9 +974,11 @@ export default function SaintPaulStudentExperience({
             value={currentResponse.answer}
             onChange={(event) =>
               handleAssessmentTextChange(
+                assessmentType,
                 setResponses,
                 question.id,
                 event.target.value,
+                currentResponse.answer,
               )
             }
             disabled={submitted}
@@ -739,9 +1009,11 @@ export default function SaintPaulStudentExperience({
                   type="button"
                   onClick={() =>
                     handleAssessmentConfidenceSelect(
+                      assessmentType,
                       setResponses,
                       question.id,
                       option.value,
+                      currentResponse.confidence,
                     )
                   }
                   disabled={submitted}
@@ -785,6 +1057,7 @@ export default function SaintPaulStudentExperience({
 
   const renderAssessmentSection = (
     questions: SaintPaulAssessmentQuestion[],
+    assessmentType: "pre" | "post",
     responses: AssessmentResponseState,
     setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
     submitted: boolean,
@@ -811,6 +1084,7 @@ export default function SaintPaulStudentExperience({
             renderAssessmentQuestion(
               question,
               index,
+              assessmentType,
               responses,
               setResponses,
               submitted,
@@ -841,6 +1115,16 @@ export default function SaintPaulStudentExperience({
     const thinkingId = `thinking-chat-${Date.now()}`;
     const nextMessages = [...nextActiveMessages, userMessage];
 
+    void postSaintPaulEvent(
+      "button_clicked",
+      { button_id: "send_tutor_message" },
+      { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+    );
+    void postSaintPaulEvent(
+      "chat_sent",
+      { content: trimmed, message_id: userMessage.id },
+      { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+    );
     setDraftMessage("");
     setChatError(null);
     setQuizError(null);
@@ -882,6 +1166,9 @@ export default function SaintPaulStudentExperience({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          session_id: sessionId,
+          student_id: studentId,
+          objective_index: objectiveIndex,
           topic: lesson.topic,
           objective,
           objectives,
@@ -903,6 +1190,15 @@ export default function SaintPaulStudentExperience({
         role: "assistant",
         content: payload.message.content,
       };
+      void postSaintPaulEvent(
+        "chat_received",
+        {
+          content: assistantMessage.content,
+          message_id: assistantMessage.id,
+          model: payload.model,
+        },
+        { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+      );
 
       setMessagesByObjective((current) => ({
         ...current,
@@ -924,6 +1220,11 @@ export default function SaintPaulStudentExperience({
     } catch (error) {
       console.error(error);
       setChatError(getStudentFacingErrorMessage("chat"));
+      void postSaintPaulEvent(
+        "chat_error",
+        { message: getStudentFacingErrorMessage("chat") },
+        { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+      );
       setTimelineByObjective((current) => ({
         ...current,
         [objectiveIndex]: (current[objectiveIndex] ?? []).filter(
@@ -944,6 +1245,11 @@ export default function SaintPaulStudentExperience({
     const objective = activeObjective;
     const nextActiveMessages = messagesByObjective[objectiveIndex] ?? [];
     const nextQuizContext = buildQuizContext(objectiveIndex);
+    void postSaintPaulEvent(
+      "button_clicked",
+      { button_id: "generate_image_explanation" },
+      { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+    );
     setChatError(null);
     setQuizError(null);
     setIsGeneratingImage(true);
@@ -968,6 +1274,9 @@ export default function SaintPaulStudentExperience({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          session_id: sessionId,
+          student_id: studentId,
+          objective_index: objectiveIndex,
           topic: lesson.topic,
           objective,
           objectives,
@@ -989,6 +1298,14 @@ export default function SaintPaulStudentExperience({
         source: payload.source,
         error: payload.error,
       };
+      void postSaintPaulEvent(
+        "image_generated",
+        {
+          asset_key: payload.asset_key ?? null,
+          source: payload.source,
+        },
+        { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+      );
       setTimelineByObjective((current) => ({
         ...current,
         [objectiveIndex]: (current[objectiveIndex] ?? []).map((item) =>
@@ -1011,6 +1328,11 @@ export default function SaintPaulStudentExperience({
     } catch (error) {
       console.error(error);
       setChatError(getStudentFacingErrorMessage("image"));
+      void postSaintPaulEvent(
+        "image_generation_error",
+        { message: getStudentFacingErrorMessage("image") },
+        { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+      );
       setTimelineByObjective((current) => ({
         ...current,
         [objectiveIndex]: (current[objectiveIndex] ?? []).filter(
@@ -1031,6 +1353,11 @@ export default function SaintPaulStudentExperience({
     const objective = activeObjective;
     const nextActiveMessages = messagesByObjective[objectiveIndex] ?? [];
     const nextQuizContext = buildQuizContext(objectiveIndex);
+    void postSaintPaulEvent(
+      "button_clicked",
+      { button_id: "generate_quiz" },
+      { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+    );
     setChatError(null);
     setQuizError(null);
     setIsGeneratingQuiz(true);
@@ -1055,6 +1382,9 @@ export default function SaintPaulStudentExperience({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          session_id: sessionId,
+          student_id: studentId,
+          objective_index: objectiveIndex,
           topic: lesson.topic,
           objective,
           objectives,
@@ -1084,6 +1414,15 @@ export default function SaintPaulStudentExperience({
           isCorrect: null,
         })),
       };
+      void postSaintPaulEvent(
+        "quiz_generated",
+        {
+          quiz_id: payload.quiz_id,
+          source: payload.source,
+          title: payload.title,
+        },
+        { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+      );
       setQuizByObjective((current) => ({
         ...current,
         [objectiveIndex]: quizState,
@@ -1110,6 +1449,11 @@ export default function SaintPaulStudentExperience({
     } catch (error) {
       console.error(error);
       setQuizError(getStudentFacingErrorMessage("quiz"));
+      void postSaintPaulEvent(
+        "quiz_generation_error",
+        { message: getStudentFacingErrorMessage("quiz") },
+        { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+      );
       setTimelineByObjective((current) => ({
         ...current,
         [objectiveIndex]: (current[objectiveIndex] ?? []).filter(
@@ -1249,6 +1593,54 @@ export default function SaintPaulStudentExperience({
       score,
       questions: gradedQuestions,
     };
+    void postSaintPaulEvent(
+      "quiz_answered",
+      {
+        question_id: questionId,
+        quiz_id: quizId,
+        score,
+        selected_option_id: optionId,
+      },
+      { objectiveIndex: objectiveIndex, tabOverride: "tutor" },
+    );
+    if (sessionId && studentId) {
+      void fetch(`${API_BASE}/saintpaul/session/quiz-attempt`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          student_id: studentId,
+          objective_index: objectiveIndex,
+          quiz_id: nextQuizState.quizId,
+          title: nextQuizState.title,
+          score,
+          total_questions: nextQuizState.questions.length,
+          error: nextQuizState.error,
+          questions: nextQuizState.questions.map((question) => ({
+            id: question.id,
+            prompt: question.prompt,
+            options: question.options,
+            correct_option_id: question.correct_option_id,
+            explanation: question.explanation,
+            selected_option_id: question.selectedOptionId,
+            is_correct: question.isCorrect,
+          })),
+          submitted_at: new Date().toISOString(),
+        }),
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error("Saint Paul quiz attempt persist failed");
+          }
+
+          return (await response.json()) as SaintPaulQuizAttemptResponse;
+        })
+        .catch((error) => {
+          console.error("無法儲存 Saint Paul quiz attempt", error);
+        });
+    }
 
     setTimelineByObjective((current) => ({
       ...current,
@@ -1322,7 +1714,14 @@ export default function SaintPaulStudentExperience({
         </div>
         <button
           type="button"
-          onClick={() => setPreviewImageDataUrl(image.imageDataUrl)}
+          onClick={() => {
+            setPreviewImageDataUrl(image.imageDataUrl);
+            void postSaintPaulEvent(
+              "image_preview_opened",
+              { source: image.source },
+              { objectiveIndex: activeObjectiveIndex, tabOverride: "tutor" },
+            );
+          }}
           className="block w-full overflow-hidden bg-[#FCFBF8] text-left"
         >
           <img
@@ -1400,10 +1799,10 @@ export default function SaintPaulStudentExperience({
                 聖保祿學生頁面
               </p>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#171717] md:text-4xl">
-                先輸入學號，再開始作答
+                先輸入考生學號，再開始作答
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57] md:text-base">
-                你的學號將作為本次學習流程的學生識別 ID。完成輸入並確認後，系統才會開啟後續的前測、智慧導學與後測流程。
+                你的考生學號將作為本次學習流程的學生識別 ID。完成輸入並確認後，系統才會開啟後續的前測、智慧導學與後測流程。
               </p>
             </div>
 
@@ -1420,7 +1819,7 @@ export default function SaintPaulStudentExperience({
                     htmlFor="saint-paul-student-id"
                     className="block text-sm font-medium text-[#171717]"
                   >
-                    學號
+                    考生學號
                   </label>
                   <input
                     id="saint-paul-student-id"
@@ -1429,7 +1828,7 @@ export default function SaintPaulStudentExperience({
                     onChange={(event) => setStudentIdDraft(event.target.value)}
                     autoComplete="off"
                     inputMode="text"
-                    placeholder="請輸入你的學號"
+                    placeholder="請輸入你的考生學號"
                     className={cn(
                       "mt-3 h-14 w-full rounded-2xl border bg-white px-4 text-base text-[#171717] outline-none transition-colors focus:border-[#171717]",
                       studentIdSubmitAttempted && !trimmedStudentId
@@ -1438,18 +1837,30 @@ export default function SaintPaulStudentExperience({
                     )}
                   />
                   <p className="mt-3 text-sm leading-6 text-[#5F5D57]">
-                    請輸入老師指定的學號。此欄位為必填，後續會作為你的學生 ID 使用。
+                    請輸入老師指定的考生學號。此欄位為必填，後續會作為你的學生 ID 使用。
                   </p>
                   {studentIdSubmitAttempted && !trimmedStudentId ? (
                     <p className="mt-3 text-sm text-[#D14343]">
-                      請先輸入學號，才能開始後續流程。
+                      請先輸入考生學號，才能開始後續流程。
                     </p>
+                  ) : null}
+                  {sessionError ? (
+                    <p className="mt-3 text-sm text-[#D14343]">{sessionError}</p>
                   ) : null}
 
                   <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-[#E7E1D6] pt-5">
-                    <PrimaryButton type="submit">
-                      確認學號並開始
-                      <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
+                    <PrimaryButton type="submit" disabled={isStartingSession}>
+                      {isStartingSession ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          建立作答流程中
+                        </>
+                      ) : (
+                        <>
+                          確認考生學號並開始
+                          <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
+                        </>
+                      )}
                     </PrimaryButton>
                     <p className="text-sm leading-6 text-[#6B6A63]">
                       確認後才會進入作答流程。
@@ -1475,8 +1886,8 @@ export default function SaintPaulStudentExperience({
                       開始前提醒
                     </p>
                     <div className="mt-4 space-y-3 text-sm leading-6 text-[#5F5D57]">
-                      <p>1. 請先確認你輸入的是正確學號。</p>
-                      <p>2. 未完成學號確認前，系統不會開啟任何測驗內容。</p>
+                      <p>1. 請先確認你輸入的是正確考生學號。</p>
+                      <p>2. 未完成考生學號確認前，系統不會開啟任何測驗內容。</p>
                       <p>3. 完成確認後，會依照老師設定的模式進入後續流程。</p>
                     </div>
                   </div>
@@ -1550,6 +1961,7 @@ export default function SaintPaulStudentExperience({
             </p>
             {renderAssessmentSection(
               preQuizQuestions,
+              "pre",
               preQuizResponses,
               setPreQuizResponses,
               preQuizSubmitted,
@@ -1616,7 +2028,7 @@ export default function SaintPaulStudentExperience({
                     <button
                       key={objective}
                       type="button"
-                      onClick={() => setActiveObjectiveIndex(index)}
+                      onClick={() => handleObjectiveSelect(index)}
                       className={cn(
                         "w-full rounded-2xl border px-4 py-4 text-left transition-colors",
                         index === activeObjectiveIndex
@@ -1653,7 +2065,7 @@ export default function SaintPaulStudentExperience({
                     {activeObjective}
                   </h2>
                   <p className="mt-2 text-sm leading-7 text-[#5F5D57]">
-                    學號 {studentId}．
+                    考生學號 {studentId}．
                     {topicLabel}．已完成 {completedObjectiveCount} /{" "}
                     {objectives.length} 個學習目標．已生成{" "}
                     {activeQuizHistory.length} 題練習題
@@ -1764,7 +2176,22 @@ export default function SaintPaulStudentExperience({
                         </button>
 
                         <SecondaryButton
-                          onClick={() => setActiveTab("post")}
+                          onClick={() => {
+                            void postSaintPaulEvent(
+                              "button_clicked",
+                              { button_id: "go_to_post_quiz_from_tutor" },
+                              {
+                                objectiveIndex: activeObjectiveIndex,
+                                tabOverride: "tutor",
+                              },
+                            );
+                            setActiveTab("post");
+                            void postSaintPaulEvent(
+                              "tab_changed",
+                              { from_tab: "tutor", to_tab: "post" },
+                              { tabOverride: "post" },
+                            );
+                          }}
                           disabled={!canOpenPostQuiz}
                         >
                           前往後測
@@ -1827,6 +2254,7 @@ export default function SaintPaulStudentExperience({
             </p>
             {renderAssessmentSection(
               postQuizQuestions,
+              "post",
               postQuizResponses,
               setPostQuizResponses,
               postQuizSubmitted,
@@ -1887,7 +2315,7 @@ export default function SaintPaulStudentExperience({
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               <div className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
-                  學號
+                  考生學號
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[#171717]">
                   {studentId}

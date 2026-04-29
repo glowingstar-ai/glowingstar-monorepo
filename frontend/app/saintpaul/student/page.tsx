@@ -39,9 +39,12 @@ export default function SaintPaulStudentPage({
   return (
     <SaintPaulStudentExperience
       lesson={selectedLesson}
+      grade={grade}
       mode={selectedMode.value}
       modeLabel={selectedMode.label}
+      subject={subject}
       topicLabel={topicLabel}
+      version={version}
     />
   );
 }

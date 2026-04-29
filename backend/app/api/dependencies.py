@@ -13,6 +13,10 @@ from app.services.payment import StripePaymentService
 from app.services.realtime import RealtimeSessionClient
 from app.services.research import ResearchDiscoveryService
 from app.services.context_storage import get_context_storage as _get_context_storage
+from app.services.saintpaul_persistence import (
+    SaintPaulPersistenceError,
+    SaintPaulPersistenceService,
+)
 from app.services.storage import S3AudioStorage, StorageServiceError
 from app.services.tutor import TutorModeService
 from app.services.vision import VisionAnalyzer
@@ -208,6 +212,21 @@ def get_tutor_service() -> TutorModeService:
     """FastAPI dependency wrapper around the tutor service singleton."""
 
     return _get_tutor_service()
+
+
+@lru_cache
+def _get_saintpaul_persistence() -> SaintPaulPersistenceService:
+    settings = _get_settings()
+    return SaintPaulPersistenceService(settings)
+
+
+def get_saintpaul_persistence() -> SaintPaulPersistenceService:
+    """Return the configured Saint Paul persistence service."""
+
+    try:
+        return _get_saintpaul_persistence()
+    except SaintPaulPersistenceError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @lru_cache

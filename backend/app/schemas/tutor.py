@@ -42,6 +42,13 @@ class TutorChatMessage(BaseModel):
 class TutorChatRequest(BaseModel):
     """Student-facing tutor chat request."""
 
+    session_id: str | None = Field(default=None, description="Saint Paul session id")
+    student_id: str | None = Field(default=None, description="Student identifier")
+    objective_index: int | None = Field(
+        default=None,
+        ge=0,
+        description="Zero-based active objective index",
+    )
     topic: str = Field(..., description="Lesson topic shown to the student")
     objective: str = Field(..., description="Currently selected learning objective")
     objectives: list[str] = Field(
@@ -68,6 +75,13 @@ class TutorChatResponse(BaseModel):
 class TutorImageExplanationRequest(BaseModel):
     """Generate a visual explanation for the current learning objective."""
 
+    session_id: str | None = Field(default=None, description="Saint Paul session id")
+    student_id: str | None = Field(default=None, description="Student identifier")
+    objective_index: int | None = Field(
+        default=None,
+        ge=0,
+        description="Zero-based active objective index",
+    )
     topic: str = Field(..., description="Lesson topic shown to the student")
     objective: str = Field(..., description="Currently selected learning objective")
     objectives: list[str] = Field(
@@ -96,6 +110,18 @@ class TutorImageExplanationResponse(BaseModel):
     error: str | None = Field(
         default=None,
         description="Fallback reason when OpenAI image generation failed",
+    )
+    asset_bucket: str | None = Field(
+        default=None,
+        description="S3 bucket storing the generated image asset",
+    )
+    asset_key: str | None = Field(
+        default=None,
+        description="S3 object key storing the generated image asset",
+    )
+    asset_url: str | None = Field(
+        default=None,
+        description="Public object URL when available",
     )
 
 
@@ -157,6 +183,13 @@ class TutorQuizHistoryItem(BaseModel):
 class TutorQuizRequest(BaseModel):
     """Generate a fresh multiple-choice quiz for the active learning objective."""
 
+    session_id: str | None = Field(default=None, description="Saint Paul session id")
+    student_id: str | None = Field(default=None, description="Student identifier")
+    objective_index: int | None = Field(
+        default=None,
+        ge=0,
+        description="Zero-based active objective index",
+    )
     topic: str = Field(..., description="Lesson topic shown to the student")
     objective: str = Field(..., description="Currently selected learning objective")
     objectives: list[str] = Field(

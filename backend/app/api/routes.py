@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import binascii
 import json
@@ -21,6 +23,7 @@ from app.api.dependencies import (
     get_payment_service,
     get_realtime_client,
     get_research_service,
+    get_saintpaul_persistence,
     get_settings,
     get_tutor_service,
     get_vision_analyzer,
@@ -46,6 +49,17 @@ from app.schemas.realtime import (
 from app.schemas.journal import JournalEntryRequest, JournalEntryResponse
 from app.schemas.research import ResearchPaperSummary, ResearchSearchRequest
 from app.schemas.note import NoteCreateRequest, NoteCreateResponse
+from app.schemas.saintpaul import (
+    SaintPaulErrorRecord,
+    SaintPaulEventRequest,
+    SaintPaulEventResponse,
+    SaintPaulQuizAttemptRequest,
+    SaintPaulQuizAttemptResponse,
+    SaintPaulSessionSnapshotRequest,
+    SaintPaulSessionSnapshotResponse,
+    SaintPaulSessionStartRequest,
+    SaintPaulSessionStartResponse,
+)
 from app.schemas.tutor import (
     TutorChatRequest,
     TutorChatResponse,
@@ -69,6 +83,10 @@ from app.services.transcription import AudioTranscriber
 from app.services.payment import StripePaymentError, StripePaymentService
 from app.services.realtime import RealtimeSessionClient, RealtimeSessionError
 from app.services.research import ResearchDiscoveryService
+from app.services.saintpaul_persistence import (
+    SaintPaulPersistenceError,
+    SaintPaulPersistenceService,
+)
 # from app.services.storage import S3AudioStorage, StorageServiceError  # Commented out AWS S3 for now
 from app.services.tutor import TutorModeService, TutorServiceUnavailableError
 from app.services.vision import (
@@ -667,6 +685,96 @@ async def create_checkout_session(
     return PaymentCheckoutResponse(session_id=session.session_id, checkout_url=session.url)
 
 
+@router.post(
+    "/saintpaul/session/start",
+    response_model=SaintPaulSessionStartResponse,
+    tags=["saintpaul"],
+)
+async def create_saintpaul_session(
+    payload: SaintPaulSessionStartRequest,
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
+) -> SaintPaulSessionStartResponse:
+    """Create a new persisted Saint Paul student session."""
+
+    try:
+        session_id, started_at = persistence.create_session(payload)
+    except SaintPaulPersistenceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return SaintPaulSessionStartResponse(
+        session_id=session_id,
+        started_at=started_at,
+        persistence_enabled=persistence.enabled,
+    )
+
+
+@router.post(
+    "/saintpaul/session/snapshot",
+    response_model=SaintPaulSessionSnapshotResponse,
+    tags=["saintpaul"],
+)
+async def save_saintpaul_session_snapshot(
+    payload: SaintPaulSessionSnapshotRequest,
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
+) -> SaintPaulSessionSnapshotResponse:
+    """Persist the latest recoverable Saint Paul session snapshot."""
+
+    try:
+        saved_at = persistence.save_snapshot(payload)
+    except SaintPaulPersistenceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return SaintPaulSessionSnapshotResponse(
+        saved_at=saved_at,
+        persistence_enabled=persistence.enabled,
+    )
+
+
+@router.post(
+    "/saintpaul/session/event",
+    response_model=SaintPaulEventResponse,
+    tags=["saintpaul"],
+)
+async def append_saintpaul_event(
+    payload: SaintPaulEventRequest,
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
+) -> SaintPaulEventResponse:
+    """Append a Saint Paul workflow event."""
+
+    try:
+        event_id, recorded_at = persistence.append_event(payload)
+    except SaintPaulPersistenceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return SaintPaulEventResponse(
+        event_id=event_id,
+        recorded_at=recorded_at,
+        persistence_enabled=persistence.enabled,
+    )
+
+
+@router.post(
+    "/saintpaul/session/quiz-attempt",
+    response_model=SaintPaulQuizAttemptResponse,
+    tags=["saintpaul"],
+)
+async def save_saintpaul_quiz_attempt(
+    payload: SaintPaulQuizAttemptRequest,
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
+) -> SaintPaulQuizAttemptResponse:
+    """Persist a completed Saint Paul AI quiz attempt."""
+
+    try:
+        saved_at = persistence.persist_quiz_attempt(payload)
+    except SaintPaulPersistenceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return SaintPaulQuizAttemptResponse(
+        saved_at=saved_at,
+        persistence_enabled=persistence.enabled,
+    )
+
+
 @router.post("/tutor/mode", response_model=TutorModeResponse, tags=["tutor"])
 async def create_tutor_mode_plan(
     payload: TutorModeRequest,
@@ -681,12 +789,87 @@ async def create_tutor_mode_plan(
 async def create_tutor_chat_reply(
     payload: TutorChatRequest,
     tutor_service: TutorModeService = Depends(get_tutor_service),
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
 ) -> TutorChatResponse:
     """Reply as the student-facing AI tutor for one learning objective."""
 
+    if payload.session_id and payload.messages:
+        latest_message = payload.messages[-1]
+        if latest_message.role == "user":
+            try:
+                persistence.persist_chat_message(
+                    session_id=payload.session_id,
+                    student_id=payload.student_id,
+                    objective_index=payload.objective_index,
+                    role=latest_message.role,
+                    content=latest_message.content,
+                )
+            except SaintPaulPersistenceError as exc:
+                try:
+                    persistence.record_error(
+                        SaintPaulErrorRecord(
+                            session_id=payload.session_id,
+                            student_id=payload.student_id,
+                            stage="chat_message_persist",
+                            error_scope="storage",
+                            error_message=str(exc),
+                            raw_error=repr(exc),
+                            tab="tutor",
+                            objective_index=payload.objective_index,
+                            metadata={"role": latest_message.role},
+                        )
+                    )
+                except SaintPaulPersistenceError:
+                    pass
+
     try:
-        return await tutor_service.chat_with_student(payload)
+        response = await tutor_service.chat_with_student(payload)
+        if payload.session_id:
+            try:
+                persistence.persist_chat_message(
+                    session_id=payload.session_id,
+                    student_id=payload.student_id,
+                    objective_index=payload.objective_index,
+                    role=response.message.role,
+                    content=response.message.content,
+                    model=response.model,
+                )
+            except SaintPaulPersistenceError as exc:
+                try:
+                    persistence.record_error(
+                        SaintPaulErrorRecord(
+                            session_id=payload.session_id,
+                            student_id=payload.student_id,
+                            stage="chat_message_persist",
+                            error_scope="storage",
+                            error_message=str(exc),
+                            raw_error=repr(exc),
+                            tab="tutor",
+                            objective_index=payload.objective_index,
+                            metadata={"role": response.message.role},
+                        )
+                    )
+                except SaintPaulPersistenceError:
+                    pass
+        return response
     except TutorServiceUnavailableError as exc:
+        if payload.session_id:
+            try:
+                persistence.record_error(
+                    SaintPaulErrorRecord(
+                        session_id=payload.session_id,
+                        student_id=payload.student_id,
+                        stage="tutor_chat",
+                        error_scope="backend",
+                        error_message=str(exc),
+                        raw_error=repr(exc),
+                        tab="tutor",
+                        objective_index=payload.objective_index,
+                        metadata={"topic": payload.topic, "objective": payload.objective},
+                    )
+                )
+            except SaintPaulPersistenceError:
+                pass
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
@@ -698,12 +881,68 @@ async def create_tutor_chat_reply(
 async def create_tutor_image_explanation(
     payload: TutorImageExplanationRequest,
     tutor_service: TutorModeService = Depends(get_tutor_service),
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
 ) -> TutorImageExplanationResponse:
     """Generate a visual explanation for the selected learning objective."""
 
     try:
-        return await tutor_service.generate_image_explanation(payload)
+        response = await tutor_service.generate_image_explanation(payload)
+        asset = None
+        if payload.session_id:
+            try:
+                asset = persistence.upload_image_data_url(
+                    session_id=payload.session_id,
+                    objective_index=payload.objective_index,
+                    image_data_url=response.image_data_url,
+                )
+                persistence.persist_image_artifact(
+                    session_id=payload.session_id,
+                    student_id=payload.student_id,
+                    objective_index=payload.objective_index,
+                    prompt=response.prompt,
+                    source=response.source,
+                    error=response.error,
+                    asset=asset,
+                )
+            except SaintPaulPersistenceError as exc:
+                try:
+                    persistence.record_error(
+                        SaintPaulErrorRecord(
+                            session_id=payload.session_id,
+                            student_id=payload.student_id,
+                            stage="image_asset_persist",
+                            error_scope="storage",
+                            error_message=str(exc),
+                            raw_error=repr(exc),
+                            tab="tutor",
+                            objective_index=payload.objective_index,
+                            metadata={"topic": payload.topic, "objective": payload.objective},
+                        )
+                    )
+                except SaintPaulPersistenceError:
+                    pass
+        response.asset_bucket = asset.bucket if asset else None
+        response.asset_key = asset.key if asset else None
+        response.asset_url = asset.url if asset else None
+        return response
     except TutorServiceUnavailableError as exc:
+        if payload.session_id:
+            try:
+                persistence.record_error(
+                    SaintPaulErrorRecord(
+                        session_id=payload.session_id,
+                        student_id=payload.student_id,
+                        stage="tutor_image_explanation",
+                        error_scope="backend",
+                        error_message=str(exc),
+                        raw_error=repr(exc),
+                        tab="tutor",
+                        objective_index=payload.objective_index,
+                        metadata={"topic": payload.topic, "objective": payload.objective},
+                    )
+                )
+            except SaintPaulPersistenceError:
+                pass
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
@@ -711,12 +950,60 @@ async def create_tutor_image_explanation(
 async def create_tutor_quiz(
     payload: TutorQuizRequest,
     tutor_service: TutorModeService = Depends(get_tutor_service),
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
 ) -> TutorQuizResponse:
     """Generate a fresh multiple-choice quiz for the selected learning objective."""
 
     try:
-        return await tutor_service.generate_quiz(payload)
+        response = await tutor_service.generate_quiz(payload)
+        if payload.session_id:
+            try:
+                persistence.persist_quiz_artifact(
+                    session_id=payload.session_id,
+                    student_id=payload.student_id,
+                    objective_index=payload.objective_index,
+                    title=response.title,
+                    quiz_id=response.quiz_id,
+                    questions=[question.model_dump(mode="json") for question in response.questions],
+                    source=response.source,
+                    error=response.error,
+                )
+            except SaintPaulPersistenceError as exc:
+                try:
+                    persistence.record_error(
+                        SaintPaulErrorRecord(
+                            session_id=payload.session_id,
+                            student_id=payload.student_id,
+                            stage="quiz_artifact_persist",
+                            error_scope="storage",
+                            error_message=str(exc),
+                            raw_error=repr(exc),
+                            tab="tutor",
+                            objective_index=payload.objective_index,
+                            metadata={"topic": payload.topic, "objective": payload.objective},
+                        )
+                    )
+                except SaintPaulPersistenceError:
+                    pass
+        return response
     except TutorServiceUnavailableError as exc:
+        if payload.session_id:
+            try:
+                persistence.record_error(
+                    SaintPaulErrorRecord(
+                        session_id=payload.session_id,
+                        student_id=payload.student_id,
+                        stage="tutor_quiz",
+                        error_scope="backend",
+                        error_message=str(exc),
+                        raw_error=repr(exc),
+                        tab="tutor",
+                        objective_index=payload.objective_index,
+                        metadata={"topic": payload.topic, "objective": payload.objective},
+                    )
+                )
+            except SaintPaulPersistenceError:
+                pass
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 

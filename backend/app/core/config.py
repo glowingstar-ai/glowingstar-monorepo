@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import lru_cache
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -45,8 +47,21 @@ class Settings(BaseSettings):
     aws_secret_access_key: str | None = Field(
         default=None, alias="AWS_SECRET_ACCESS_KEY"
     )
+    aws_profile: str | None = Field(default=None, alias="AWS_PROFILE")
     aws_region_name: str | None = Field(default=None, alias="AWS_REGION")
     aws_s3_bucket: str | None = Field(default=None, alias="AWS_S3_BUCKET")
+    aws_saintpaul_assets_bucket: str | None = Field(
+        default=None, alias="AWS_SAINTPAUL_ASSETS_BUCKET"
+    )
+    aws_saintpaul_sessions_table: str | None = Field(
+        default=None, alias="AWS_SAINTPAUL_SESSIONS_TABLE"
+    )
+    aws_saintpaul_events_table: str | None = Field(
+        default=None, alias="AWS_SAINTPAUL_EVENTS_TABLE"
+    )
+    aws_saintpaul_errors_table: str | None = Field(
+        default=None, alias="AWS_SAINTPAUL_ERRORS_TABLE"
+    )
     auth0_domain: str | None = Field(default=None, alias="AUTH0_DOMAIN")
     auth0_client_id: str | None = Field(default=None, alias="AUTH0_CLIENT_ID")
     auth0_client_secret: str | None = Field(
