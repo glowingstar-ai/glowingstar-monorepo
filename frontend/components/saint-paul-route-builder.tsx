@@ -84,18 +84,6 @@ function SelectField({
   );
 }
 
-function SummaryRow({
-  label,
-  value,
-}: Readonly<{ label: string; value: string }>): JSX.Element {
-  return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl bg-[#F7F4EE] px-4 py-3">
-      <span className="text-sm text-[#6B6A63]">{label}</span>
-      <span className="text-sm font-semibold text-[#171717]">{value}</span>
-    </div>
-  );
-}
-
 export default function SaintPaulRouteBuilder({
   data,
   initialSelection,
@@ -195,10 +183,10 @@ export default function SaintPaulRouteBuilder({
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-6 md:flex-row md:items-end md:justify-between md:px-8">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6B6A63]">
-              Saint Paul
+              聖保祿
             </p>
             <p className="mt-2 text-2xl font-semibold tracking-tight">
-              Teacher Link Builder
+              老師連結產生器
             </p>
           </div>
           <p className="max-w-md text-sm leading-6 text-[#5F5D57]">
@@ -210,10 +198,10 @@ export default function SaintPaulRouteBuilder({
       <div className="mx-auto max-w-7xl px-6 py-8 md:px-8 md:py-10">
         <section className="rounded-[28px] border border-[#DDD7CC] bg-[#FBF8F2] p-6 md:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6B6A63]">
-            Teacher Setup
+            老師設定
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#171717] md:text-4xl">
-            用 dropdown 快速建立學生連結
+            用下拉選單快速建立學生連結
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57] md:text-base">
             依序選擇科目、版本、年級與模式，連結會即時更新。整個流程集中在同一個表單裡，老師不用在多個區塊之間切換。
@@ -278,7 +266,7 @@ export default function SaintPaulRouteBuilder({
           <div className="flex flex-col gap-3 border-b border-[#EEE9DF] pb-5 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6B6A63]">
-                Live Link
+                即時連結
               </p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#171717]">
                 即時連結與內容預覽
@@ -310,27 +298,15 @@ export default function SaintPaulRouteBuilder({
               </p>
             </div>
 
-            <div className="mt-5 grid gap-3 md:grid-cols-4">
-              <SummaryRow
-                label="科目"
-                value={getLabel(subject, SUBJECT_LABELS)}
-              />
-              <SummaryRow
-                label="版本"
-                value={getLabel(currentVersion, VERSION_LABELS)}
-              />
-              <SummaryRow
-                label="年級"
-                value={getLabel(currentGrade, GRADE_LABELS)}
-              />
-              <SummaryRow label="模式" value={selectedMode.label} />
-            </div>
+            <p className="mt-5 text-sm leading-7 text-[#5F5D57]">
+              請將上方連結直接分享給學生。學生開啟後，會依照你目前設定的科目、版本、年級與模式進入對應內容。
+            </p>
 
             {selectedLesson ? (
               <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)]">
                 <div className="rounded-2xl bg-[#F7F4EE] p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6B6A63]">
-                    Topic
+                    主題
                   </p>
                   <p className="mt-3 text-xl font-semibold leading-8 text-[#171717]">
                     {selectedLesson.topic}
@@ -339,7 +315,7 @@ export default function SaintPaulRouteBuilder({
 
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6B6A63]">
-                    Objectives
+                    教學目標
                   </p>
                   <div className="mt-4 space-y-3">
                     {selectedLesson.objectives.map((objective, index) => (

@@ -13,6 +13,7 @@ import {
 import {
   type ButtonHTMLAttributes,
   type Dispatch,
+  type ReactNode,
   type SetStateAction,
   useState,
 } from "react";
@@ -32,7 +33,7 @@ type SaintPaulStudentExperienceProps = {
   topicLabel: string;
 };
 
-type StudentTabId = "pre" | "tutor" | "post";
+type StudentTabId = "pre" | "tutor" | "post" | "complete";
 type ObjectiveStatus = "not-started" | "in-progress" | "completed";
 type ChatMessage = {
   id: string;
@@ -143,7 +144,28 @@ type TimelineItem =
   | TimelineQuizItem
   | TimelineImageItem;
 
-type AssessmentResponseState = Record<string, string>;
+type AssessmentConfidence = "guess" | "somewhat-confident" | "very-confident";
+
+type AssessmentResponseValue = {
+  answer: string;
+  confidence: AssessmentConfidence | "";
+};
+
+type AssessmentResponseState = Record<string, AssessmentResponseValue>;
+
+type AssessmentQuestionErrors = {
+  answer: boolean;
+  confidence: boolean;
+};
+
+const CONFIDENCE_OPTIONS: Array<{
+  value: AssessmentConfidence;
+  label: string;
+}> = [
+  { value: "guess", label: "猜測" },
+  { value: "somewhat-confident", label: "略有把握" },
+  { value: "very-confident", label: "非常確定" },
+];
 
 function PrimaryButton({
   children,
@@ -245,6 +267,65 @@ function buildIntroTimelineItem(objective: string): TimelineTextItem {
   };
 }
 
+function getAssessmentFieldErrors(
+  questions: SaintPaulAssessmentQuestion[],
+  responses: AssessmentResponseState,
+): Record<string, AssessmentQuestionErrors> {
+  return Object.fromEntries(
+    questions.map((question) => {
+      const response = responses[question.id];
+      const answer = response?.answer ?? "";
+      const confidence = response?.confidence ?? "";
+
+      return [
+        question.id,
+        {
+          answer:
+            question.type === "MCQ" ? answer.length === 0 : answer.trim().length === 0,
+          confidence: confidence.length === 0,
+        },
+      ];
+    }),
+  );
+}
+
+function hasAssessmentErrors(
+  fieldErrors: Record<string, AssessmentQuestionErrors>,
+): boolean {
+  return Object.values(fieldErrors).some(
+    (errors) => errors.answer || errors.confidence,
+  );
+}
+
+function formatInlineMath(math: string): string {
+  return math
+    .replace(/\\Phi/g, "Φ")
+    .replace(/\\pi/g, "π")
+    .replace(/\\sin/g, "sin")
+    .replace(/\\sqrt\{([^}]+)\}/g, "√$1");
+}
+
+function renderTextWithInlineMath(text: string): ReactNode {
+  const segments = text.split(/(\$[^$]+\$)/g);
+
+  return segments.map((segment, index) => {
+    if (segment.startsWith("$") && segment.endsWith("$")) {
+      const math = segment.slice(1, -1).trim();
+
+      return (
+        <span
+          key={`${segment}-${index}`}
+          className="font-[Times_New_Roman] text-[1.02em] italic"
+        >
+          {formatInlineMath(math)}
+        </span>
+      );
+    }
+
+    return <span key={`${segment}-${index}`}>{segment}</span>;
+  });
+}
+
 export default function SaintPaulStudentExperience({
   lesson,
   mode,
@@ -253,8 +334,6 @@ export default function SaintPaulStudentExperience({
 }: Readonly<SaintPaulStudentExperienceProps>): JSX.Element {
   const hasTutorStage = mode === "quiz-plus-ai-tutor";
   const objectives = lesson?.objectives ?? [];
-  const preQuizTitle = lesson?.preQuizTitle ?? "前測";
-  const postQuizTitle = lesson?.postQuizTitle ?? "後測";
   const preQuizQuestions = lesson?.preQuestions ?? [];
   const postQuizQuestions = lesson?.postQuestions ?? [];
 
@@ -265,6 +344,8 @@ export default function SaintPaulStudentExperience({
     useState<AssessmentResponseState>({});
   const [preQuizSubmitted, setPreQuizSubmitted] = useState(false);
   const [postQuizSubmitted, setPostQuizSubmitted] = useState(false);
+  const [preQuizSubmitAttempted, setPreQuizSubmitAttempted] = useState(false);
+  const [postQuizSubmitAttempted, setPostQuizSubmitAttempted] = useState(false);
   const [activeObjectiveIndex, setActiveObjectiveIndex] = useState(0);
   const [objectiveStatuses, setObjectiveStatuses] = useState<ObjectiveStatus[]>(
     objectives.map(() => "not-started"),
@@ -342,14 +423,24 @@ export default function SaintPaulStudentExperience({
   const activeQuiz = quizByObjective[activeObjectiveIndex];
   const activeQuizHistory = quizHistoryByObjective[activeObjectiveIndex] ?? [];
   const activeQuizContext = buildQuizContext(activeObjectiveIndex);
+  const preQuizFieldErrors = getAssessmentFieldErrors(
+    preQuizQuestions,
+    preQuizResponses,
+  );
+  const postQuizFieldErrors = getAssessmentFieldErrors(
+    postQuizQuestions,
+    postQuizResponses,
+  );
+  const preQuizHasErrors = hasAssessmentErrors(preQuizFieldErrors);
+  const postQuizHasErrors = hasAssessmentErrors(postQuizFieldErrors);
   const completedObjectiveCount = objectiveStatuses.filter(
     (status) => status === "completed",
   ).length;
   const canOpenTutor = hasTutorStage && preQuizSubmitted;
-  const canOpenPostQuiz =
-    hasTutorStage &&
-    completedObjectiveCount === objectives.length &&
-    objectives.length > 0;
+  const canOpenPostQuiz = hasTutorStage
+    ? completedObjectiveCount === objectives.length && objectives.length > 0
+    : preQuizSubmitted;
+  const hasEnteredPostStage = activeTab === "post" || activeTab === "complete";
 
   const tabs = !hasTutorStage
     ? [
@@ -358,6 +449,18 @@ export default function SaintPaulStudentExperience({
           label: "前測",
           disabled: false,
           completed: preQuizSubmitted,
+        },
+        {
+          id: "post" as const,
+          label: "後測",
+          disabled: !canOpenPostQuiz,
+          completed: postQuizSubmitted,
+        },
+        {
+          id: "complete" as const,
+          label: "完成",
+          disabled: !postQuizSubmitted,
+          completed: false,
         },
       ]
     : [
@@ -370,7 +473,7 @@ export default function SaintPaulStudentExperience({
         {
           id: "tutor" as const,
           label: "智慧導學",
-          disabled: !canOpenTutor,
+          disabled: !canOpenTutor || hasEnteredPostStage,
           completed: false,
         },
         {
@@ -379,17 +482,36 @@ export default function SaintPaulStudentExperience({
           disabled: !canOpenPostQuiz,
           completed: postQuizSubmitted,
         },
+        {
+          id: "complete" as const,
+          label: "完成",
+          disabled: !postQuizSubmitted,
+          completed: false,
+        },
       ];
 
   const submitPreQuiz = () => {
+    setPreQuizSubmitAttempted(true);
+    if (preQuizHasErrors) {
+      return;
+    }
+
     setPreQuizSubmitted(true);
     if (hasTutorStage) {
       setActiveTab("tutor");
+    } else {
+      setActiveTab("post");
     }
   };
 
   const submitPostQuiz = () => {
+    setPostQuizSubmitAttempted(true);
+    if (postQuizHasErrors) {
+      return;
+    }
+
     setPostQuizSubmitted(true);
+    setActiveTab("complete");
   };
 
   const markObjectiveCompleted = () => {
@@ -422,7 +544,10 @@ export default function SaintPaulStudentExperience({
   ) => {
     setResponses((current) => ({
       ...current,
-      [questionId]: optionId,
+      [questionId]: {
+        answer: optionId,
+        confidence: current[questionId]?.confidence ?? "",
+      },
     }));
   };
 
@@ -433,7 +558,24 @@ export default function SaintPaulStudentExperience({
   ) => {
     setResponses((current) => ({
       ...current,
-      [questionId]: value,
+      [questionId]: {
+        answer: value,
+        confidence: current[questionId]?.confidence ?? "",
+      },
+    }));
+  };
+
+  const handleAssessmentConfidenceSelect = (
+    setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
+    questionId: string,
+    confidence: AssessmentConfidence,
+  ) => {
+    setResponses((current) => ({
+      ...current,
+      [questionId]: {
+        answer: current[questionId]?.answer ?? "",
+        confidence,
+      },
     }));
   };
 
@@ -443,17 +585,29 @@ export default function SaintPaulStudentExperience({
     responses: AssessmentResponseState,
     setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
     submitted: boolean,
+    fieldErrors: AssessmentQuestionErrors,
+    showErrors: boolean,
   ): JSX.Element => {
-    const currentResponse = responses[question.id] ?? "";
+    const currentResponse = responses[question.id] ?? {
+      answer: "",
+      confidence: "",
+    };
+    const showAnswerError = showErrors && fieldErrors.answer;
+    const showConfidenceError = showErrors && fieldErrors.confidence;
+    const showQuestionError = showAnswerError || showConfidenceError;
 
     return (
       <div
         key={question.id}
-        className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5"
+        className={cn(
+          "rounded-2xl border bg-[#FCFBF8] p-5",
+          showQuestionError ? "border-[#D14343] bg-[#FFF6F6]" : "border-[#E7E1D6]",
+        )}
       >
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm font-medium text-[#171717]">
-            {`第 ${index + 1} 題：${question.prompt}`}
+            <span>{`第 ${index + 1} 題：`}</span>
+            {renderTextWithInlineMath(question.prompt)}
           </p>
           <span className="inline-flex rounded-full border border-[#D8D2C7] bg-white px-3 py-1 text-xs font-medium text-[#5F5D57]">
             {question.type === "MCQ" ? "選擇題" : "簡答題"}
@@ -463,7 +617,7 @@ export default function SaintPaulStudentExperience({
         {question.type === "MCQ" ? (
           <div className="mt-4 grid gap-2">
             {question.options.map((option) => {
-              const isSelected = currentResponse === option.id;
+              const isSelected = currentResponse.answer === option.id;
 
               return (
                 <button
@@ -480,10 +634,15 @@ export default function SaintPaulStudentExperience({
                   className={cn(
                     "flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors",
                     !submitted &&
+                      !showAnswerError &&
                       "border-[#DDD7CC] bg-white hover:border-[#171717]",
                     !submitted &&
                       isSelected &&
                       "border-[#171717] bg-[#F7F3EC]",
+                    !submitted &&
+                      showAnswerError &&
+                      !isSelected &&
+                      "border-[#D14343] bg-white",
                     submitted && isSelected && "border-[#171717] bg-[#F7F3EC]",
                     submitted &&
                       !isSelected &&
@@ -493,14 +652,16 @@ export default function SaintPaulStudentExperience({
                   <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full border border-current px-1 text-xs font-semibold">
                     {option.id}
                   </span>
-                  <span className="leading-6">{option.text}</span>
+                  <span className="leading-6">
+                    {renderTextWithInlineMath(option.text)}
+                  </span>
                 </button>
               );
             })}
           </div>
         ) : (
           <textarea
-            value={currentResponse}
+            value={currentResponse.answer}
             onChange={(event) =>
               handleAssessmentTextChange(
                 setResponses,
@@ -509,14 +670,71 @@ export default function SaintPaulStudentExperience({
               )
             }
             disabled={submitted}
-            className="mt-4 min-h-28 w-full rounded-2xl border border-[#DDD7CC] bg-white px-4 py-3 text-sm leading-6 text-[#171717] outline-none transition-colors focus:border-[#171717] disabled:bg-[#F5F1E8]"
+            className={cn(
+              "mt-4 min-h-28 w-full rounded-2xl border bg-white px-4 py-3 text-sm leading-6 text-[#171717] outline-none transition-colors focus:border-[#171717] disabled:bg-[#F5F1E8]",
+              showAnswerError ? "border-[#D14343]" : "border-[#DDD7CC]",
+            )}
             placeholder="請輸入你的回答"
           />
         )}
 
-        {question.confidenceRating ? (
-          <p className="mt-3 text-xs leading-6 text-[#7B776F]">
-            {question.confidenceRating}
+        <div
+          className={cn(
+            "mt-4 ml-4 border-l pl-4",
+            showConfidenceError ? "border-[#D14343]" : "border-[#E2DCCE]",
+          )}
+        >
+          <p className="text-sm font-medium text-[#171717]">
+            請選擇你對這題答案的把握程度
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {CONFIDENCE_OPTIONS.map((option) => {
+              const isSelected = currentResponse.confidence === option.value;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() =>
+                    handleAssessmentConfidenceSelect(
+                      setResponses,
+                      question.id,
+                      option.value,
+                    )
+                  }
+                  disabled={submitted}
+                  className={cn(
+                    "rounded-2xl border px-4 py-3 text-left text-sm transition-colors",
+                    !submitted &&
+                      !showConfidenceError &&
+                      "border-[#DDD7CC] bg-white hover:border-[#171717]",
+                    !submitted &&
+                      isSelected &&
+                      "border-[#171717] bg-[#F7F3EC]",
+                    !submitted &&
+                      showConfidenceError &&
+                      !isSelected &&
+                      "border-[#D14343] bg-white",
+                    submitted && isSelected && "border-[#171717] bg-[#F7F3EC]",
+                    submitted &&
+                      !isSelected &&
+                      "border-[#E5DED1] bg-[#FCFBF8] text-[#5F5D57]",
+                  )}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {showQuestionError ? (
+          <p className="mt-3 text-sm text-[#D14343]">
+            {showAnswerError && showConfidenceError
+              ? "請完成作答並選擇把握程度。"
+              : showAnswerError
+                ? "這題還沒有作答。"
+                : "這題還沒有選擇把握程度。"}
           </p>
         ) : null}
       </div>
@@ -524,11 +742,12 @@ export default function SaintPaulStudentExperience({
   };
 
   const renderAssessmentSection = (
-    title: string,
     questions: SaintPaulAssessmentQuestion[],
     responses: AssessmentResponseState,
     setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
     submitted: boolean,
+    fieldErrors: Record<string, AssessmentQuestionErrors>,
+    showErrors: boolean,
   ): JSX.Element => {
     if (questions.length === 0) {
       return (
@@ -541,11 +760,8 @@ export default function SaintPaulStudentExperience({
     return (
       <div className="mt-6">
         <div className="rounded-2xl bg-[#F7F4EE] px-5 py-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
-            {title}
-          </p>
           <p className="mt-2 text-sm leading-6 text-[#5F5D57]">
-            共 {questions.length} 題。選擇題可直接點選答案，簡答題請輸入文字作答。
+            共 {questions.length} 題。每題都要完成作答，並選擇一次把握程度後才能繼續。
           </p>
         </div>
         <div className="mt-4 space-y-4">
@@ -556,6 +772,8 @@ export default function SaintPaulStudentExperience({
               responses,
               setResponses,
               submitted,
+              fieldErrors[question.id] ?? { answer: false, confidence: false },
+              showErrors,
             ),
           )}
         </div>
@@ -871,7 +1089,8 @@ export default function SaintPaulStudentExperience({
         {quiz.questions.map((question, index) => (
           <div key={question.id} className={index === 0 ? "mt-3" : "mt-5"}>
             <p className="text-sm font-medium leading-7 text-[#171717]">
-              {`第 ${index + 1} 題：${question.prompt}`}
+              <span>{`第 ${index + 1} 題：`}</span>
+              {renderTextWithInlineMath(question.prompt)}
             </p>
 
             <div className="mt-3 grid gap-2">
@@ -915,7 +1134,9 @@ export default function SaintPaulStudentExperience({
                     <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full border border-current px-1 text-xs font-semibold">
                       {option.id}
                     </span>
-                    <span className="leading-6">{option.text}</span>
+                    <span className="leading-6">
+                      {renderTextWithInlineMath(option.text)}
+                    </span>
                   </button>
                 );
               })}
@@ -1178,29 +1399,39 @@ export default function SaintPaulStudentExperience({
         {activeTab === "pre" ? (
           <section className="rounded-[28px] border border-[#DDD7CC] bg-white p-6 shadow-[0_8px_24px_rgba(23,23,23,0.04)] md:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6B6A63]">
-              {hasTutorStage ? "前測階段" : "測驗階段"}
+              前測階段
             </p>
             <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#171717]">
-              {hasTutorStage ? "前測" : "測驗"}
+              前測
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57]">
               請先完成題庫中的前測題目。提交後，此步驟會鎖定，並依序進入下一個階段。
             </p>
             {renderAssessmentSection(
-              preQuizTitle,
               preQuizQuestions,
               preQuizResponses,
               setPreQuizResponses,
               preQuizSubmitted,
+              preQuizFieldErrors,
+              preQuizSubmitAttempted && !preQuizSubmitted,
             )}
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#EEE9DF] pt-5">
-              <p className="text-sm leading-6 text-[#5F5D57]">
-                {preQuizSubmitted
+              <p
+                className={cn(
+                  "text-sm leading-6",
+                  preQuizSubmitAttempted && preQuizHasErrors && !preQuizSubmitted
+                    ? "text-[#D14343]"
+                    : "text-[#5F5D57]",
+                )}
+              >
+                {preQuizSubmitAttempted && preQuizHasErrors && !preQuizSubmitted
+                  ? "請檢查一遍，所有題目都必須完成作答，並選擇把握程度後才能繼續。"
+                  : preQuizSubmitted
                   ? "前測已提交，這一階段已鎖定。"
                   : hasTutorStage
                     ? "提交後會解鎖智慧導學。"
-                    : "提交後此測驗會鎖定。"}
+                    : "提交後會進入後測。"}
               </p>
 
               <PrimaryButton
@@ -1414,19 +1645,31 @@ export default function SaintPaulStudentExperience({
               後測
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57]">
-              完成智慧導學後，請作答後測題目。提交後此測驗會鎖定。
+              {hasTutorStage
+                ? "完成智慧導學後，請作答後測題目。提交後此測驗會鎖定。"
+                : "完成前測後，請作答後測題目。提交後此測驗會鎖定。"}
             </p>
             {renderAssessmentSection(
-              postQuizTitle,
               postQuizQuestions,
               postQuizResponses,
               setPostQuizResponses,
               postQuizSubmitted,
+              postQuizFieldErrors,
+              postQuizSubmitAttempted && !postQuizSubmitted,
             )}
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#EEE9DF] pt-5">
-              <p className="text-sm leading-6 text-[#5F5D57]">
-                {postQuizSubmitted
+              <p
+                className={cn(
+                  "text-sm leading-6",
+                  postQuizSubmitAttempted && postQuizHasErrors && !postQuizSubmitted
+                    ? "text-[#D14343]"
+                    : "text-[#5F5D57]",
+                )}
+              >
+                {postQuizSubmitAttempted && postQuizHasErrors && !postQuizSubmitted
+                  ? "請檢查一遍，所有題目都必須完成作答，並選擇把握程度後才能提交。"
+                  : postQuizSubmitted
                   ? "後測已提交，這一階段已鎖定。"
                   : "提交後將無法返回前面的測驗流程。"}
               </p>
@@ -1447,6 +1690,65 @@ export default function SaintPaulStudentExperience({
                   </>
                 )}
               </PrimaryButton>
+            </div>
+          </section>
+        ) : null}
+
+        {activeTab === "complete" ? (
+          <section className="rounded-[28px] border border-[#DDD7CC] bg-white p-6 shadow-[0_8px_24px_rgba(23,23,23,0.04)] md:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6B6A63]">
+              學習流程完成
+            </p>
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#171717]">
+              你已完成這次學習任務
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57]">
+              {hasTutorStage
+                ? "前測、智慧導學與後測都已完成，系統已記錄你的作答。你可以停留在此頁面等待老師下一步指示。"
+                : "前測與後測都已完成，系統已記錄你的作答。你可以停留在此頁面等待老師下一步指示。"}
+            </p>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+                  學習主題
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#171717]">
+                  {lesson?.topic ?? "未提供"}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+                  學習模式
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#171717]">
+                  {modeLabel}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+                  已完成目標
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#171717]">
+                  {objectives.length} / {objectives.length}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-3xl border border-[#CFE2D4] bg-[#EDF7F0] p-6">
+              <div className="flex items-start gap-3">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#256C42] text-white">
+                  <Check className="h-5 w-5" strokeWidth={2} />
+                </div>
+                <div>
+                  <p className="text-base font-medium text-[#256C42]">
+                    已成功完成全部階段
+                  </p>
+                  <p className="mt-2 text-sm leading-7 text-[#3E5F49]">
+                    如需再次查看本次課程資訊，可保留此頁面；若老師另有安排，請依老師指示進行下一步。
+                  </p>
+                </div>
+              </div>
             </div>
           </section>
         ) : null}
