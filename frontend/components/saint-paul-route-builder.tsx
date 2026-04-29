@@ -3,28 +3,22 @@
 import { Check, ChevronDown, Copy } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { type ButtonHTMLAttributes, useEffect, useState } from "react";
+import {
+  buildSaintPaulQueryString,
+  GRADE_LABELS,
+  getLabel,
+  MODE_OPTIONS,
+  normalizeFirstValue,
+  type SaintPaulSelection,
+  SUBJECT_LABELS,
+  type TeachingObjectivesData,
+  VERSION_LABELS,
+} from "@/lib/saint-paul";
 import { cn } from "@/lib/utils";
-
-type TeachingObjective = {
-  topic: string;
-  objectives: string[];
-};
-
-type TeachingObjectivesData = Record<
-  string,
-  Record<string, Record<string, TeachingObjective>>
->;
-
-type InitialSelection = {
-  grade?: string;
-  mode?: string;
-  subject?: string;
-  version?: string;
-};
 
 type SaintPaulRouteBuilderProps = {
   data: TeachingObjectivesData;
-  initialSelection: InitialSelection;
+  initialSelection: SaintPaulSelection;
 };
 
 type SelectFieldProps = {
@@ -34,55 +28,6 @@ type SelectFieldProps = {
   value: string;
   onChange: (value: string) => void;
 };
-
-const SUBJECT_LABELS: Record<string, string> = {
-  chemistry: "化學",
-  geography: "地理",
-  history: "歷史",
-  physics: "物理",
-};
-
-const VERSION_LABELS: Record<string, string> = {
-  formal: "正式",
-  preliminary: "預備",
-  unspecified: "單一版本",
-};
-
-const GRADE_LABELS: Record<string, string> = {
-  F4: "高一",
-  F5: "高二",
-};
-
-const MODE_OPTIONS = [
-  {
-    value: "quiz-only",
-    label: "僅測驗",
-    description: "學生只會看到測驗內容。",
-  },
-  {
-    value: "quiz-plus-ai-tutor",
-    label: "測驗加 AI 導師",
-    description: "學生可使用測驗與 AI 導師輔助。",
-  },
-];
-
-function getLabel(
-  key: string,
-  labels: Record<string, string>,
-  fallback?: string,
-): string {
-  return labels[key] ?? fallback ?? key;
-}
-
-function normalizeFirstValue(
-  value: string | string[] | undefined,
-): string | undefined {
-  if (Array.isArray(value)) {
-    return value[0];
-  }
-
-  return value;
-}
 
 function ActionButton({
   children,
@@ -205,13 +150,12 @@ export default function SaintPaulRouteBuilder({
   }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (subject) params.set("subject", subject);
-    if (currentVersion) params.set("version", currentVersion);
-    if (currentGrade) params.set("grade", currentGrade);
-    if (mode) params.set("mode", mode);
-
-    const queryString = params.toString();
+    const queryString = buildSaintPaulQueryString({
+      grade: currentGrade,
+      mode,
+      subject,
+      version: currentVersion,
+    });
     const nextUrl = queryString ? `${pathname}?${queryString}` : pathname;
     window.history.replaceState(null, "", nextUrl);
   }, [currentGrade, currentVersion, mode, pathname, subject]);
@@ -226,13 +170,14 @@ export default function SaintPaulRouteBuilder({
     return () => window.clearTimeout(timeout);
   }, [copied]);
 
-  const shareParams = new URLSearchParams({
+  const shareSelection = {
     grade: currentGrade,
     mode,
     subject,
     version: currentVersion,
-  });
-  const sharePath = `${pathname}?${shareParams.toString()}`;
+  };
+  const shareQueryString = buildSaintPaulQueryString(shareSelection);
+  const sharePath = `/saintpaul/student?${shareQueryString}`;
   const shareUrl = origin ? `${origin}${sharePath}` : sharePath;
 
   const handleCopy = async () => {

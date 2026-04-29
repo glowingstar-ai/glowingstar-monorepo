@@ -30,6 +30,174 @@ class TutorModeRequest(BaseModel):
     )
 
 
+class TutorChatMessage(BaseModel):
+    """Single tutor chat turn."""
+
+    role: Literal["user", "assistant"] = Field(
+        description="Speaker role in the conversation history"
+    )
+    content: str = Field(description="Plain text content for the turn")
+
+
+class TutorChatRequest(BaseModel):
+    """Student-facing tutor chat request."""
+
+    topic: str = Field(..., description="Lesson topic shown to the student")
+    objective: str = Field(..., description="Currently selected learning objective")
+    objectives: list[str] = Field(
+        default_factory=list,
+        description="All learning objectives for the lesson so the tutor can stay scoped",
+    )
+    messages: list[TutorChatMessage] = Field(
+        default_factory=list,
+        description="Conversation history including the latest student message",
+    )
+    quiz_history: list["TutorQuizHistoryItem"] = Field(
+        default_factory=list,
+        description="Previously generated quizzes and the student's choices",
+    )
+
+
+class TutorChatResponse(BaseModel):
+    """Assistant reply for the student-facing tutor experience."""
+
+    model: str = Field(description="Model powering the reply")
+    message: TutorChatMessage
+
+
+class TutorImageExplanationRequest(BaseModel):
+    """Generate a visual explanation for the current learning objective."""
+
+    topic: str = Field(..., description="Lesson topic shown to the student")
+    objective: str = Field(..., description="Currently selected learning objective")
+    objectives: list[str] = Field(
+        default_factory=list,
+        description="All lesson objectives for additional context",
+    )
+    messages: list[TutorChatMessage] = Field(
+        default_factory=list,
+        description="Conversation history for the active learning objective",
+    )
+    quiz_history: list["TutorQuizHistoryItem"] = Field(
+        default_factory=list,
+        description="Previously generated quizzes and the student's choices",
+    )
+
+
+class TutorImageExplanationResponse(BaseModel):
+    """Image explanation payload for the student-facing tutor experience."""
+
+    model: str = Field(description="Model powering the image explanation")
+    prompt: str = Field(description="Prompt used to generate the explanation image")
+    image_data_url: str = Field(description="Rendered image as a browser-ready data URL")
+    source: Literal["openai", "fallback"] = Field(
+        description="Whether the image came from OpenAI or the local fallback renderer"
+    )
+    error: str | None = Field(
+        default=None,
+        description="Fallback reason when OpenAI image generation failed",
+    )
+
+
+class TutorQuizOption(BaseModel):
+    """One multiple-choice option for a generated quiz question."""
+
+    id: str = Field(description="Stable option identifier such as A/B/C/D")
+    text: str = Field(description="Traditional Chinese answer option text")
+
+
+class TutorQuizQuestion(BaseModel):
+    """Multiple-choice quiz question with answer key."""
+
+    id: str = Field(description="Stable question identifier")
+    prompt: str = Field(description="Question prompt shown to the student")
+    options: list[TutorQuizOption] = Field(
+        default_factory=list,
+        description="List of answer options",
+    )
+    correct_option_id: str = Field(description="Correct option id")
+    explanation: str | None = Field(
+        default=None,
+        description="Short explanation shown after submission",
+    )
+
+
+class TutorQuizQuestionHistory(TutorQuizQuestion):
+    """Quiz question plus the student's answer state."""
+
+    selected_option_id: str | None = Field(
+        default=None,
+        description="Student-selected option id",
+    )
+    is_correct: bool | None = Field(
+        default=None,
+        description="Whether the student's answer was correct",
+    )
+
+
+class TutorQuizHistoryItem(BaseModel):
+    """One previously generated quiz attempt."""
+
+    quiz_id: str = Field(description="Stable quiz instance identifier")
+    title: str = Field(description="Quiz title shown to the student")
+    questions: list[TutorQuizQuestionHistory] = Field(
+        default_factory=list,
+        description="Questions, answer keys, and student selections",
+    )
+    score: int | None = Field(
+        default=None,
+        description="Number of correct answers in this quiz attempt",
+    )
+    total_questions: int | None = Field(
+        default=None,
+        description="Total number of questions in this quiz attempt",
+    )
+
+
+class TutorQuizRequest(BaseModel):
+    """Generate a fresh multiple-choice quiz for the active learning objective."""
+
+    topic: str = Field(..., description="Lesson topic shown to the student")
+    objective: str = Field(..., description="Currently selected learning objective")
+    objectives: list[str] = Field(
+        default_factory=list,
+        description="All lesson objectives for additional context",
+    )
+    messages: list[TutorChatMessage] = Field(
+        default_factory=list,
+        description="Conversation history for the active learning objective",
+    )
+    quiz_history: list[TutorQuizHistoryItem] = Field(
+        default_factory=list,
+        description="Previously generated quizzes and the student's choices",
+    )
+    question_count: int = Field(
+        default=3,
+        ge=1,
+        le=5,
+        description="Number of multiple-choice questions to generate",
+    )
+
+
+class TutorQuizResponse(BaseModel):
+    """Freshly generated quiz payload."""
+
+    model: str = Field(description="Model powering the quiz generation")
+    quiz_id: str = Field(description="Stable quiz instance identifier")
+    title: str = Field(description="Quiz title shown to the student")
+    questions: list[TutorQuizQuestion] = Field(
+        default_factory=list,
+        description="Multiple-choice questions with answer keys",
+    )
+    source: Literal["openai", "fallback"] = Field(
+        description="Whether the quiz came from OpenAI or the local fallback generator"
+    )
+    error: str | None = Field(
+        default=None,
+        description="Fallback reason when OpenAI quiz generation failed",
+    )
+
+
 class TutorUnderstandingPlan(BaseModel):
     """Step 0 – capture how the tutor will gauge the learner's level."""
 
@@ -158,3 +326,8 @@ class TutorModeResponse(BaseModel):
     completion: TutorCompletionPlan
     conversation_manager: TutorConversationManager
     learning_stages: list[TutorLearningStage]
+
+
+TutorChatRequest.model_rebuild()
+TutorImageExplanationRequest.model_rebuild()
+TutorQuizRequest.model_rebuild()

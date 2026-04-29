@@ -1,0 +1,10 @@
+.env
+.env.*
+.pytest_cache
+.ruff_cache
+.venv
+__pycache__
+*.pyc
+captured_images
+tests
+

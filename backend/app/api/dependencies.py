@@ -12,9 +12,9 @@ from app.services.transcription import AudioTranscriber
 from app.services.payment import StripePaymentService
 from app.services.realtime import RealtimeSessionClient
 from app.services.research import ResearchDiscoveryService
+from app.services.context_storage import get_context_storage as _get_context_storage
 from app.services.storage import S3AudioStorage, StorageServiceError
 from app.services.tutor import TutorModeService
-from app.services.context_storage import get_context_storage
 from app.services.vision import VisionAnalyzer
 
 
@@ -185,6 +185,12 @@ def get_research_service() -> ResearchDiscoveryService:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
+def get_context_storage():
+    """Return the shared context storage instance."""
+
+    return _get_context_storage()
+
+
 @lru_cache
 def _get_tutor_service() -> TutorModeService:
     """Return a singleton tutor mode service configured from settings."""
@@ -193,7 +199,8 @@ def _get_tutor_service() -> TutorModeService:
     return TutorModeService(
         api_key=settings.openai_api_key,
         base_url=settings.openai_api_base_url,
-        model="gpt-5",
+        model=settings.openai_tutor_model,
+        image_model=settings.openai_image_model,
     )
 
 
@@ -246,5 +253,3 @@ def get_payment_service() -> StripePaymentService:
         return _get_payment_service()
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-

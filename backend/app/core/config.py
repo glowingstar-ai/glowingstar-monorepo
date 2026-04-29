@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     openai_api_base_url: str = Field(
         default="https://api.openai.com/v1", alias="OPENAI_API_BASE_URL"
     )
+    openai_tutor_model: str = Field(
+        default="gpt-5.5", alias="OPENAI_TUTOR_MODEL"
+    )
+    openai_image_model: str = Field(
+        default="gpt-image-2", alias="OPENAI_IMAGE_MODEL"
+    )
     openai_realtime_model: str = Field(
         default="gpt-realtime", alias="OPENAI_REALTIME_MODEL"
     )

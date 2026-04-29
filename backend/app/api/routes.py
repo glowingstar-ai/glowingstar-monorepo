@@ -46,7 +46,16 @@ from app.schemas.realtime import (
 from app.schemas.journal import JournalEntryRequest, JournalEntryResponse
 from app.schemas.research import ResearchPaperSummary, ResearchSearchRequest
 from app.schemas.note import NoteCreateRequest, NoteCreateResponse
-from app.schemas.tutor import TutorModeRequest, TutorModeResponse
+from app.schemas.tutor import (
+    TutorChatRequest,
+    TutorChatResponse,
+    TutorImageExplanationRequest,
+    TutorImageExplanationResponse,
+    TutorModeRequest,
+    TutorModeResponse,
+    TutorQuizRequest,
+    TutorQuizResponse,
+)
 from app.services.auth import Auth0Client, Auth0ClientError
 from app.services.emotion import EmotionAnalyzer
 from app.services.generative_ui import (
@@ -56,7 +65,7 @@ from app.services.generative_ui import (
 )
 from app.services.journal import JournalCoach, JournalCoachError
 from app.services.note import NoteAnnotator, NoteAnnotationError
-from app.services.transcription import AudioTranscriber, AudioTranscriptionError
+from app.services.transcription import AudioTranscriber
 from app.services.payment import StripePaymentError, StripePaymentService
 from app.services.realtime import RealtimeSessionClient, RealtimeSessionError
 from app.services.research import ResearchDiscoveryService
@@ -432,7 +441,6 @@ async def stream_note_annotation(
 
     async def event_stream():
         annotation_chunks: list[str] = []
-        audio_bytes: bytes | None = None
         audio_url: str | None = None
         transcript_text: str | None = None
 
@@ -667,6 +675,40 @@ async def create_tutor_mode_plan(
     """Create a BabyAGI-inspired tutoring plan powered by GPT-5."""
 
     return await tutor_service.generate_plan(payload)
+
+
+@router.post("/tutor/chat", response_model=TutorChatResponse, tags=["tutor"])
+async def create_tutor_chat_reply(
+    payload: TutorChatRequest,
+    tutor_service: TutorModeService = Depends(get_tutor_service),
+) -> TutorChatResponse:
+    """Reply as the student-facing AI tutor for one learning objective."""
+
+    return await tutor_service.chat_with_student(payload)
+
+
+@router.post(
+    "/tutor/image-explanation",
+    response_model=TutorImageExplanationResponse,
+    tags=["tutor"],
+)
+async def create_tutor_image_explanation(
+    payload: TutorImageExplanationRequest,
+    tutor_service: TutorModeService = Depends(get_tutor_service),
+) -> TutorImageExplanationResponse:
+    """Generate a visual explanation for the selected learning objective."""
+
+    return await tutor_service.generate_image_explanation(payload)
+
+
+@router.post("/tutor/quiz", response_model=TutorQuizResponse, tags=["tutor"])
+async def create_tutor_quiz(
+    payload: TutorQuizRequest,
+    tutor_service: TutorModeService = Depends(get_tutor_service),
+) -> TutorQuizResponse:
+    """Generate a fresh multiple-choice quiz for the selected learning objective."""
+
+    return await tutor_service.generate_quiz(payload)
 
 
 def _encode_event(payload: dict[str, object]) -> str:
