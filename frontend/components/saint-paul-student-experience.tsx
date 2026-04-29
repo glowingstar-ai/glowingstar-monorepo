@@ -92,6 +92,19 @@ type TutorQuizResponse = {
   error: string | null;
 };
 
+function getStudentFacingErrorMessage(
+  feature: "chat" | "image" | "quiz",
+): string {
+  switch (feature) {
+    case "chat":
+      return "智慧導學目前暫時無法使用，請先告訴老師。";
+    case "image":
+      return "圖像說明目前暫時無法使用，請先告訴老師。";
+    case "quiz":
+      return "即時練習目前暫時無法使用，請先告訴老師。";
+  }
+}
+
 type GeneratedImageState = {
   imageDataUrl: string;
   source: "openai" | "fallback";
@@ -881,7 +894,7 @@ export default function SaintPaulStudentExperience({
       });
 
       if (!response.ok) {
-        throw new Error("Tutor chat request failed");
+        throw new Error(getStudentFacingErrorMessage("chat"));
       }
 
       const payload = (await response.json()) as TutorChatResponse;
@@ -910,7 +923,7 @@ export default function SaintPaulStudentExperience({
       }));
     } catch (error) {
       console.error(error);
-      setChatError("目前無法連接智慧導學，請稍後再試。");
+      setChatError(getStudentFacingErrorMessage("chat"));
       setTimelineByObjective((current) => ({
         ...current,
         [objectiveIndex]: (current[objectiveIndex] ?? []).filter(
@@ -967,7 +980,7 @@ export default function SaintPaulStudentExperience({
       });
 
       if (!response.ok) {
-        throw new Error("Tutor image request failed");
+        throw new Error(getStudentFacingErrorMessage("image"));
       }
 
       const payload = (await response.json()) as TutorImageExplanationResponse;
@@ -997,7 +1010,7 @@ export default function SaintPaulStudentExperience({
       );
     } catch (error) {
       console.error(error);
-      setChatError("目前無法生成圖像說明，請稍後再試。");
+      setChatError(getStudentFacingErrorMessage("image"));
       setTimelineByObjective((current) => ({
         ...current,
         [objectiveIndex]: (current[objectiveIndex] ?? []).filter(
@@ -1055,7 +1068,7 @@ export default function SaintPaulStudentExperience({
       });
 
       if (!response.ok) {
-        throw new Error("Tutor quiz request failed");
+        throw new Error(getStudentFacingErrorMessage("quiz"));
       }
 
       const payload = (await response.json()) as TutorQuizResponse;
@@ -1096,7 +1109,7 @@ export default function SaintPaulStudentExperience({
       );
     } catch (error) {
       console.error(error);
-      setQuizError("目前無法生成新的測驗，請稍後再試。");
+      setQuizError(getStudentFacingErrorMessage("quiz"));
       setTimelineByObjective((current) => ({
         ...current,
         [objectiveIndex]: (current[objectiveIndex] ?? []).filter(

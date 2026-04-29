@@ -1,9 +1,10 @@
-"""Tutor mode orchestration powered by GPT-5 (with graceful fallbacks)."""
+"""Tutor mode orchestration powered by GPT-5."""
 
 from __future__ import annotations
 
 import base64
 import json
+import logging
 from datetime import datetime, timezone
 from html import escape
 from textwrap import dedent
@@ -35,6 +36,12 @@ from app.schemas.tutor import (
     TutorTeachingModality,
     TutorUnderstandingPlan,
 )
+
+logger = logging.getLogger(__name__)
+
+
+class TutorServiceUnavailableError(RuntimeError):
+    """Raised when tutor features cannot reach required upstream services."""
 
 
 class TutorModeService:
@@ -71,7 +78,9 @@ class TutorModeService:
         """Generate a student-facing tutor reply scoped to one learning objective."""
 
         if not self.api_key:
-            return self._offline_chat_response(payload)
+            raise TutorServiceUnavailableError(
+                "智慧導學暫時不可用，請先尋求老師協助。"
+            )
 
         try:
             response_text = await self._call_openai_chat(payload)
@@ -79,8 +88,11 @@ class TutorModeService:
                 model=self.model,
                 message=TutorChatMessage(role="assistant", content=response_text),
             )
-        except Exception:
-            return self._offline_chat_response(payload)
+        except Exception as exc:
+            logger.exception("Tutor chat request failed")
+            raise TutorServiceUnavailableError(
+                "智慧導學暫時不可用，請先尋求老師協助。"
+            ) from exc
 
     async def generate_image_explanation(
         self, payload: TutorImageExplanationRequest
@@ -90,12 +102,8 @@ class TutorModeService:
         prompt = self._build_image_prompt(payload)
 
         if not self.api_key:
-            return TutorImageExplanationResponse(
-                model=self.image_model,
-                prompt=prompt,
-                image_data_url=self._offline_image_data_url(payload.objective),
-                source="fallback",
-                error="目前無法連接圖像服務，已改為顯示備援圖示。",
+            raise TutorServiceUnavailableError(
+                "圖像說明暫時不可用，請先尋求老師協助。"
             )
 
         try:
@@ -107,31 +115,27 @@ class TutorModeService:
                 source="openai",
                 error=None,
             )
-        except Exception:
-            return TutorImageExplanationResponse(
-                model=self.image_model,
-                prompt=prompt,
-                image_data_url=self._offline_image_data_url(payload.objective),
-                source="fallback",
-                error="目前無法生成真實圖像，已改為顯示備援圖示。",
+        except Exception as exc:
+            logger.exception("Tutor image explanation request failed")
+            raise TutorServiceUnavailableError(
+                "圖像說明暫時不可用，請先尋求老師協助。"
             )
 
     async def generate_quiz(self, payload: TutorQuizRequest) -> TutorQuizResponse:
         """Generate a new multiple-choice quiz for the active learning objective."""
 
         if not self.api_key:
-            return self._offline_quiz_response(
-                payload,
-                error="目前無法連接測驗服務，已改為顯示備援題目。",
+            raise TutorServiceUnavailableError(
+                "練習題暫時不可用，請先尋求老師協助。"
             )
 
         try:
             response_json = await self._call_openai_quiz(payload)
             return self._from_openai_quiz(payload, response_json)
-        except Exception:
-            return self._offline_quiz_response(
-                payload,
-                error="目前無法生成新的測驗，已改為顯示備援題目。",
+        except Exception as exc:
+            logger.exception("Tutor quiz generation failed")
+            raise TutorServiceUnavailableError(
+                "練習題暫時不可用，請先尋求老師協助。"
             )
 
     async def _call_openai(self, payload: TutorModeRequest) -> dict[str, Any]:

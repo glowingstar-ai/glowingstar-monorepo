@@ -70,7 +70,7 @@ from app.services.payment import StripePaymentError, StripePaymentService
 from app.services.realtime import RealtimeSessionClient, RealtimeSessionError
 from app.services.research import ResearchDiscoveryService
 # from app.services.storage import S3AudioStorage, StorageServiceError  # Commented out AWS S3 for now
-from app.services.tutor import TutorModeService
+from app.services.tutor import TutorModeService, TutorServiceUnavailableError
 from app.services.vision import (
     VisionAnalysisError,
     VisionAnalyzer,
@@ -684,7 +684,10 @@ async def create_tutor_chat_reply(
 ) -> TutorChatResponse:
     """Reply as the student-facing AI tutor for one learning objective."""
 
-    return await tutor_service.chat_with_student(payload)
+    try:
+        return await tutor_service.chat_with_student(payload)
+    except TutorServiceUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post(
@@ -698,7 +701,10 @@ async def create_tutor_image_explanation(
 ) -> TutorImageExplanationResponse:
     """Generate a visual explanation for the selected learning objective."""
 
-    return await tutor_service.generate_image_explanation(payload)
+    try:
+        return await tutor_service.generate_image_explanation(payload)
+    except TutorServiceUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/tutor/quiz", response_model=TutorQuizResponse, tags=["tutor"])
@@ -708,7 +714,10 @@ async def create_tutor_quiz(
 ) -> TutorQuizResponse:
     """Generate a fresh multiple-choice quiz for the selected learning objective."""
 
-    return await tutor_service.generate_quiz(payload)
+    try:
+        return await tutor_service.generate_quiz(payload)
+    except TutorServiceUnavailableError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 def _encode_event(payload: dict[str, object]) -> str:
