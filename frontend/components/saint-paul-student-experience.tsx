@@ -337,6 +337,9 @@ export default function SaintPaulStudentExperience({
   const preQuizQuestions = lesson?.preQuestions ?? [];
   const postQuizQuestions = lesson?.postQuestions ?? [];
 
+  const [studentIdDraft, setStudentIdDraft] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [studentIdSubmitAttempted, setStudentIdSubmitAttempted] = useState(false);
   const [activeTab, setActiveTab] = useState<StudentTabId>("pre");
   const [preQuizResponses, setPreQuizResponses] =
     useState<AssessmentResponseState>({});
@@ -445,6 +448,8 @@ export default function SaintPaulStudentExperience({
   const hasEnteredPostStage = activeTab === "post" || activeTab === "complete";
   const isLessonStageCompleted =
     activeTab === "post" || activeTab === "complete" || lessonInstructionAcknowledged;
+  const trimmedStudentId = studentIdDraft.trim();
+  const hasStudentId = studentId.length > 0;
 
   const tabs = !hasTutorStage
     ? [
@@ -550,6 +555,15 @@ export default function SaintPaulStudentExperience({
     }
 
     setActiveTab(tabId);
+  };
+
+  const handleStudentIdSubmit = () => {
+    setStudentIdSubmitAttempted(true);
+    if (!trimmedStudentId) {
+      return;
+    }
+
+    setStudentId(trimmedStudentId);
   };
 
   const handleAssessmentOptionSelect = (
@@ -1363,6 +1377,105 @@ export default function SaintPaulStudentExperience({
     );
   }
 
+  if (!hasStudentId) {
+    return (
+      <main className="saint-paul-shell min-h-screen bg-[#F6F2EB] text-[#171717]">
+        <div className="mx-auto max-w-5xl px-6 py-10 md:px-8 md:py-14">
+          <section className="overflow-hidden rounded-[32px] border border-[#DDD7CC] bg-white shadow-[0_18px_44px_rgba(23,23,23,0.06)]">
+            <div className="border-b border-[#E7E1D6] bg-[linear-gradient(135deg,#FBF8F2_0%,#F2ECE1_100%)] px-6 py-8 md:px-8 md:py-10">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6B6A63]">
+                聖保祿學生頁面
+              </p>
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#171717] md:text-4xl">
+                先輸入學號，再開始作答
+              </h1>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57] md:text-base">
+                你的學號將作為本次學習流程的學生識別 ID。完成輸入並確認後，系統才會開啟後續的前測、智慧導學與後測流程。
+              </p>
+            </div>
+
+            <div className="px-6 py-8 md:px-8 md:py-10">
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_320px]">
+                <form
+                  className="rounded-[28px] border border-[#E7E1D6] bg-[#FCFBF8] p-5 md:p-6"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    handleStudentIdSubmit();
+                  }}
+                >
+                  <label
+                    htmlFor="saint-paul-student-id"
+                    className="block text-sm font-medium text-[#171717]"
+                  >
+                    學號
+                  </label>
+                  <input
+                    id="saint-paul-student-id"
+                    type="text"
+                    value={studentIdDraft}
+                    onChange={(event) => setStudentIdDraft(event.target.value)}
+                    autoComplete="off"
+                    inputMode="text"
+                    placeholder="請輸入你的學號"
+                    className={cn(
+                      "mt-3 h-14 w-full rounded-2xl border bg-white px-4 text-base text-[#171717] outline-none transition-colors focus:border-[#171717]",
+                      studentIdSubmitAttempted && !trimmedStudentId
+                        ? "border-[#D14343]"
+                        : "border-[#DDD7CC]",
+                    )}
+                  />
+                  <p className="mt-3 text-sm leading-6 text-[#5F5D57]">
+                    請輸入老師指定的學號。此欄位為必填，後續會作為你的學生 ID 使用。
+                  </p>
+                  {studentIdSubmitAttempted && !trimmedStudentId ? (
+                    <p className="mt-3 text-sm text-[#D14343]">
+                      請先輸入學號，才能開始後續流程。
+                    </p>
+                  ) : null}
+
+                  <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-[#E7E1D6] pt-5">
+                    <PrimaryButton type="submit">
+                      確認學號並開始
+                      <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
+                    </PrimaryButton>
+                    <p className="text-sm leading-6 text-[#6B6A63]">
+                      確認後才會進入作答流程。
+                    </p>
+                  </div>
+                </form>
+
+                <div className="space-y-4">
+                  <div className="rounded-[28px] border border-[#E7E1D6] bg-white p-5 md:p-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+                      本次課程
+                    </p>
+                    <p className="mt-3 text-lg font-semibold leading-8 text-[#171717]">
+                      {lesson.topic}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#5F5D57]">
+                      {topicLabel}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[28px] border border-[#E7E1D6] bg-[#FBF8F2] p-5 md:p-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+                      開始前提醒
+                    </p>
+                    <div className="mt-4 space-y-3 text-sm leading-6 text-[#5F5D57]">
+                      <p>1. 請先確認你輸入的是正確學號。</p>
+                      <p>2. 未完成學號確認前，系統不會開啟任何測驗內容。</p>
+                      <p>3. 完成確認後，會依照老師設定的模式進入後續流程。</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="saint-paul-shell min-h-screen bg-[#F6F2EB] text-[#171717]">
       <header className="border-b border-[#E4DED2] bg-[#FBF8F2]">
@@ -1527,6 +1640,7 @@ export default function SaintPaulStudentExperience({
                     {activeObjective}
                   </h2>
                   <p className="mt-2 text-sm leading-7 text-[#5F5D57]">
+                    學號 {studentId}．
                     {topicLabel}．已完成 {completedObjectiveCount} /{" "}
                     {objectives.length} 個學習目標．已生成{" "}
                     {activeQuizHistory.length} 題練習題
@@ -1758,6 +1872,14 @@ export default function SaintPaulStudentExperience({
             </p>
 
             <div className="mt-6 grid gap-4 md:grid-cols-3">
+              <div className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+                  學號
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#171717]">
+                  {studentId}
+                </p>
+              </div>
               <div className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
                   學習主題
