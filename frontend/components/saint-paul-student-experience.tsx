@@ -10,19 +10,23 @@ import {
   SendHorizonal,
   X,
 } from "lucide-react";
-import { Fragment, type ButtonHTMLAttributes, useState } from "react";
+import {
+  type ButtonHTMLAttributes,
+  type Dispatch,
+  type SetStateAction,
+  useState,
+} from "react";
+import type {
+  SaintPaulAssessmentQuestion,
+  SaintPaulLesson,
+} from "@/lib/saint-paul-quiz-bank";
 import { cn } from "@/lib/utils";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1";
 
-type TeachingObjective = {
-  topic: string;
-  objectives: string[];
-};
-
 type SaintPaulStudentExperienceProps = {
-  lesson: TeachingObjective | null;
+  lesson: SaintPaulLesson | null;
   mode: string;
   modeLabel: string;
   topicLabel: string;
@@ -139,6 +143,8 @@ type TimelineItem =
   | TimelineQuizItem
   | TimelineImageItem;
 
+type AssessmentResponseState = Record<string, string>;
+
 function PrimaryButton({
   children,
   className,
@@ -239,17 +245,6 @@ function buildIntroTimelineItem(objective: string): TimelineTextItem {
   };
 }
 
-function buildQuizPrompts(
-  objectives: string[],
-  type: "pre" | "post",
-): string[] {
-  return objectives.map((objective) =>
-    type === "pre"
-      ? `請用你目前的理解，簡短回應這個學習目標：${objective}`
-      : `完成學習後，請重新說明你現在如何理解這個學習目標：${objective}`,
-  );
-}
-
 export default function SaintPaulStudentExperience({
   lesson,
   mode,
@@ -258,16 +253,16 @@ export default function SaintPaulStudentExperience({
 }: Readonly<SaintPaulStudentExperienceProps>): JSX.Element {
   const hasTutorStage = mode === "quiz-plus-ai-tutor";
   const objectives = lesson?.objectives ?? [];
-  const preQuizPrompts = buildQuizPrompts(objectives, "pre");
-  const postQuizPrompts = buildQuizPrompts(objectives, "post");
+  const preQuizTitle = lesson?.preQuizTitle ?? "前測";
+  const postQuizTitle = lesson?.postQuizTitle ?? "後測";
+  const preQuizQuestions = lesson?.preQuestions ?? [];
+  const postQuizQuestions = lesson?.postQuestions ?? [];
 
   const [activeTab, setActiveTab] = useState<StudentTabId>("pre");
-  const [preQuizAnswers, setPreQuizAnswers] = useState<Record<number, string>>(
-    {},
-  );
-  const [postQuizAnswers, setPostQuizAnswers] = useState<
-    Record<number, string>
-  >({});
+  const [preQuizResponses, setPreQuizResponses] =
+    useState<AssessmentResponseState>({});
+  const [postQuizResponses, setPostQuizResponses] =
+    useState<AssessmentResponseState>({});
   const [preQuizSubmitted, setPreQuizSubmitted] = useState(false);
   const [postQuizSubmitted, setPostQuizSubmitted] = useState(false);
   const [activeObjectiveIndex, setActiveObjectiveIndex] = useState(0);
@@ -420,19 +415,171 @@ export default function SaintPaulStudentExperience({
     setActiveTab(tabId);
   };
 
+  const handleAssessmentOptionSelect = (
+    setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
+    questionId: string,
+    optionId: string,
+  ) => {
+    setResponses((current) => ({
+      ...current,
+      [questionId]: optionId,
+    }));
+  };
+
+  const handleAssessmentTextChange = (
+    setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
+    questionId: string,
+    value: string,
+  ) => {
+    setResponses((current) => ({
+      ...current,
+      [questionId]: value,
+    }));
+  };
+
+  const renderAssessmentQuestion = (
+    question: SaintPaulAssessmentQuestion,
+    index: number,
+    responses: AssessmentResponseState,
+    setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
+    submitted: boolean,
+  ): JSX.Element => {
+    const currentResponse = responses[question.id] ?? "";
+
+    return (
+      <div
+        key={question.id}
+        className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5"
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm font-medium text-[#171717]">
+            {`第 ${index + 1} 題：${question.prompt}`}
+          </p>
+          <span className="inline-flex rounded-full border border-[#D8D2C7] bg-white px-3 py-1 text-xs font-medium text-[#5F5D57]">
+            {question.type === "MCQ" ? "選擇題" : "簡答題"}
+          </span>
+        </div>
+
+        {question.type === "MCQ" ? (
+          <div className="mt-4 grid gap-2">
+            {question.options.map((option) => {
+              const isSelected = currentResponse === option.id;
+
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() =>
+                    handleAssessmentOptionSelect(
+                      setResponses,
+                      question.id,
+                      option.id,
+                    )
+                  }
+                  disabled={submitted}
+                  className={cn(
+                    "flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors",
+                    !submitted &&
+                      "border-[#DDD7CC] bg-white hover:border-[#171717]",
+                    !submitted &&
+                      isSelected &&
+                      "border-[#171717] bg-[#F7F3EC]",
+                    submitted && isSelected && "border-[#171717] bg-[#F7F3EC]",
+                    submitted &&
+                      !isSelected &&
+                      "border-[#E5DED1] bg-[#FCFBF8] text-[#5F5D57]",
+                  )}
+                >
+                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full border border-current px-1 text-xs font-semibold">
+                    {option.id}
+                  </span>
+                  <span className="leading-6">{option.text}</span>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <textarea
+            value={currentResponse}
+            onChange={(event) =>
+              handleAssessmentTextChange(
+                setResponses,
+                question.id,
+                event.target.value,
+              )
+            }
+            disabled={submitted}
+            className="mt-4 min-h-28 w-full rounded-2xl border border-[#DDD7CC] bg-white px-4 py-3 text-sm leading-6 text-[#171717] outline-none transition-colors focus:border-[#171717] disabled:bg-[#F5F1E8]"
+            placeholder="請輸入你的回答"
+          />
+        )}
+
+        {question.confidenceRating ? (
+          <p className="mt-3 text-xs leading-6 text-[#7B776F]">
+            {question.confidenceRating}
+          </p>
+        ) : null}
+      </div>
+    );
+  };
+
+  const renderAssessmentSection = (
+    title: string,
+    questions: SaintPaulAssessmentQuestion[],
+    responses: AssessmentResponseState,
+    setResponses: Dispatch<SetStateAction<AssessmentResponseState>>,
+    submitted: boolean,
+  ): JSX.Element => {
+    if (questions.length === 0) {
+      return (
+        <div className="mt-6 rounded-2xl border border-dashed border-[#D7D2C8] bg-[#FCFBF8] p-5 text-sm leading-6 text-[#5F5D57]">
+          目前沒有可顯示的題目。
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-6">
+        <div className="rounded-2xl bg-[#F7F4EE] px-5 py-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+            {title}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[#5F5D57]">
+            共 {questions.length} 題。選擇題可直接點選答案，簡答題請輸入文字作答。
+          </p>
+        </div>
+        <div className="mt-4 space-y-4">
+          {questions.map((question, index) =>
+            renderAssessmentQuestion(
+              question,
+              index,
+              responses,
+              setResponses,
+              submitted,
+            ),
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const handleSendMessage = async () => {
     const trimmed = draftMessage.trim();
     if (!trimmed || !lesson || !activeObjective) {
       return;
     }
 
+    const objectiveIndex = activeObjectiveIndex;
+    const objective = activeObjective;
+    const nextActiveMessages = messagesByObjective[objectiveIndex] ?? [];
+    const nextQuizContext = buildQuizContext(objectiveIndex);
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: "user",
       content: trimmed,
     };
     const thinkingId = `thinking-chat-${Date.now()}`;
-    const nextMessages = [...activeMessages, userMessage];
+    const nextMessages = [...nextActiveMessages, userMessage];
 
     setDraftMessage("");
     setChatError(null);
@@ -440,12 +587,12 @@ export default function SaintPaulStudentExperience({
     setIsSending(true);
     setMessagesByObjective((current) => ({
       ...current,
-      [activeObjectiveIndex]: nextMessages,
+      [objectiveIndex]: nextMessages,
     }));
     setTimelineByObjective((current) => ({
       ...current,
-      [activeObjectiveIndex]: [
-        ...(current[activeObjectiveIndex] ?? []),
+      [objectiveIndex]: [
+        ...(current[objectiveIndex] ?? []),
         {
           id: userMessage.id,
           kind: "text",
@@ -462,7 +609,7 @@ export default function SaintPaulStudentExperience({
     }));
     setObjectiveStatuses((current) =>
       current.map((status, index) =>
-        index === activeObjectiveIndex && status === "not-started"
+        index === objectiveIndex && status === "not-started"
           ? "in-progress"
           : status,
       ),
@@ -476,13 +623,13 @@ export default function SaintPaulStudentExperience({
         },
         body: JSON.stringify({
           topic: lesson.topic,
-          objective: activeObjective,
+          objective,
           objectives,
           messages: nextMessages.map((message) => ({
             role: message.role,
             content: message.content,
           })),
-          quiz_history: activeQuizContext,
+          quiz_history: nextQuizContext,
         }),
       });
 
@@ -499,20 +646,19 @@ export default function SaintPaulStudentExperience({
 
       setMessagesByObjective((current) => ({
         ...current,
-        [activeObjectiveIndex]: [...nextMessages, assistantMessage],
+        [objectiveIndex]: [...nextMessages, assistantMessage],
       }));
       setTimelineByObjective((current) => ({
         ...current,
-        [activeObjectiveIndex]: (current[activeObjectiveIndex] ?? []).map(
-          (item) =>
-            item.id === thinkingId
-              ? {
-                  id: assistantMessage.id,
-                  kind: "text",
-                  role: assistantMessage.role,
-                  content: assistantMessage.content,
-                }
-              : item,
+        [objectiveIndex]: (current[objectiveIndex] ?? []).map((item) =>
+          item.id === thinkingId
+            ? {
+                id: assistantMessage.id,
+                kind: "text",
+                role: assistantMessage.role,
+                content: assistantMessage.content,
+              }
+            : item,
         ),
       }));
     } catch (error) {
@@ -520,7 +666,7 @@ export default function SaintPaulStudentExperience({
       setChatError("目前無法連接智慧導學，請稍後再試。");
       setTimelineByObjective((current) => ({
         ...current,
-        [activeObjectiveIndex]: (current[activeObjectiveIndex] ?? []).filter(
+        [objectiveIndex]: (current[objectiveIndex] ?? []).filter(
           (item) => item.id !== thinkingId,
         ),
       }));
@@ -534,14 +680,18 @@ export default function SaintPaulStudentExperience({
       return;
     }
 
+    const objectiveIndex = activeObjectiveIndex;
+    const objective = activeObjective;
+    const nextActiveMessages = messagesByObjective[objectiveIndex] ?? [];
+    const nextQuizContext = buildQuizContext(objectiveIndex);
     setChatError(null);
     setQuizError(null);
     setIsGeneratingImage(true);
     const thinkingId = `thinking-image-${Date.now()}`;
     setTimelineByObjective((current) => ({
       ...current,
-      [activeObjectiveIndex]: [
-        ...(current[activeObjectiveIndex] ?? []),
+      [objectiveIndex]: [
+        ...(current[objectiveIndex] ?? []),
         {
           id: thinkingId,
           kind: "thinking",
@@ -559,13 +709,13 @@ export default function SaintPaulStudentExperience({
         },
         body: JSON.stringify({
           topic: lesson.topic,
-          objective: activeObjective,
+          objective,
           objectives,
-          messages: activeMessages.map((message) => ({
+          messages: nextActiveMessages.map((message) => ({
             role: message.role,
             content: message.content,
           })),
-          quiz_history: activeQuizContext,
+          quiz_history: nextQuizContext,
         }),
       });
 
@@ -581,20 +731,19 @@ export default function SaintPaulStudentExperience({
       };
       setTimelineByObjective((current) => ({
         ...current,
-        [activeObjectiveIndex]: (current[activeObjectiveIndex] ?? []).map(
-          (item) =>
-            item.id === thinkingId
-              ? {
-                  id: `image-${Date.now()}`,
-                  kind: "image",
-                  image: imageState,
-                }
-              : item,
+        [objectiveIndex]: (current[objectiveIndex] ?? []).map((item) =>
+          item.id === thinkingId
+            ? {
+                id: `image-${Date.now()}`,
+                kind: "image",
+                image: imageState,
+              }
+            : item,
         ),
       }));
       setObjectiveStatuses((current) =>
         current.map((status, index) =>
-          index === activeObjectiveIndex && status === "not-started"
+          index === objectiveIndex && status === "not-started"
             ? "in-progress"
             : status,
         ),
@@ -604,7 +753,7 @@ export default function SaintPaulStudentExperience({
       setChatError("目前無法生成圖像說明，請稍後再試。");
       setTimelineByObjective((current) => ({
         ...current,
-        [activeObjectiveIndex]: (current[activeObjectiveIndex] ?? []).filter(
+        [objectiveIndex]: (current[objectiveIndex] ?? []).filter(
           (item) => item.id !== thinkingId,
         ),
       }));
@@ -618,14 +767,18 @@ export default function SaintPaulStudentExperience({
       return;
     }
 
+    const objectiveIndex = activeObjectiveIndex;
+    const objective = activeObjective;
+    const nextActiveMessages = messagesByObjective[objectiveIndex] ?? [];
+    const nextQuizContext = buildQuizContext(objectiveIndex);
     setChatError(null);
     setQuizError(null);
     setIsGeneratingQuiz(true);
     const thinkingId = `thinking-quiz-${Date.now()}`;
     setTimelineByObjective((current) => ({
       ...current,
-      [activeObjectiveIndex]: [
-        ...(current[activeObjectiveIndex] ?? []),
+      [objectiveIndex]: [
+        ...(current[objectiveIndex] ?? []),
         {
           id: thinkingId,
           kind: "thinking",
@@ -643,13 +796,13 @@ export default function SaintPaulStudentExperience({
         },
         body: JSON.stringify({
           topic: lesson.topic,
-          objective: activeObjective,
+          objective,
           objectives,
-          messages: activeMessages.map((message) => ({
+          messages: nextActiveMessages.map((message) => ({
             role: message.role,
             content: message.content,
           })),
-          quiz_history: activeQuizContext,
+          quiz_history: nextQuizContext,
           question_count: 1,
         }),
       });
@@ -673,24 +826,23 @@ export default function SaintPaulStudentExperience({
       };
       setQuizByObjective((current) => ({
         ...current,
-        [activeObjectiveIndex]: quizState,
+        [objectiveIndex]: quizState,
       }));
       setTimelineByObjective((current) => ({
         ...current,
-        [activeObjectiveIndex]: (current[activeObjectiveIndex] ?? []).map(
-          (item) =>
-            item.id === thinkingId
-              ? {
-                  id: `quiz-${payload.quiz_id}`,
-                  kind: "quiz",
-                  quiz: quizState,
-                }
-              : item,
+        [objectiveIndex]: (current[objectiveIndex] ?? []).map((item) =>
+          item.id === thinkingId
+            ? {
+                id: `quiz-${payload.quiz_id}`,
+                kind: "quiz",
+                quiz: quizState,
+              }
+            : item,
         ),
       }));
       setObjectiveStatuses((current) =>
         current.map((status, index) =>
-          index === activeObjectiveIndex && status === "not-started"
+          index === objectiveIndex && status === "not-started"
             ? "in-progress"
             : status,
         ),
@@ -700,7 +852,7 @@ export default function SaintPaulStudentExperience({
       setQuizError("目前無法生成新的測驗，請稍後再試。");
       setTimelineByObjective((current) => ({
         ...current,
-        [activeObjectiveIndex]: (current[activeObjectiveIndex] ?? []).filter(
+        [objectiveIndex]: (current[objectiveIndex] ?? []).filter(
           (item) => item.id !== thinkingId,
         ),
       }));
@@ -709,18 +861,14 @@ export default function SaintPaulStudentExperience({
     }
   };
 
-  const renderPracticeCard = (): JSX.Element | null => {
-    if (!activeQuiz) {
-      return null;
-    }
-
+  const renderPracticeCard = (quiz: GeneratedQuizState): JSX.Element => {
     return (
       <div className="max-w-[92%] rounded-2xl border border-[#E7E1D6] bg-white px-4 py-4 text-sm text-[#171717]">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#6B6A63]">
           即時練習
         </p>
 
-        {activeQuiz.questions.map((question, index) => (
+        {quiz.questions.map((question, index) => (
           <div key={question.id} className={index === 0 ? "mt-3" : "mt-5"}>
             <p className="text-sm font-medium leading-7 text-[#171717]">
               {`第 ${index + 1} 題：${question.prompt}`}
@@ -737,24 +885,28 @@ export default function SaintPaulStudentExperience({
                     key={option.id}
                     type="button"
                     onClick={() =>
-                      handleSelectQuizOption(question.id, option.id)
+                      handleSelectQuizOption(
+                        quiz.quizId,
+                        question.id,
+                        option.id,
+                      )
                     }
-                    disabled={activeQuiz.submitted}
+                    disabled={quiz.submitted}
                     className={cn(
                       "flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors",
-                      !activeQuiz.submitted &&
+                      !quiz.submitted &&
                         "border-[#DDD7CC] bg-[#FCFBF8] hover:border-[#171717]",
-                      !activeQuiz.submitted &&
+                      !quiz.submitted &&
                         isSelected &&
                         "border-[#171717] bg-[#F7F3EC]",
-                      activeQuiz.submitted &&
+                      quiz.submitted &&
                         isCorrectOption &&
                         "border-[#B8DEC5] bg-[#E8F5EC] text-[#256C42]",
-                      activeQuiz.submitted &&
+                      quiz.submitted &&
                         isSelected &&
                         !isCorrectOption &&
                         "border-[#E7BCB7] bg-[#FCEDEC] text-[#A43D36]",
-                      activeQuiz.submitted &&
+                      quiz.submitted &&
                         !isSelected &&
                         !isCorrectOption &&
                         "border-[#E5DED1] bg-[#FCFBF8] text-[#5F5D57]",
@@ -769,7 +921,7 @@ export default function SaintPaulStudentExperience({
               })}
             </div>
 
-            {activeQuiz.submitted ? (
+            {quiz.submitted ? (
               <div className="mt-3 rounded-2xl bg-[#FCFBF8] px-4 py-3 text-sm leading-6 text-[#5F5D57]">
                 <p
                   className={cn(
@@ -791,8 +943,8 @@ export default function SaintPaulStudentExperience({
 
         <div className="mt-4 text-sm leading-6 text-[#5F5D57]">
           <p>這題不計分，只用來幫你確認目前理解。</p>
-          {activeQuiz.error ? (
-            <p className="mt-1 text-[#8A6512]">{activeQuiz.error}</p>
+          {quiz.error ? (
+            <p className="mt-1 text-[#8A6512]">{quiz.error}</p>
           ) : null}
         </div>
       </div>
@@ -800,68 +952,159 @@ export default function SaintPaulStudentExperience({
   };
 
   const handleSelectQuizOption = (
+    quizId: string,
     questionId: string,
     optionId: string,
   ): void => {
+    const objectiveIndex = activeObjectiveIndex;
+    const timeline = timelineByObjective[objectiveIndex] ?? [];
+    const targetTimelineItem = timeline.find(
+      (item): item is TimelineQuizItem =>
+        item.kind === "quiz" && item.quiz.quizId === quizId,
+    );
+    const targetQuiz = targetTimelineItem?.quiz;
+
+    if (!targetQuiz || targetQuiz.submitted) {
+      return;
+    }
+
+    const gradedQuestions = targetQuiz.questions.map((question) =>
+      question.id === questionId
+        ? {
+            ...question,
+            selectedOptionId: optionId,
+            isCorrect: optionId === question.correct_option_id,
+          }
+        : question,
+    );
+    const score = gradedQuestions.filter(
+      (question) => question.isCorrect,
+    ).length;
+    const nextQuizState: GeneratedQuizState = {
+      ...targetQuiz,
+      submitted: true,
+      score,
+      questions: gradedQuestions,
+    };
+
+    setTimelineByObjective((current) => ({
+      ...current,
+      [objectiveIndex]: (current[objectiveIndex] ?? []).map((item) =>
+        item.kind === "quiz" && item.quiz.quizId === quizId
+          ? {
+              ...item,
+              quiz: nextQuizState,
+            }
+          : item,
+      ),
+    }));
     setQuizByObjective((current) => {
-      const active = current[activeObjectiveIndex];
-      if (!active || active.submitted) {
+      const active = current[objectiveIndex];
+      if (!active || active.quizId !== quizId || active.submitted) {
         return current;
       }
 
-      const gradedQuestions = active.questions.map((question) =>
-        question.id === questionId
-          ? {
-              ...question,
-              selectedOptionId: optionId,
-              isCorrect: optionId === question.correct_option_id,
-            }
-          : question,
-      );
-      const score = gradedQuestions.filter(
-        (question) => question.isCorrect,
-      ).length;
-      const nextQuizState: GeneratedQuizState = {
-        ...active,
-        submitted: true,
-        score,
-        questions: gradedQuestions,
-      };
-
-      setQuizHistoryByObjective((historyCurrent) => ({
-        ...historyCurrent,
-        [activeObjectiveIndex]: [
-          ...(historyCurrent[activeObjectiveIndex] ?? []),
-          {
-            quiz_id: nextQuizState.quizId,
-            title: nextQuizState.title,
-            score,
-            total_questions: nextQuizState.questions.length,
-            questions: nextQuizState.questions.map((question) => ({
-              id: question.id,
-              prompt: question.prompt,
-              options: question.options,
-              correct_option_id: question.correct_option_id,
-              explanation: question.explanation,
-              selected_option_id: question.selectedOptionId,
-              is_correct: question.isCorrect,
-            })),
-          },
-        ],
-      }));
-
       return {
         ...current,
-        [activeObjectiveIndex]: nextQuizState,
+        [objectiveIndex]: nextQuizState,
       };
     });
+    setQuizHistoryByObjective((historyCurrent) => ({
+      ...historyCurrent,
+      [objectiveIndex]: [
+        ...(historyCurrent[objectiveIndex] ?? []),
+        {
+          quiz_id: nextQuizState.quizId,
+          title: nextQuizState.title,
+          score,
+          total_questions: nextQuizState.questions.length,
+          questions: nextQuizState.questions.map((question) => ({
+            id: question.id,
+            prompt: question.prompt,
+            options: question.options,
+            correct_option_id: question.correct_option_id,
+            explanation: question.explanation,
+            selected_option_id: question.selectedOptionId,
+            is_correct: question.isCorrect,
+          })),
+        },
+      ],
+    }));
     setObjectiveStatuses((current) =>
       current.map((status, index) =>
-        index === activeObjectiveIndex && status === "not-started"
+        index === objectiveIndex && status === "not-started"
           ? "in-progress"
           : status,
       ),
     );
+  };
+
+  const renderImageCard = (image: GeneratedImageState): JSX.Element => {
+    const isModelGenerated = image.source === "openai";
+
+    return (
+      <div className="max-w-[440px] overflow-hidden rounded-2xl border border-[#E7E1D6] bg-white">
+        <div className="flex items-center justify-between gap-3 border-b border-[#E7E1D6] px-4 py-3">
+          <p className="text-sm font-medium text-[#171717]">圖像說明</p>
+          <span
+            className={cn(
+              "inline-flex items-center rounded-lg border px-2.5 py-1 text-xs font-medium",
+              isModelGenerated
+                ? "border-[#B8DEC5] bg-[#E8F5EC] text-[#256C42]"
+                : "border-[#E8D39B] bg-[#FBF2D7] text-[#8D6513]",
+            )}
+          >
+            {isModelGenerated ? "模型生成" : "備援圖示"}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setPreviewImageDataUrl(image.imageDataUrl)}
+          className="block w-full overflow-hidden bg-[#FCFBF8] text-left"
+        >
+          <img
+            src={image.imageDataUrl}
+            alt={`${activeObjective} 圖像說明`}
+            draggable={false}
+            className="pointer-events-none h-56 w-full select-none object-cover object-top"
+          />
+          <p className="border-t border-[#E7E1D6] px-4 py-3 text-xs leading-6 text-[#5F5D57]">
+            點擊查看較大預覽
+          </p>
+        </button>
+        {!isModelGenerated && image.error ? (
+          <p className="border-t border-[#E7E1D6] px-4 py-3 text-xs leading-6 text-[#8A6512]">
+            目前顯示的是備援圖示，原因：{image.error}
+          </p>
+        ) : null}
+      </div>
+    );
+  };
+
+  const renderTimelineItem = (item: TimelineItem): JSX.Element => {
+    switch (item.kind) {
+      case "text":
+        return (
+          <div
+            className={cn(
+              "max-w-[90%] rounded-2xl px-4 py-3 text-sm leading-7 md:max-w-[82%]",
+              item.role === "assistant"
+                ? "bg-white text-[#171717]"
+                : "ml-auto bg-[#171717] text-white",
+            )}
+          >
+            {item.content}
+          </div>
+        );
+      case "thinking":
+        return <ThinkingIndicator title={item.title} detail={item.detail} />;
+      case "quiz":
+        return renderPracticeCard(item.quiz);
+      case "image":
+        return renderImageCard(item.image);
+      default:
+        return <></>;
+    }
   };
 
   if (!lesson) {
@@ -941,31 +1184,15 @@ export default function SaintPaulStudentExperience({
               {hasTutorStage ? "前測" : "測驗"}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57]">
-              先用自己的話回答以下問題。提交後，此步驟會鎖定，並依序進入下一個階段。
+              請先完成題庫中的前測題目。提交後，此步驟會鎖定，並依序進入下一個階段。
             </p>
-
-            <div className="mt-6 space-y-4">
-              {preQuizPrompts.map((prompt, index) => (
-                <div
-                  key={prompt}
-                  className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5"
-                >
-                  <p className="text-sm font-medium text-[#171717]">{prompt}</p>
-                  <textarea
-                    value={preQuizAnswers[index] ?? ""}
-                    onChange={(event) =>
-                      setPreQuizAnswers((current) => ({
-                        ...current,
-                        [index]: event.target.value,
-                      }))
-                    }
-                    disabled={preQuizSubmitted}
-                    className="mt-3 min-h-28 w-full rounded-2xl border border-[#DDD7CC] bg-white px-4 py-3 text-sm leading-6 text-[#171717] outline-none transition-colors focus:border-[#171717] disabled:bg-[#F5F1E8]"
-                    placeholder="請輸入你的回答"
-                  />
-                </div>
-              ))}
-            </div>
+            {renderAssessmentSection(
+              preQuizTitle,
+              preQuizQuestions,
+              preQuizResponses,
+              setPreQuizResponses,
+              preQuizSubmitted,
+            )}
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#EEE9DF] pt-5">
               <p className="text-sm leading-6 text-[#5F5D57]">
@@ -1005,6 +1232,11 @@ export default function SaintPaulStudentExperience({
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[#171717]">
                 學習目標
               </h2>
+              <div className="mt-4 rounded-2xl border border-[#F1D28A] bg-[#FFF4D6] px-4 py-4 text-sm leading-6 text-[#8A6512] shadow-[0_6px_18px_rgba(241,210,138,0.22)]">
+                <p className="font-medium text-[#8A6512]">
+                  請依序完成每個學習目標。
+                </p>
+              </div>
               <div className="mt-5 space-y-3">
                 {objectives.map((objective, index) => {
                   const status = objectiveStatuses[index];
@@ -1064,89 +1296,9 @@ export default function SaintPaulStudentExperience({
               <div className="mt-5 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-[#E7E1D6] bg-[#FCFBF8]">
                 <div className="flex min-h-0 flex-1 flex-col">
                   <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-5 pb-36 md:px-6 md:py-6">
-                    {activeMessages.map((message, index) => (
-                      <Fragment key={message.id}>
-                        <div
-                          className={cn(
-                            "max-w-[90%] rounded-2xl px-4 py-3 text-sm leading-7 md:max-w-[82%]",
-                            message.role === "assistant"
-                              ? "bg-white text-[#171717]"
-                              : "ml-auto bg-[#171717] text-white",
-                          )}
-                        >
-                          {message.content}
-                        </div>
-                        {activeQuizInsertionIndex === index + 1
-                          ? renderPracticeCard()
-                          : null}
-                      </Fragment>
+                    {activeTimeline.map((item) => (
+                      <div key={item.id}>{renderTimelineItem(item)}</div>
                     ))}
-                    {activeMessages.length === 0 &&
-                    activeQuizInsertionIndex === 0
-                      ? renderPracticeCard()
-                      : null}
-
-                    {imageByObjective[activeObjectiveIndex] ? (
-                      <div className="max-w-[440px] overflow-hidden rounded-2xl border border-[#E7E1D6] bg-white">
-                        <div className="flex items-center justify-between gap-3 border-b border-[#E7E1D6] px-4 py-3">
-                          <p className="text-sm font-medium text-[#171717]">
-                            圖像說明
-                          </p>
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-lg border px-2.5 py-1 text-xs font-medium",
-                              imageByObjective[activeObjectiveIndex]?.source ===
-                                "openai"
-                                ? "border-[#B8DEC5] bg-[#E8F5EC] text-[#256C42]"
-                                : "border-[#E8D39B] bg-[#FBF2D7] text-[#8D6513]",
-                            )}
-                          >
-                            {imageByObjective[activeObjectiveIndex]?.source ===
-                            "openai"
-                              ? "模型生成"
-                              : "備援圖示"}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setPreviewImageDataUrl(
-                              imageByObjective[activeObjectiveIndex]
-                                ?.imageDataUrl ?? null,
-                            )
-                          }
-                          className="block w-full overflow-hidden bg-[#FCFBF8] text-left"
-                        >
-                          <img
-                            src={
-                              imageByObjective[activeObjectiveIndex]
-                                ?.imageDataUrl
-                            }
-                            alt={`${activeObjective} 圖像說明`}
-                            draggable={false}
-                            className="pointer-events-none h-56 w-full select-none object-cover object-top"
-                          />
-                          <p className="border-t border-[#E7E1D6] px-4 py-3 text-xs leading-6 text-[#5F5D57]">
-                            點擊查看較大預覽
-                          </p>
-                        </button>
-                        {imageByObjective[activeObjectiveIndex]?.source ===
-                          "fallback" &&
-                        imageByObjective[activeObjectiveIndex]?.error ? (
-                          <p className="border-t border-[#E7E1D6] px-4 py-3 text-xs leading-6 text-[#8A6512]">
-                            目前顯示的是備援圖示，原因：
-                            {imageByObjective[activeObjectiveIndex]?.error}
-                          </p>
-                        ) : null}
-                      </div>
-                    ) : null}
-
-                    {activeThinkingState ? (
-                      <ThinkingIndicator
-                        title={activeThinkingState.title}
-                        detail={activeThinkingState.detail}
-                      />
-                    ) : null}
                   </div>
 
                   <div className="sticky bottom-0 z-10 border-t border-[#E9E3D8] bg-[linear-gradient(180deg,rgba(252,251,248,0.78)_0%,rgba(252,251,248,0.96)_24%,rgba(252,251,248,1)_100%)] px-4 py-4 backdrop-blur md:px-6">
@@ -1229,10 +1381,14 @@ export default function SaintPaulStudentExperience({
                           )}
                         </SecondaryButton>
 
-                        <SecondaryButton onClick={markObjectiveCompleted}>
+                        <button
+                          type="button"
+                          onClick={markObjectiveCompleted}
+                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#C97D10] bg-[#F59E0B] px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_18px_rgba(245,158,11,0.24)] transition-colors hover:border-[#A86508] hover:bg-[#D88908]"
+                        >
                           <Check className="h-4 w-4" strokeWidth={1.8} />
                           標記此目標完成
-                        </SecondaryButton>
+                        </button>
 
                         <SecondaryButton
                           onClick={() => setActiveTab("post")}
@@ -1258,31 +1414,15 @@ export default function SaintPaulStudentExperience({
               後測
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[#5F5D57]">
-              完成智慧導學後，再用自己的話重新整理答案。提交後此測驗會鎖定。
+              完成智慧導學後，請作答後測題目。提交後此測驗會鎖定。
             </p>
-
-            <div className="mt-6 space-y-4">
-              {postQuizPrompts.map((prompt, index) => (
-                <div
-                  key={prompt}
-                  className="rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] p-5"
-                >
-                  <p className="text-sm font-medium text-[#171717]">{prompt}</p>
-                  <textarea
-                    value={postQuizAnswers[index] ?? ""}
-                    onChange={(event) =>
-                      setPostQuizAnswers((current) => ({
-                        ...current,
-                        [index]: event.target.value,
-                      }))
-                    }
-                    disabled={postQuizSubmitted}
-                    className="mt-3 min-h-28 w-full rounded-2xl border border-[#DDD7CC] bg-white px-4 py-3 text-sm leading-6 text-[#171717] outline-none transition-colors focus:border-[#171717] disabled:bg-[#F5F1E8]"
-                    placeholder="請輸入你的回答"
-                  />
-                </div>
-              ))}
-            </div>
+            {renderAssessmentSection(
+              postQuizTitle,
+              postQuizQuestions,
+              postQuizResponses,
+              setPostQuizResponses,
+              postQuizSubmitted,
+            )}
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#EEE9DF] pt-5">
               <p className="text-sm leading-6 text-[#5F5D57]">

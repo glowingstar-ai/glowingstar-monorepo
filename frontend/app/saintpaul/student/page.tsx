@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import SaintPaulStudentExperience from "@/components/saint-paul-student-experience";
-import teachingObjectives from "@/data/saintpaul/teaching_objectives.json";
+import saintPaulQuizBank from "@/data/saintpaul/all_quizzes.json";
 import {
   GRADE_LABELS,
   getLabel,
@@ -9,6 +9,7 @@ import {
   SUBJECT_LABELS,
   VERSION_LABELS,
 } from "@/lib/saint-paul";
+import { findSaintPaulLesson } from "@/lib/saint-paul-quiz-bank";
 
 export const metadata: Metadata = {
   title: "聖保祿學生頁面",
@@ -26,8 +27,7 @@ export default function SaintPaulStudentPage({
   const subject = selection.subject ?? "";
   const version = selection.version ?? "";
   const grade = selection.grade ?? "";
-  const selectedLesson =
-    teachingObjectives[subject]?.[version]?.[grade] ?? null;
+  const selectedLesson = findSaintPaulLesson(saintPaulQuizBank, selection);
   const selectedMode =
     MODE_OPTIONS.find((option) => option.value === selection.mode) ??
     MODE_OPTIONS[0];
