@@ -45,6 +45,7 @@ const storeInvite = (value: StoredInvite | null) => {
 
 const UNPROTECTED_PATHS = new Set<string>([
   "/",
+  "/edu",
   "/manifesto",
   "/original",
   "/northeastern/ict6480",
