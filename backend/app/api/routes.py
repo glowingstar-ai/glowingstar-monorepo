@@ -55,6 +55,10 @@ from app.schemas.saintpaul import (
     SaintPaulEventResponse,
     SaintPaulQuizAttemptRequest,
     SaintPaulQuizAttemptResponse,
+    SaintPaulResearchOverviewResponse,
+    SaintPaulResearchSessionDetailResponse,
+    SaintPaulSessionMessageRequest,
+    SaintPaulSessionMessageResponse,
     SaintPaulSessionSnapshotRequest,
     SaintPaulSessionSnapshotResponse,
     SaintPaulSessionStartRequest,
@@ -775,6 +779,83 @@ async def save_saintpaul_quiz_attempt(
     )
 
 
+@router.post(
+    "/saintpaul/session/message",
+    response_model=SaintPaulSessionMessageResponse,
+    tags=["saintpaul"],
+)
+async def save_saintpaul_session_message(
+    payload: SaintPaulSessionMessageRequest,
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
+) -> SaintPaulSessionMessageResponse:
+    """Persist one Saint Paul session message."""
+
+    try:
+        saved_at = persistence.persist_chat_message(
+            session_id=payload.session_id,
+            student_id=payload.student_id,
+            objective_index=payload.objective_index,
+            role=payload.role,
+            content=payload.content,
+            model=payload.model,
+            created_at=payload.created_at,
+            message_key=payload.message_key,
+        )
+    except SaintPaulPersistenceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return SaintPaulSessionMessageResponse(
+        saved_at=saved_at,
+        persistence_enabled=persistence.enabled,
+    )
+
+
+@router.get(
+    "/saintpaul/research/overview",
+    response_model=SaintPaulResearchOverviewResponse,
+    tags=["saintpaul"],
+)
+async def get_saintpaul_research_overview(
+    limit: int = Query(
+        200,
+        ge=1,
+        le=1000,
+        description="Maximum number of sessions to include in the activity index.",
+    ),
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
+) -> SaintPaulResearchOverviewResponse:
+    """Return grouped Saint Paul student/session activity for internal review."""
+
+    try:
+        payload = persistence.get_research_overview(limit=limit)
+    except SaintPaulPersistenceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return SaintPaulResearchOverviewResponse.model_validate(payload)
+
+
+@router.get(
+    "/saintpaul/research/session/{session_id}",
+    response_model=SaintPaulResearchSessionDetailResponse,
+    tags=["saintpaul"],
+)
+async def get_saintpaul_research_session_detail(
+    session_id: str,
+    persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
+) -> SaintPaulResearchSessionDetailResponse:
+    """Return the full persisted activity stream for one Saint Paul session."""
+
+    try:
+        payload = persistence.get_session_research_detail(session_id)
+    except SaintPaulPersistenceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    if payload.get("session") is None:
+        raise HTTPException(status_code=404, detail="Saint Paul session not found")
+
+    return SaintPaulResearchSessionDetailResponse.model_validate(payload)
+
+
 @router.post("/tutor/mode", response_model=TutorModeResponse, tags=["tutor"])
 async def create_tutor_mode_plan(
     payload: TutorModeRequest,
@@ -792,6 +873,14 @@ async def create_tutor_chat_reply(
     persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
 ) -> TutorChatResponse:
     """Reply as the student-facing AI tutor for one learning objective."""
+
+    payload = payload.model_copy(
+        update={
+            "reference_image_url": persistence.prepare_reference_image_url(
+                payload.reference_image_url
+            )
+        }
+    )
 
     if payload.session_id and payload.messages:
         latest_message = payload.messages[-1]
