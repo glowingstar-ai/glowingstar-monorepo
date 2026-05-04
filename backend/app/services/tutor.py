@@ -286,6 +286,7 @@ class TutorModeService:
             - 先判斷學生卡住的地方，再給出一步一步的引導。
             - 回答保持精簡，最多 5 句。
             - 如果適合，可提出 1 個小問題確認理解。
+            - 如果附上了教學圖像，請先閱讀圖像內容，再結合圖中的標示與結構回答。
             - 不要輸出 markdown 標題，不要輸出 JSON。
 
             對話紀錄：
@@ -300,9 +301,28 @@ class TutorModeService:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
+        content: list[dict[str, Any]] = [
+            {
+                "type": "input_text",
+                "text": prompt,
+            }
+        ]
+        if payload.reference_image_url:
+            content.append(
+                {
+                    "type": "input_image",
+                    "image_url": payload.reference_image_url,
+                    "detail": "high",
+                }
+            )
         body: dict[str, Any] = {
             "model": self.model,
-            "input": prompt,
+            "input": [
+                {
+                    "role": "user",
+                    "content": content,
+                }
+            ],
             "reasoning": {"effort": "medium"},
             "text": {"verbosity": "medium"},
         }

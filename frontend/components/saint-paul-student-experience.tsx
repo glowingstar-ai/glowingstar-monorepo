@@ -125,6 +125,7 @@ function getStudentFacingErrorMessage(
 
 type GeneratedImageState = {
   imageDataUrl: string;
+  assetUrl: string | null;
   source: "openai" | "fallback";
   error: string | null;
 };
@@ -422,6 +423,11 @@ export default function SaintPaulStudentExperience({
   const [previewImageDataUrl, setPreviewImageDataUrl] = useState<string | null>(
     null,
   );
+  const [isObjectiveSheetOpen, setIsObjectiveSheetOpen] = useState(false);
+  const [isMobileActionsSheetOpen, setIsMobileActionsSheetOpen] = useState(false);
+  const [referenceImageByObjective, setReferenceImageByObjective] = useState<
+    Record<number, GeneratedImageState>
+  >({});
   const [quizByObjective, setQuizByObjective] = useState<
     Record<number, GeneratedQuizState>
   >({});
@@ -463,6 +469,7 @@ export default function SaintPaulStudentExperience({
   const activeObjective = objectives[activeObjectiveIndex] ?? "";
   const activeMessages = messagesByObjective[activeObjectiveIndex] ?? [];
   const activeTimeline = timelineByObjective[activeObjectiveIndex] ?? [];
+  const activeReferenceImage = referenceImageByObjective[activeObjectiveIndex];
   const activeQuiz = quizByObjective[activeObjectiveIndex];
   const activeQuizHistory = quizHistoryByObjective[activeObjectiveIndex] ?? [];
   const activeQuizContext = buildQuizContext(activeObjectiveIndex);
@@ -760,6 +767,7 @@ export default function SaintPaulStudentExperience({
   };
 
   const handleObjectiveSelect = (objectiveIndex: number) => {
+    setIsObjectiveSheetOpen(false);
     setActiveObjectiveIndex(objectiveIndex);
     void postSaintPaulEvent(
       "objective_selected",
@@ -769,6 +777,71 @@ export default function SaintPaulStudentExperience({
       { objectiveIndex, tabOverride: "tutor" },
     );
   };
+
+  const handleTutorPostQuizNavigation = () => {
+    void postSaintPaulEvent(
+      "button_clicked",
+      { button_id: "go_to_post_quiz_from_tutor" },
+      {
+        objectiveIndex: activeObjectiveIndex,
+        tabOverride: "tutor",
+      },
+    );
+    setActiveTab("post");
+    void postSaintPaulEvent(
+      "tab_changed",
+      { from_tab: "tutor", to_tab: "post" },
+      { tabOverride: "post" },
+    );
+  };
+
+  const renderObjectiveList = (): JSX.Element => (
+    <div className="space-y-3">
+      {objectives.map((objective, index) => {
+        const status = objectiveStatuses[index];
+
+        return (
+          <button
+            key={objective}
+            type="button"
+            onClick={() => handleObjectiveSelect(index)}
+            className={cn(
+              "w-full rounded-2xl border px-4 py-4 text-left transition-colors",
+              index === activeObjectiveIndex
+                ? "border-[#171717] bg-[#171717] text-white"
+                : "border-[#E2DCCE] bg-[#FCFBF8] text-[#171717] hover:border-[#171717]",
+            )}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p
+                  className={cn(
+                    "text-xs uppercase tracking-[0.18em]",
+                    index === activeObjectiveIndex
+                      ? "text-white/70"
+                      : "text-[#7B776F]",
+                  )}
+                >
+                  {`學習目標 ${index + 1}`}
+                </p>
+                <p className="mt-2 text-sm leading-6">{objective}</p>
+              </div>
+              <StatusPill status={status} />
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  useEffect(() => {
+    if (activeTab === "tutor") {
+      return;
+    }
+
+    setIsObjectiveSheetOpen(false);
+    setIsMobileActionsSheetOpen(false);
+  }, [activeTab]);
 
   const handleStudentIdSubmit = async () => {
     setStudentIdSubmitAttempted(true);
@@ -1177,6 +1250,10 @@ export default function SaintPaulStudentExperience({
             content: message.content,
           })),
           quiz_history: nextQuizContext,
+          reference_image_url:
+            activeReferenceImage?.assetUrl ??
+            activeReferenceImage?.imageDataUrl ??
+            null,
         }),
       });
 
@@ -1295,6 +1372,7 @@ export default function SaintPaulStudentExperience({
       const payload = (await response.json()) as TutorImageExplanationResponse;
       const imageState: GeneratedImageState = {
         imageDataUrl: payload.image_data_url,
+        assetUrl: payload.asset_url ?? null,
         source: payload.source,
         error: payload.error,
       };
@@ -1317,6 +1395,10 @@ export default function SaintPaulStudentExperience({
               }
             : item,
         ),
+      }));
+      setReferenceImageByObjective((current) => ({
+        ...current,
+        [objectiveIndex]: imageState,
       }));
       setObjectiveStatuses((current) =>
         current.map((status, index) =>
@@ -1903,9 +1985,9 @@ export default function SaintPaulStudentExperience({
   return (
     <main className="saint-paul-shell min-h-screen bg-[#F6F2EB] text-[#171717]">
       <header className="border-b border-[#E4DED2] bg-[#FBF8F2]">
-        <div className="mx-auto flex max-w-[1600px] justify-center px-6 py-5 md:px-10">
+        <div className="mx-auto max-w-[1600px] px-4 py-4 md:px-10 md:py-5">
           <div
-            className="flex flex-wrap justify-center gap-3"
+            className="flex items-center justify-start gap-3 overflow-x-auto pb-1 md:justify-center"
             role="tablist"
             aria-label="學習流程"
           >
@@ -1920,7 +2002,7 @@ export default function SaintPaulStudentExperience({
                   handleTabClick(tab.id, tab.disabled, tab.completed)
                 }
                 className={cn(
-                  "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-colors",
+                  "inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition-colors",
                   activeTab === tab.id
                     ? "border-[#171717] bg-[#171717] text-white"
                     : "border-[#D8D2C7] bg-white text-[#171717]",
@@ -1942,9 +2024,9 @@ export default function SaintPaulStudentExperience({
 
       <div
         className={cn(
-          "mx-auto max-w-[1600px] px-6 md:px-10",
+          "mx-auto max-w-[1600px] px-4 md:px-10",
           activeTab === "tutor"
-            ? "h-[calc(100dvh-96px)] overflow-hidden py-6"
+            ? "py-5 md:py-6 xl:h-[calc(100dvh-96px)] xl:overflow-hidden"
             : "py-8 md:py-10",
         )}
       >
@@ -2008,8 +2090,39 @@ export default function SaintPaulStudentExperience({
         ) : null}
 
         {activeTab === "tutor" ? (
-          <section className="grid h-full min-h-0 items-stretch gap-6 xl:grid-cols-[280px_minmax(0,1fr)]">
-            <aside className="min-h-0 overflow-y-auto rounded-[28px] border border-[#DDD7CC] bg-white p-5 shadow-[0_8px_24px_rgba(23,23,23,0.04)] md:p-6">
+          <section className="grid gap-4 md:gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[280px_minmax(0,1fr)] xl:items-stretch">
+            <section className="rounded-[24px] border border-[#DDD7CC] bg-white p-4 shadow-[0_8px_24px_rgba(23,23,23,0.04)] md:hidden">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+                    目前學習目標
+                  </p>
+                  <h2 className="mt-2 text-xl font-semibold tracking-tight text-[#171717]">
+                    {activeObjective}
+                  </h2>
+                </div>
+                <StatusPill
+                  status={
+                    objectiveStatuses[activeObjectiveIndex] ?? "not-started"
+                  }
+                />
+              </div>
+              <div className="mt-4 rounded-2xl border border-[#E7E1D6] bg-[#FCFBF8] px-4 py-4">
+                <p className="text-sm leading-6 text-[#5F5D57]">
+                  進度 {activeObjectiveIndex + 1} / {objectives.length}．已完成{" "}
+                  {completedObjectiveCount} 個學習目標．已生成{" "}
+                  {activeQuizHistory.length} 題練習題
+                </p>
+                <SecondaryButton
+                  onClick={() => setIsObjectiveSheetOpen(true)}
+                  className="mt-3 w-full justify-center"
+                >
+                  查看全部目標
+                </SecondaryButton>
+              </div>
+            </section>
+
+            <aside className="hidden min-h-0 overflow-y-auto rounded-[28px] border border-[#DDD7CC] bg-white p-5 shadow-[0_8px_24px_rgba(23,23,23,0.04)] md:p-6 xl:block">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#6B6A63]">
                 學習目標列表
               </p>
@@ -2021,72 +2134,40 @@ export default function SaintPaulStudentExperience({
                   請依序完成每個學習目標。
                 </p>
               </div>
-              <div className="mt-5 space-y-3">
-                {objectives.map((objective, index) => {
-                  const status = objectiveStatuses[index];
-                  return (
-                    <button
-                      key={objective}
-                      type="button"
-                      onClick={() => handleObjectiveSelect(index)}
-                      className={cn(
-                        "w-full rounded-2xl border px-4 py-4 text-left transition-colors",
-                        index === activeObjectiveIndex
-                          ? "border-[#171717] bg-[#171717] text-white"
-                          : "border-[#E2DCCE] bg-[#FCFBF8] text-[#171717] hover:border-[#171717]",
-                      )}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p
-                            className={cn(
-                              "text-xs uppercase tracking-[0.18em]",
-                              index === activeObjectiveIndex
-                                ? "text-white/70"
-                                : "text-[#7B776F]",
-                            )}
-                          >
-                            {`學習目標 ${index + 1}`}
-                          </p>
-                          <p className="mt-2 text-sm leading-6">{objective}</p>
-                        </div>
-                        <StatusPill status={status} />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+              <div className="mt-5">{renderObjectiveList()}</div>
             </aside>
 
-            <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-[28px] border border-[#DDD7CC] bg-white p-5 shadow-[0_8px_24px_rgba(23,23,23,0.04)] md:p-6">
-              <div className="flex flex-col gap-3 border-b border-[#EEE9DF] pb-5 md:flex-row md:items-start md:justify-between">
+            <section className="flex flex-col rounded-[24px] border border-[#DDD7CC] bg-white p-4 shadow-[0_8px_24px_rgba(23,23,23,0.04)] md:rounded-[28px] md:p-6 xl:h-full xl:min-h-0 xl:overflow-hidden">
+              <div className="flex flex-col gap-3 border-b border-[#EEE9DF] pb-4 md:pb-5 xl:flex-row xl:items-start xl:justify-between">
                 <div>
-                  <h2 className="text-2xl font-semibold tracking-tight text-[#171717]">
+                  <h2 className="text-xl font-semibold tracking-tight text-[#171717] md:text-2xl">
                     {activeObjective}
                   </h2>
-                  <p className="mt-2 text-sm leading-7 text-[#5F5D57]">
+                  <p className="mt-2 text-sm leading-6 text-[#5F5D57] md:leading-7">
                     考生學號 {studentId}．
                     {topicLabel}．已完成 {completedObjectiveCount} /{" "}
                     {objectives.length} 個學習目標．已生成{" "}
                     {activeQuizHistory.length} 題練習題
                   </p>
                 </div>
-                <StatusPill
-                  status={
-                    objectiveStatuses[activeObjectiveIndex] ?? "not-started"
-                  }
-                />
+                <div className="hidden md:block">
+                  <StatusPill
+                    status={
+                      objectiveStatuses[activeObjectiveIndex] ?? "not-started"
+                    }
+                  />
+                </div>
               </div>
 
-              <div className="mt-5 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-[#E7E1D6] bg-[#FCFBF8]">
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-5 pb-36 md:px-6 md:py-6">
+              <div className="mt-4 flex flex-col rounded-3xl border border-[#E7E1D6] bg-[#FCFBF8] xl:mt-5 xl:min-h-0 xl:flex-1 xl:overflow-hidden">
+                <div className="flex flex-col xl:min-h-0 xl:flex-1">
+                  <div className="space-y-3 px-4 py-5 md:px-6 md:py-6 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:pb-40">
                     {activeTimeline.map((item) => (
                       <div key={item.id}>{renderTimelineItem(item)}</div>
                     ))}
                   </div>
 
-                  <div className="sticky bottom-0 z-10 border-t border-[#E9E3D8] bg-[linear-gradient(180deg,rgba(252,251,248,0.78)_0%,rgba(252,251,248,0.96)_24%,rgba(252,251,248,1)_100%)] px-4 py-4 backdrop-blur md:px-6">
+                  <div className="border-t border-[#E9E3D8] px-4 py-4 md:px-6 xl:sticky xl:bottom-0 xl:z-10 xl:bg-[linear-gradient(180deg,rgba(252,251,248,0.78)_0%,rgba(252,251,248,0.96)_24%,rgba(252,251,248,1)_100%)] xl:backdrop-blur">
                     {chatError ? (
                       <p className="mb-3 text-sm text-[#B42318]">{chatError}</p>
                     ) : null}
@@ -2103,12 +2184,18 @@ export default function SaintPaulStudentExperience({
                         className="min-h-24 w-full resize-none rounded-2xl border border-[#DDD7CC] bg-[#FCFBF8] px-4 py-3 text-sm leading-6 text-[#171717] outline-none transition-colors focus:border-[#171717]"
                         placeholder="輸入你想詢問智慧導學的問題"
                       />
+                      {activeReferenceImage ? (
+                        <p className="mt-3 px-1 text-xs leading-6 text-[#6B685F]">
+                          本次提問會一併附上目前這個學習目標最近生成的圖像說明。
+                        </p>
+                      ) : null}
                       <div className="mt-3 flex flex-wrap items-center gap-3">
                         <PrimaryButton
                           onClick={handleSendMessage}
                           disabled={
                             isSending || draftMessage.trim().length === 0
                           }
+                          className="w-full justify-center md:w-auto"
                         >
                           {isSending ? (
                             <>
@@ -2127,8 +2214,16 @@ export default function SaintPaulStudentExperience({
                         </PrimaryButton>
 
                         <SecondaryButton
+                          onClick={() => setIsMobileActionsSheetOpen(true)}
+                          className="w-full justify-center md:hidden"
+                        >
+                          更多操作
+                        </SecondaryButton>
+
+                        <SecondaryButton
                           onClick={handleGenerateQuiz}
                           disabled={isGeneratingQuiz}
+                          className="hidden md:inline-flex"
                         >
                           {isGeneratingQuiz ? (
                             <>
@@ -2149,6 +2244,7 @@ export default function SaintPaulStudentExperience({
                         <SecondaryButton
                           onClick={handleGenerateImage}
                           disabled={isGeneratingImage}
+                          className="hidden md:inline-flex"
                         >
                           {isGeneratingImage ? (
                             <>
@@ -2169,30 +2265,16 @@ export default function SaintPaulStudentExperience({
                         <button
                           type="button"
                           onClick={markObjectiveCompleted}
-                          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[#C97D10] bg-[#F59E0B] px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_18px_rgba(245,158,11,0.24)] transition-colors hover:border-[#A86508] hover:bg-[#D88908]"
+                          className="hidden min-h-11 items-center justify-center gap-2 rounded-xl border border-[#C97D10] bg-[#F59E0B] px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_18px_rgba(245,158,11,0.24)] transition-colors hover:border-[#A86508] hover:bg-[#D88908] md:inline-flex"
                         >
                           <Check className="h-4 w-4" strokeWidth={1.8} />
                           標記此目標完成
                         </button>
 
                         <SecondaryButton
-                          onClick={() => {
-                            void postSaintPaulEvent(
-                              "button_clicked",
-                              { button_id: "go_to_post_quiz_from_tutor" },
-                              {
-                                objectiveIndex: activeObjectiveIndex,
-                                tabOverride: "tutor",
-                              },
-                            );
-                            setActiveTab("post");
-                            void postSaintPaulEvent(
-                              "tab_changed",
-                              { from_tab: "tutor", to_tab: "post" },
-                              { tabOverride: "post" },
-                            );
-                          }}
+                          onClick={handleTutorPostQuizNavigation}
                           disabled={!canOpenPostQuiz}
+                          className="hidden md:inline-flex"
                         >
                           前往後測
                         </SecondaryButton>
@@ -2409,6 +2491,143 @@ export default function SaintPaulStudentExperience({
                 draggable={false}
                 className="mx-auto h-auto max-h-[72vh] w-auto max-w-full select-none rounded-2xl border border-[#E7E1D6] bg-white"
               />
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {isObjectiveSheetOpen ? (
+        <div className="fixed inset-0 z-40 flex items-end bg-[#171717]/45 backdrop-blur-sm xl:hidden">
+          <button
+            type="button"
+            aria-label="關閉學習目標列表"
+            onClick={() => setIsObjectiveSheetOpen(false)}
+            className="absolute inset-0"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="學習目標列表"
+            className="relative z-10 max-h-[82vh] w-full overflow-hidden rounded-t-[28px] border border-[#DDD7CC] bg-white shadow-[0_-16px_40px_rgba(23,23,23,0.14)]"
+          >
+            <div className="flex items-center justify-between border-b border-[#E7E1D6] px-4 py-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6B6A63]">
+                  學習目標列表
+                </p>
+                <p className="mt-1 text-sm leading-6 text-[#5F5D57]">
+                  請依序完成每個學習目標。
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsObjectiveSheetOpen(false)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#D8D2C7] text-[#171717] transition-colors hover:border-[#171717] hover:bg-[#FBF8F2]"
+              >
+                <X className="h-4 w-4" strokeWidth={1.8} />
+              </button>
+            </div>
+            <div className="max-h-[calc(82vh-88px)] overflow-y-auto px-4 py-4">
+              {renderObjectiveList()}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {isMobileActionsSheetOpen ? (
+        <div className="fixed inset-0 z-40 flex items-end bg-[#171717]/45 backdrop-blur-sm md:hidden">
+          <button
+            type="button"
+            aria-label="關閉更多操作"
+            onClick={() => setIsMobileActionsSheetOpen(false)}
+            className="absolute inset-0"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="更多操作"
+            className="relative z-10 w-full overflow-hidden rounded-t-[28px] border border-[#DDD7CC] bg-white shadow-[0_-16px_40px_rgba(23,23,23,0.14)]"
+          >
+            <div className="flex items-center justify-between border-b border-[#E7E1D6] px-4 py-4">
+              <div>
+                <p className="text-sm font-medium text-[#171717]">更多操作</p>
+                <p className="mt-1 text-xs leading-6 text-[#5F5D57]">
+                  依照目前學習目標選擇下一步。
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileActionsSheetOpen(false)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#D8D2C7] text-[#171717] transition-colors hover:border-[#171717] hover:bg-[#FBF8F2]"
+              >
+                <X className="h-4 w-4" strokeWidth={1.8} />
+              </button>
+            </div>
+            <div className="grid gap-3 px-4 py-4">
+              <SecondaryButton
+                onClick={() => {
+                  setIsMobileActionsSheetOpen(false);
+                  void handleGenerateQuiz();
+                }}
+                disabled={isGeneratingQuiz}
+                className="w-full justify-center"
+              >
+                {isGeneratingQuiz ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    生成中
+                  </>
+                ) : (
+                  <>
+                    <ListChecks className="h-4 w-4" strokeWidth={1.8} />
+                    出一題練習
+                  </>
+                )}
+              </SecondaryButton>
+
+              <SecondaryButton
+                onClick={() => {
+                  setIsMobileActionsSheetOpen(false);
+                  void handleGenerateImage();
+                }}
+                disabled={isGeneratingImage}
+                className="w-full justify-center"
+              >
+                {isGeneratingImage ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    生成中
+                  </>
+                ) : (
+                  <>
+                    <ImagePlus className="h-4 w-4" strokeWidth={1.8} />
+                    生成圖像說明
+                  </>
+                )}
+              </SecondaryButton>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileActionsSheetOpen(false);
+                  markObjectiveCompleted();
+                }}
+                className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#C97D10] bg-[#F59E0B] px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_18px_rgba(245,158,11,0.24)] transition-colors hover:border-[#A86508] hover:bg-[#D88908]"
+              >
+                <Check className="h-4 w-4" strokeWidth={1.8} />
+                標記此目標完成
+              </button>
+
+              <SecondaryButton
+                onClick={() => {
+                  setIsMobileActionsSheetOpen(false);
+                  handleTutorPostQuizNavigation();
+                }}
+                disabled={!canOpenPostQuiz}
+                className="w-full justify-center"
+              >
+                前往後測
+              </SecondaryButton>
             </div>
           </div>
         </div>

@@ -80,6 +80,29 @@ def test_student_tutor_chat_offline_reply() -> None:
     assert "分析文藝復興的歷史背景" in data["message"]["content"]
 
 
+def test_student_tutor_chat_accepts_reference_image_url() -> None:
+    payload = {
+        "topic": "交通運輸",
+        "objective": "分析交通運輸布局如何影響區域發展。",
+        "objectives": [
+            "分析交通運輸布局如何影響區域發展。",
+        ],
+        "messages": [
+            {"role": "user", "content": "請根據這張圖幫我說明重點。"}
+        ],
+        "reference_image_url": "https://example.com/teaching-image.png",
+    }
+
+    with TestClient(app) as client:
+        response = client.post("/api/v1/tutor/chat", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["model"] == "gpt-5.5"
+    assert data["message"]["role"] == "assistant"
+
+
 def test_student_tutor_image_explanation_offline_fallback() -> None:
     payload = {
         "topic": "文藝復興",

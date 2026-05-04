@@ -63,6 +63,10 @@ class TutorChatRequest(BaseModel):
         default_factory=list,
         description="Previously generated quizzes and the student's choices",
     )
+    reference_image_url: str | None = Field(
+        default=None,
+        description="Optional generated teaching image attached to the tutor chat turn",
+    )
 
 
 class TutorChatResponse(BaseModel):
