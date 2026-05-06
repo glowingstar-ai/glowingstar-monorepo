@@ -526,6 +526,7 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<DashboardViewMode>("table");
   const [showValidStudentIdsOnly, setShowValidStudentIdsOnly] = useState(true);
+  const [hideZeroStudentRows, setHideZeroStudentRows] = useState(true);
   const [selectedCompletionRowKey, setSelectedCompletionRowKey] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -779,9 +780,19 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
     });
   }, [indexedStudents]);
 
+  const visibleCompletionRows = useMemo(() => {
+    if (!hideZeroStudentRows) {
+      return completionRows;
+    }
+
+    return completionRows.filter((row) => row.totalStudents > 0);
+  }, [completionRows, hideZeroStudentRows]);
+
+  const hiddenZeroStudentRowCount = completionRows.length - visibleCompletionRows.length;
+
   const selectedCompletionRow = useMemo(() => {
-    return completionRows.find((row) => row.key === selectedCompletionRowKey) ?? null;
-  }, [completionRows, selectedCompletionRowKey]);
+    return visibleCompletionRows.find((row) => row.key === selectedCompletionRowKey) ?? null;
+  }, [selectedCompletionRowKey, visibleCompletionRows]);
 
   const selectedDetail = selectedSessionId ? detailBySession[selectedSessionId] : null;
 
@@ -1106,9 +1117,12 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
             eyebrow="Dropdown Coverage"
             action={
               <div className="flex flex-wrap gap-2">
-                <Badge tone="sky">{`${formatNumber(completionRows.length)} combinations`}</Badge>
+                <Badge tone="sky">{`${formatNumber(visibleCompletionRows.length)} combinations`}</Badge>
                 <Badge tone={showValidStudentIdsOnly ? "emerald" : "amber"}>
                   {showValidStudentIdsOnly ? "7-digit ids only" : "all student ids"}
+                </Badge>
+                <Badge tone={hideZeroStudentRows ? "emerald" : "amber"}>
+                  {hideZeroStudentRows ? "0-student rows hidden" : "0-student rows shown"}
                 </Badge>
               </div>
             }
@@ -1121,25 +1135,48 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
               {showValidStudentIdsOnly && hiddenInvalidStudentCount > 0 ? (
                 <Badge tone="amber">{`${formatNumber(hiddenInvalidStudentCount)} non-7-digit ids hidden`}</Badge>
               ) : null}
+              {hideZeroStudentRows && hiddenZeroStudentRowCount > 0 ? (
+                <Badge tone="amber">{`${formatNumber(hiddenZeroStudentRowCount)} 0-student rows hidden`}</Badge>
+              ) : null}
             </div>
 
-            <label className="mt-5 flex max-w-xl items-start gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
-              <input
-                type="checkbox"
-                checked={showValidStudentIdsOnly}
-                onChange={(event) => setShowValidStudentIdsOnly(event.target.checked)}
-                className="mt-1 size-4 rounded border-slate-700 bg-slate-950 text-sky-400 focus:ring-sky-400"
-              />
-              <span className="space-y-1">
-                <span className="block text-sm font-medium text-slate-100">
-                  Keep 7-digit student IDs only
+            <div className="mt-5 flex max-w-xl flex-col gap-3">
+              <label className="flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                <input
+                  type="checkbox"
+                  checked={showValidStudentIdsOnly}
+                  onChange={(event) => setShowValidStudentIdsOnly(event.target.checked)}
+                  className="mt-1 size-4 rounded border-slate-700 bg-slate-950 text-sky-400 focus:ring-sky-400"
+                />
+                <span className="space-y-1">
+                  <span className="block text-sm font-medium text-slate-100">
+                    Keep 7-digit student IDs only
+                  </span>
+                  <span className="block text-xs leading-5 text-slate-400">
+                    Hides IDs unless they are exactly 7 digits, so values like `111 18` or `12345`
+                    are excluded from the completion table.
+                  </span>
                 </span>
-                <span className="block text-xs leading-5 text-slate-400">
-                  Hides IDs unless they are exactly 7 digits, so values like `111 18` or `12345`
-                  are excluded from the completion table.
+              </label>
+
+              <label className="flex items-start gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
+                <input
+                  type="checkbox"
+                  checked={hideZeroStudentRows}
+                  onChange={(event) => setHideZeroStudentRows(event.target.checked)}
+                  className="mt-1 size-4 rounded border-slate-700 bg-slate-950 text-sky-400 focus:ring-sky-400"
+                />
+                <span className="space-y-1">
+                  <span className="block text-sm font-medium text-slate-100">
+                    Hide rows with 0 students
+                  </span>
+                  <span className="block text-xs leading-5 text-slate-400">
+                    Keeps the matrix focused on combinations that currently have at least one
+                    distinct student.
+                  </span>
                 </span>
-              </span>
-            </label>
+              </label>
+            </div>
 
             <div className="mt-5 overflow-x-auto">
               <table className="min-w-[1080px] border-separate border-spacing-0 text-sm">
@@ -1166,7 +1203,7 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
                   </tr>
                 </thead>
                 <tbody>
-                  {completionRows.map((row) => (
+                  {visibleCompletionRows.map((row) => (
                     <tr key={row.key} className="text-slate-200">
                       <td className="sticky left-0 z-10 border-b border-slate-800 bg-slate-950/95 px-4 py-3 font-medium">
                         {row.subjectLabel}
