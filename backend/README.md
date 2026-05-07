@@ -43,3 +43,14 @@ Each layer has a clear responsibility:
 - **schemas** — Pydantic models for request/response validation.
 - **services** — business logic that can be shared across routers.
 - **tests** — pytest-based integration/unit tests.
+
+## DynamoDB backup
+
+Before running a migration, you can export the configured DynamoDB tables to local files:
+
+```bash
+cd backend
+AWS_PROFILE=glowingstar poetry run python scripts/export_dynamodb_backup.py
+```
+
+By default this reads `backend/.env`, exports the configured `AWS_SAINTPAUL_*_TABLE` tables, and writes a timestamped backup under `backend/backups/dynamodb/`.

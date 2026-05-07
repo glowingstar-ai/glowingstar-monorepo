@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "AI教学研究 Pre/Post Quiz 题库",
-    "total_courses": 12,
+    "total_courses": 14,
     "questions_per_course": {
       "pre_quiz": 8,
       "post_quiz_total": 11,
@@ -1789,7 +1789,7 @@
       "quiz_name_post": "物理 F4 動量、衝量與動量定理 – Post-quiz",
       "subject": "物理",
       "grade": "F4",
-      "exam_type": "unspecified",
+      "exam_type": "preliminary",
       "topic": "動量、衝量與動量定理",
       "learning_objectives": [
         {
@@ -2031,7 +2031,7 @@
       "quiz_name_post": "物理 F5 交流發電機與交變電流 – Post-quiz",
       "subject": "物理",
       "grade": "F5",
-      "exam_type": "unspecified",
+      "exam_type": "preliminary",
       "topic": "交流發電機與交變電流",
       "learning_objectives": [
         {
@@ -2257,7 +2257,7 @@
       "quiz_name_post": "化學 F4 元素週期律 – Post-quiz",
       "subject": "化學",
       "grade": "F4",
-      "exam_type": "unspecified",
+      "exam_type": "preliminary",
       "topic": "第四章 物質結構 元素週期表 — 第二節 元素週期律",
       "learning_objectives": [
         {
@@ -2489,7 +2489,7 @@
       "quiz_name_post": "化學 F5 烴的衍生物 — 醛和酮 – Post-quiz",
       "subject": "化學",
       "grade": "F5",
-      "exam_type": "unspecified",
+      "exam_type": "preliminary",
       "topic": "烴的衍生物 — 醛和酮",
       "learning_objectives": [
         {
@@ -2709,6 +2709,458 @@
             "no_marks": "未能指出正確的化學性質差異，或實驗方案完全不可行。"
           },
           "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        }
+      ]
+    },
+    {
+      "subject": "物理",
+      "grade": "F5",
+      "exam_type": "formal",
+      "topic": "感抗與容抗",
+      "quiz_name_pre": "Pre-Quiz: 感抗與容抗",
+      "quiz_name_post": "Post-Quiz: 感抗與容抗",
+      "learning_objectives": [
+        {
+          "id": "LO1",
+          "description": "電感線圈對直流、交流電的影響。"
+        },
+        {
+          "id": "LO2",
+          "description": "電容對直流、交流電的影響。"
+        },
+        {
+          "id": "LO3",
+          "description": "自感係數和交流電的頻率對感抗大小的影響。"
+        },
+        {
+          "id": "LO4",
+          "description": "電容和交流電的頻率對容抗大小的影響。"
+        }
+      ],
+      "shared_questions": [
+        {
+          "id": "LO1-M1",
+          "type": "MCQ",
+          "bloom_level": "Understand",
+          "options": {
+            "A": "對直流電和交流電的阻礙作用相同",
+            "B": "對直流電沒有阻礙作用，對交流電有阻礙作用",
+            "C": "對直流電有阻礙作用，對交流電沒有阻礙作用",
+            "D": "對兩者都沒有阻礙作用"
+          },
+          "correct_answer": "B",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "理想電感線圈對直流電和交流電的阻礙作用有何不同？",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "distractor_rationale": "選項C反映了將電感與電容作用混淆的常見誤概念。"
+        },
+        {
+          "id": "LO2-M1",
+          "type": "MCQ",
+          "bloom_level": "Understand",
+          "options": {
+            "A": "允許交流電通過，阻礙直流電通過",
+            "B": "允許直流電通過，阻礙交流電通過",
+            "C": "對直流電和交流電都完全阻斷",
+            "D": "對直流電和交流電都允許通過"
+          },
+          "correct_answer": "A",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "關於電容器在電路中的作用，下列說法正確的是？",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "distractor_rationale": "選項B反映了將電容與電感作用混淆的常見誤概念。"
+        },
+        {
+          "id": "LO3-M1",
+          "type": "MCQ",
+          "bloom_level": "Apply",
+          "options": {
+            "A": "變小",
+            "B": "保持不變",
+            "C": "變大",
+            "D": "先變大後變小"
+          },
+          "correct_answer": "C",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "若將交流電源的頻率提高，電感線圈的感抗將如何變化？",
+          "mapped_LO": [
+            "LO3"
+          ],
+          "distractor_rationale": "選項A反映了學生可能將感抗與容抗的頻率特性混淆。"
+        },
+        {
+          "id": "LO4-M1",
+          "type": "MCQ",
+          "bloom_level": "Apply",
+          "options": {
+            "A": "變小",
+            "B": "保持不變",
+            "C": "先變小後變大",
+            "D": "變大"
+          },
+          "correct_answer": "D",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "在一個包含電容器的交流電路中，若減小電容器的電容，容抗會如何變化？",
+          "mapped_LO": [
+            "LO4"
+          ],
+          "distractor_rationale": "選項A反映了學生誤以為電容與容抗成正比的誤概念。"
+        },
+        {
+          "id": "LO3-M2",
+          "type": "MCQ",
+          "bloom_level": "Understand",
+          "options": {
+            "A": "僅與交流電的頻率有關",
+            "B": "僅與線圈的自感係數有關",
+            "C": "與交流電的頻率和線圈的自感係數都有關",
+            "D": "與交流電的電壓大小有關"
+          },
+          "correct_answer": "C",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "決定電感線圈感抗大小的因素有哪些？",
+          "mapped_LO": [
+            "LO3"
+          ],
+          "distractor_rationale": "選項D反映了學生將感抗與歐姆定律中的電阻概念混淆，誤以為與電壓有關。"
+        },
+        {
+          "id": "LO4-M2",
+          "type": "MCQ",
+          "bloom_level": "Understand",
+          "options": {
+            "A": "容抗與交流電的頻率成反比",
+            "B": "容抗與電容器的電容成反比",
+            "C": "頻率越高，電容器對交流電的阻礙作用越小",
+            "D": "電容越大，容抗越大"
+          },
+          "correct_answer": "D",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "關於容抗，下列哪一項描述是錯誤的？",
+          "mapped_LO": [
+            "LO4"
+          ],
+          "distractor_rationale": "選項D作為錯誤描述，反映了學生常有的直覺誤區：物理量越大，其阻礙作用也越大。"
+        },
+        {
+          "id": "LO1-S1",
+          "type": "SA",
+          "bloom_level": "Analyze",
+          "rubric": {
+            "full_marks": "準確指出交流電會產生變化的磁場，進而產生感應電動勢阻礙電流變化；而直流電電流恆定，無感應電動勢。",
+            "partial_marks": "僅提到交流電會產生感應電動勢，或僅提到直流電電流不變。",
+            "no_marks": "回答錯誤或未作答。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "為什麼電感線圈對交流電有阻礙作用，而對恆定直流電沒有阻礙作用？請簡要解釋。",
+          "mapped_LO": [
+            "LO1"
+          ]
+        },
+        {
+          "id": "LO2-S1",
+          "type": "SA",
+          "bloom_level": "Analyze",
+          "rubric": {
+            "full_marks": "準確解釋交流電不斷改變方向，使電容器反覆充放電，形成持續電流；直流電只能充電一次，充滿後電路斷開。",
+            "partial_marks": "僅提到電容器反覆充放電，或僅提到直流電充滿後斷開。",
+            "no_marks": "回答錯誤或未作答。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "在電路中串聯一個電容器，為什麼接通交流電源時電路中有持續的電流，而接通直流電源時卻沒有？",
+          "mapped_LO": [
+            "LO2"
+          ]
+        }
+      ],
+      "new_questions_post_only": [
+        {
+          "id": "LO3-M3-NEW",
+          "type": "MCQ",
+          "bloom_level": "Apply",
+          "options": {
+            "A": "高頻信號使自感係數減小",
+            "B": "高頻信號使感抗增大，從而阻礙高頻電流",
+            "C": "高頻信號使感抗減小，從而阻礙高頻電流",
+            "D": "電感線圈會吸收高頻信號的能量"
+          },
+          "correct_answer": "B",
+          "transfer_context": "將感抗與頻率的關係應用於音響分頻器的實際電路中。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "在音響設備的分頻器中，常利用電感線圈來阻擋高頻音頻信號。這是基於什麼物理原理？",
+          "mapped_LO": [
+            "LO3"
+          ],
+          "distractor_rationale": "選項C反映了將感抗與容抗頻率特性混淆的誤概念。",
+          "function": "Transfer"
+        },
+        {
+          "id": "LO4-M3-NEW",
+          "type": "MCQ",
+          "bloom_level": "Analyze",
+          "options": {
+            "A": "正確，交流電壓夠高就能擊穿絕緣層",
+            "B": "正確，交流電的電荷具有穿透絕緣層的特性",
+            "C": "錯誤，交流電並未穿過絕緣層，而是極板反覆充放電形成電流",
+            "D": "錯誤，只有高頻交流電才能穿過絕緣層"
+          },
+          "correct_answer": "C",
+          "targeted_misconception": "學生常誤以為交流電「通過」電容器是指電荷實體穿過了極板間的絕緣介質。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "某學生認為：「因為電容器兩極板之間是絕緣的，所以交流電的電荷實際上穿過了極板之間的絕緣層。」關於這個觀點，下列說法正確的是？",
+          "mapped_LO": [
+            "LO4"
+          ],
+          "distractor_rationale": "選項B直接反映了學生對交流電通過電容器機制的常見誤解。",
+          "function": "Misconception Probe"
+        },
+        {
+          "id": "LO3-S2-NEW",
+          "type": "SA",
+          "bloom_level": "Evaluate",
+          "rubric": {
+            "full_marks": "準確指出頻率增加時，感抗增大而容抗減小。總阻礙作用會先減小後增大（或指出兩者變化趨勢相反，具體取決於初始狀態）。",
+            "partial_marks": "僅正確指出感抗或容抗其中之一隨頻率的變化趨勢。",
+            "no_marks": "回答錯誤或未作答。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "在一個同時串聯了電感和電容的交流電路中，我們觀察到電流的大小會隨著電源頻率的改變而發生變化。假設我們從一個非常低的頻率開始，逐漸增加電源的頻率直到非常高。請結合感抗和容抗的特性，分析在這個過程中電路中的總阻礙作用會如何變化？並解釋為什麼會出現這樣的變化趨勢。",
+          "mapped_LO": [
+            "LO3, LO4"
+          ],
+          "function": "Extension"
+        }
+      ]
+    },
+    {
+      "subject": "化學",
+      "grade": "F5",
+      "exam_type": "formal",
+      "topic": "烴的衍生物 — 酯",
+      "quiz_name_pre": "Pre-Quiz: 烴的衍生物 — 酯",
+      "quiz_name_post": "Post-Quiz: 烴的衍生物 — 酯",
+      "learning_objectives": [
+        {
+          "id": "LO1",
+          "description": "認識酯的結構特點，知道酯是羧酸分子中羥基被取代後的產物，能說出酯的官能團。"
+        },
+        {
+          "id": "LO2",
+          "description": "掌握酯的物理性質，記住低級酯有芳香氣味、密度比水小、難溶於水的核心特點。"
+        },
+        {
+          "id": "LO3",
+          "description": "理解酯的水解反應原理，能準確書寫酸性、鹼性條件下酯的水解化學方程式。"
+        },
+        {
+          "id": "LO4",
+          "description": "區分酯在酸性可逆、鹼性不可逆水解的不同條件與產物，知道鹼性水解更徹底。"
+        },
+        {
+          "id": "LO5",
+          "description": "對比酯化與酯水解，明確二者互為可逆反應，掌握催化劑、反應條件、反應類型的差異。"
+        }
+      ],
+      "shared_questions": [
+        {
+          "id": "LO1-M1",
+          "type": "MCQ",
+          "bloom_level": "Remember",
+          "options": {
+            "A": "酯是醇分子中羥基被取代後的產物",
+            "B": "酯的官能團是羧基",
+            "C": "酯是羧酸分子中羥基被取代後的產物",
+            "D": "酯的官能團是羥基"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "下列關於酯的結構特點，說法正確的是？",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "correct_answer": "C",
+          "distractor_rationale": "A和B是常見誤概念，混淆了醇、羧酸和酯的結構特點。"
+        },
+        {
+          "id": "LO2-M1",
+          "type": "MCQ",
+          "bloom_level": "Remember",
+          "options": {
+            "A": "具有芳香氣味",
+            "B": "密度比水大",
+            "C": "難溶於水",
+            "D": "易溶於有機溶劑"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "關於低級酯的物理性質，下列描述錯誤的是？",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "correct_answer": "B",
+          "distractor_rationale": "B是常見誤概念，學生常誤以為所有有機物密度都比水大。"
+        },
+        {
+          "id": "LO3-M1",
+          "type": "MCQ",
+          "bloom_level": "Understand",
+          "options": {
+            "A": "乙酸和乙醇",
+            "B": "乙酸鈉和乙醇",
+            "C": "乙酸和甲醇",
+            "D": "甲酸和乙醇"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "乙酸乙酯在酸性條件下水解的產物是？",
+          "mapped_LO": [
+            "LO3"
+          ],
+          "correct_answer": "A",
+          "distractor_rationale": "B是鹼性水解的產物，學生容易混淆酸性和鹼性條件下的產物。"
+        },
+        {
+          "id": "LO4-M1",
+          "type": "MCQ",
+          "bloom_level": "Understand",
+          "options": {
+            "A": "酸性條件下的水解是不可逆的",
+            "B": "鹼性條件下的水解是可逆的",
+            "C": "酸性水解比鹼性水解更徹底",
+            "D": "鹼性水解比酸性水解更徹底"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "關於酯的水解反應，下列說法正確的是？",
+          "mapped_LO": [
+            "LO4"
+          ],
+          "correct_answer": "D",
+          "distractor_rationale": "A、B、C都是常見誤概念，學生常混淆酸性和鹼性水解的可逆性及徹底程度。"
+        },
+        {
+          "id": "LO5-M1",
+          "type": "MCQ",
+          "bloom_level": "Analyze",
+          "options": {
+            "A": "酯化反應通常需要濃硫酸作催化劑",
+            "B": "酯的水解反應只能在鹼性條件下進行",
+            "C": "酯化反應是取代反應",
+            "D": "酯的水解反應也是取代反應"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "酯化反應與酯的水解反應互為可逆反應，下列關於這兩個反應的對比，錯誤的是？",
+          "mapped_LO": [
+            "LO5"
+          ],
+          "correct_answer": "B",
+          "distractor_rationale": "B是常見誤概念，學生可能忘記酯在酸性條件下也能水解。"
+        },
+        {
+          "id": "LO1-M2",
+          "type": "MCQ",
+          "bloom_level": "Understand",
+          "options": {
+            "A": "CH3COOH",
+            "B": "CH3CH2OH",
+            "C": "CH3COOCH2CH3",
+            "D": "CH3CHO"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "下列物質中，含有酯基的是？",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "correct_answer": "C",
+          "distractor_rationale": "A、B、D分別是羧酸、醇和醛，學生容易混淆不同官能團的結構。"
+        },
+        {
+          "id": "LO3-S1",
+          "type": "SA",
+          "bloom_level": "Apply",
+          "rubric": {
+            "full_marks": "正確寫出化學方程式（CH3COOCH2CH3 + NaOH → CH3COONa + CH3CH2OH），並指出鹼性條件下生成的酸與鹼中和，使平衡正向移動，反應不可逆。",
+            "partial_marks": "寫出正確的化學方程式，但未解釋清楚為何更徹底；或解釋正確但方程式有小錯誤。",
+            "no_marks": "方程式錯誤且解釋錯誤，或未作答。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "請寫出乙酸乙酯在氫氧化鈉溶液中加熱發生水解反應的化學方程式，並說明該反應為何比在酸性條件下更徹底。",
+          "mapped_LO": [
+            "LO3"
+          ]
+        },
+        {
+          "id": "LO5-S1",
+          "type": "SA",
+          "bloom_level": "Analyze",
+          "rubric": {
+            "full_marks": "指出酯化反應是可逆反應，加入過量反應物（乙醇）可以使平衡向生成物（乙酸乙酯）方向移動，提高乙酸的轉化率。",
+            "partial_marks": "提到平衡移動或提高產率，但未具體說明是哪種反應物過量或哪種物質的轉化率提高。",
+            "no_marks": "解釋錯誤或未作答。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "在實驗室製備乙酸乙酯時，通常會加入過量的乙醇。請從化學平衡的角度解釋這樣做的目的。",
+          "mapped_LO": [
+            "LO5"
+          ]
+        }
+      ],
+      "new_questions_post_only": [
+        {
+          "id": "LO2-M2-NEW",
+          "type": "MCQ",
+          "bloom_level": "Apply",
+          "options": {
+            "A": "乙醇",
+            "B": "乙酸",
+            "C": "戊酸戊酯",
+            "D": "甘油"
+          },
+          "transfer_context": "將低級酯的物理性質（芳香氣味、難溶於水、密度比水小）應用於化妝品成分的推斷情境中。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "某化妝品中含有一種具有蘋果香味的有機物，該物質難溶於水，密度比水小。該物質最可能是？",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "correct_answer": "C",
+          "distractor_rationale": "A、B、D的物理性質與題幹描述不符，學生需綜合運用酯的物理性質進行判斷。",
+          "function": "Transfer"
+        },
+        {
+          "id": "LO4-M2-NEW",
+          "type": "MCQ",
+          "bloom_level": "Understand",
+          "options": {
+            "A": "油脂在鹼性條件下發生了水解反應",
+            "B": "油脂在酸性條件下發生了水解反應",
+            "C": "油脂易溶於水",
+            "D": "油脂易溶於氫氧化鈉溶液"
+          },
+          "targeted_misconception": "學生常誤以為油脂不分層是因為其本身溶於水或鹼液，而忽略了其發生了鹼性水解（皂化反應）生成了易溶於水的產物。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "將油脂（一種高級脂肪酸甘油酯）與氫氧化鈉溶液共熱，完全反應後，混合液不分層。此現象說明？",
+          "mapped_LO": [
+            "LO4"
+          ],
+          "correct_answer": "A",
+          "distractor_rationale": "C和D是常見誤概念，學生可能未意識到發生了化學反應。",
+          "function": "Misconception Probe"
+        },
+        {
+          "id": "LO3-S2-NEW",
+          "type": "SA",
+          "bloom_level": "Apply",
+          "rubric": {
+            "full_marks": "指出阿司匹林中的酯基在潮濕空氣中發生了水解反應，生成了具有酸味的羧酸（如乙酸）。",
+            "partial_marks": "提到發生了水解反應，但未說明生成了具有酸味的物質；或提到生成了酸，但未指明是水解反應。",
+            "no_marks": "解釋錯誤或未作答。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定",
+          "stem": "阿司匹林（乙醯水楊酸）含有一個酯基。若將阿司匹林藥片長期暴露在潮濕空氣中，會產生一股酸味。請推測發生了什麼化學反應，並簡述理由。",
+          "mapped_LO": [
+            "LO3"
+          ],
+          "function": "Extension"
         }
       ]
     }
