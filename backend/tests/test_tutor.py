@@ -1,4 +1,5 @@
 import pytest
+import httpx
 from fastapi.testclient import TestClient
 
 from app.api.dependencies import _get_tutor_service
@@ -101,6 +102,38 @@ def test_student_tutor_chat_accepts_reference_image_url() -> None:
 
     assert data["model"] == "gpt-5.5"
     assert data["message"]["role"] == "assistant"
+
+
+def test_student_tutor_chat_retries_only_for_invalid_image_errors() -> None:
+    service = _get_tutor_service()
+    request = httpx.Request("POST", "https://api.openai.com/v1/responses")
+
+    retryable_response = httpx.Response(
+        400,
+        json={
+            "error": {
+                "message": "The image data you provided does not represent a valid image.",
+            }
+        },
+        request=request,
+    )
+    non_retryable_response = httpx.Response(
+        400,
+        json={
+            "error": {
+                "message": "Unsupported parameter: text.verbosity",
+            }
+        },
+        request=request,
+    )
+
+    assert service._should_retry_chat_without_image(
+        retryable_response, "https://example.com/image.png"
+    )
+    assert not service._should_retry_chat_without_image(
+        non_retryable_response, "https://example.com/image.png"
+    )
+    assert not service._should_retry_chat_without_image(retryable_response, None)
 
 
 def test_student_tutor_image_explanation_offline_fallback() -> None:

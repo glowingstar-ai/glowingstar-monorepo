@@ -1251,8 +1251,8 @@ export default function SaintPaulStudentExperience({
           })),
           quiz_history: nextQuizContext,
           reference_image_url:
-            activeReferenceImage?.assetUrl ??
             activeReferenceImage?.imageDataUrl ??
+            activeReferenceImage?.assetUrl ??
             null,
         }),
       });
