@@ -64,14 +64,35 @@ export function normalizeFirstValue(
   return value;
 }
 
+export function normalizeSaintPaulVersion(
+  subject: string | undefined,
+  _grade: string | undefined,
+  version: string | undefined,
+): string | undefined {
+  if (version === "unspecified" && (subject === "physics" || subject === "chemistry")) {
+    return "preliminary";
+  }
+
+  return version;
+}
+
 export function normalizeSaintPaulSearchParams(
   searchParams: Record<string, string | string[] | undefined> | undefined,
 ): SaintPaulSelection {
+  const grade = normalizeFirstValue(searchParams?.grade);
+  const mode = normalizeFirstValue(searchParams?.mode);
+  const subject = normalizeFirstValue(searchParams?.subject);
+  const version = normalizeSaintPaulVersion(
+    subject,
+    grade,
+    normalizeFirstValue(searchParams?.version),
+  );
+
   return {
-    grade: normalizeFirstValue(searchParams?.grade),
-    mode: normalizeFirstValue(searchParams?.mode),
-    subject: normalizeFirstValue(searchParams?.subject),
-    version: normalizeFirstValue(searchParams?.version),
+    grade,
+    mode,
+    subject,
+    version,
   };
 }
 
@@ -79,9 +100,14 @@ export function buildSaintPaulQueryString(
   selection: SaintPaulSelection,
 ): string {
   const params = new URLSearchParams();
+  const version = normalizeSaintPaulVersion(
+    selection.subject,
+    selection.grade,
+    selection.version,
+  );
 
   if (selection.subject) params.set("subject", selection.subject);
-  if (selection.version) params.set("version", selection.version);
+  if (version) params.set("version", version);
   if (selection.grade) params.set("grade", selection.grade);
   if (selection.mode) params.set("mode", selection.mode);
 
