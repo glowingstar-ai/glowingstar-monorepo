@@ -571,12 +571,14 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
     [detailBySession],
   );
 
-  const loadOverview = useCallback(async () => {
+  const loadOverview = useCallback(async (forceRefresh = false) => {
     setIsOverviewLoading(true);
     setOverviewError(null);
 
     try {
-      const response = await fetch(`${API_BASE}/saintpaul/research/overview?limit=1000`);
+      const response = await fetch(
+        `${API_BASE}/saintpaul/research/overview${forceRefresh ? "?refresh=true" : ""}`,
+      );
       const payload = (await response.json()) as SaintPaulResearchOverviewResponse & {
         detail?: string;
       };
@@ -623,7 +625,7 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
 
   const handleRefresh = useCallback(async () => {
     setDetailBySession({});
-    await loadOverview();
+    await loadOverview(true);
     if (viewMode === "details" && selectedSessionId) {
       await fetchSessionDetail(selectedSessionId, true);
     }

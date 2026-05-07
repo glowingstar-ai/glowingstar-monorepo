@@ -816,18 +816,22 @@ async def save_saintpaul_session_message(
     tags=["saintpaul"],
 )
 async def get_saintpaul_research_overview(
-    limit: int = Query(
-        200,
+    limit: int | None = Query(
+        None,
         ge=1,
         le=1000,
-        description="Maximum number of sessions to include in the activity index.",
+        description="Optional maximum number of latest sessions to include in the activity index.",
+    ),
+    refresh: bool = Query(
+        False,
+        description="When true, recompute the overview from DynamoDB instead of using the cached result.",
     ),
     persistence: SaintPaulPersistenceService = Depends(get_saintpaul_persistence),
 ) -> SaintPaulResearchOverviewResponse:
     """Return grouped Saint Paul student/session activity for internal review."""
 
     try:
-        payload = persistence.get_research_overview(limit=limit)
+        payload = persistence.get_research_overview(limit=limit, force_refresh=refresh)
     except SaintPaulPersistenceError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 

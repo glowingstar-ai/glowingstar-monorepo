@@ -5,9 +5,11 @@ from __future__ import annotations
 import base64
 import mimetypes
 import re
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
+from threading import RLock
 from typing import Any
 from urllib.parse import unquote, urlparse
 from uuid import uuid4
@@ -82,6 +84,8 @@ class SaintPaulPersistenceService:
             if self._errors_table_name
             else None
         )
+        self._research_overview_cache: dict[tuple[int | None], dict[str, Any]] = {}
+        self._research_overview_cache_lock = RLock()
 
     @property
     def enabled(self) -> bool:
@@ -339,8 +343,16 @@ class SaintPaulPersistenceService:
         self._put_item(self._errors_table, item)
         return error_id, recorded_at
 
-    def get_research_overview(self, *, limit: int = 200) -> dict[str, Any]:
+    def get_research_overview(
+        self, *, limit: int | None = None, force_refresh: bool = False
+    ) -> dict[str, Any]:
         """Return grouped student/session summaries for the internal dashboard."""
+
+        cache_key = (limit,)
+        if not force_refresh:
+            cached = self._get_cached_research_overview(cache_key)
+            if cached is not None:
+                return cached
 
         generated_at = datetime.now(timezone.utc)
         if not self._enabled:
@@ -354,7 +366,6 @@ class SaintPaulPersistenceService:
         meta_items = self._scan_items(
             self._sessions_table,
             filter_expression=Attr("item_key").eq("SESSION#META"),
-            limit=limit,
         )
         sessions = []
         for item in meta_items:
@@ -367,6 +378,8 @@ class SaintPaulPersistenceService:
             key=lambda item: item.get("last_seen_at") or item.get("started_at") or "",
             reverse=True,
         )
+        if limit is not None:
+            sessions = sessions[:limit]
 
         students_by_id: dict[str, dict[str, Any]] = {}
         for session in sessions:
@@ -391,12 +404,14 @@ class SaintPaulPersistenceService:
         students = list(students_by_id.values())
         students.sort(key=lambda item: item.get("last_seen_at") or "", reverse=True)
 
-        return {
+        overview = {
             "persistence_enabled": True,
             "generated_at": generated_at,
             "session_count": len(sessions),
             "students": students,
         }
+        self._set_cached_research_overview(cache_key, overview)
+        return overview
 
     def get_session_research_detail(self, session_id: str) -> dict[str, Any]:
         """Return all stored activity for one Saint Paul session."""
@@ -618,6 +633,27 @@ class SaintPaulPersistenceService:
             )
         return reference_image_url
 
+    def _get_cached_research_overview(
+        self, cache_key: tuple[int | None]
+    ) -> dict[str, Any] | None:
+        if not hasattr(self, "_research_overview_cache"):
+            self._research_overview_cache = {}
+            self._research_overview_cache_lock = RLock()
+
+        with self._research_overview_cache_lock:
+            cached = self._research_overview_cache.get(cache_key)
+            return deepcopy(cached) if cached is not None else None
+
+    def _set_cached_research_overview(
+        self, cache_key: tuple[int | None], overview: dict[str, Any]
+    ) -> None:
+        if not hasattr(self, "_research_overview_cache"):
+            self._research_overview_cache = {}
+            self._research_overview_cache_lock = RLock()
+
+        with self._research_overview_cache_lock:
+            self._research_overview_cache[cache_key] = deepcopy(overview)
+
     def _put_item(self, table: Any, item: dict[str, Any]) -> None:
         if table is None:
             return
@@ -665,16 +701,15 @@ class SaintPaulPersistenceService:
         table: Any,
         *,
         filter_expression: Any,
-        limit: int,
     ) -> list[dict[str, Any]]:
-        if table is None or limit <= 0:
+        if table is None:
             return []
 
         items: list[dict[str, Any]] = []
         exclusive_start_key: dict[str, Any] | None = None
 
         try:
-            while len(items) < limit:
+            while True:
                 kwargs: dict[str, Any] = {"FilterExpression": filter_expression}
                 if exclusive_start_key:
                     kwargs["ExclusiveStartKey"] = exclusive_start_key
@@ -688,7 +723,7 @@ class SaintPaulPersistenceService:
             raise SaintPaulPersistenceError("Failed to read Saint Paul data from DynamoDB") from exc
 
         normalized = [self._normalize_read_value(item) for item in items]
-        return normalized[:limit]
+        return normalized
 
     def _session_summary_from_item(self, item: dict[str, Any]) -> dict[str, Any]:
         normalized = self._normalize_read_value(item)
