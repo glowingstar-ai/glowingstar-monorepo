@@ -3163,6 +3163,444 @@
           "function": "Extension"
         }
       ]
+    },
+    {
+      "subject": "物理",
+      "grade": "F4",
+      "exam_type": "formal",
+      "topic": "反衝運動 火箭",
+      "quiz_name_pre": "物理F4反衝運動 火箭 Pre-Quiz",
+      "quiz_name_post": "物理F4反衝運動 火箭 Post-Quiz",
+      "learning_objectives": [
+        {
+          "id": "LO1",
+          "description": "能夠使用動量守恆定律，解釋碰撞、爆炸之類兩個物體相互作用的問題。"
+        },
+        {
+          "id": "LO2",
+          "description": "能夠說明反衝運動和火箭的原理。"
+        }
+      ],
+      "shared_questions": [
+        {
+          "id": "LO1-M1",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "bloom_level": "Remember",
+          "stem": "根據動量守恆定律，在什麼條件下系統的總動量保持不變？",
+          "options": {
+            "A": "系統不受外力或所受外力之和為零時",
+            "B": "系統內部的物體不發生碰撞時",
+            "C": "系統內部的物體質量保持不變時",
+            "D": "系統只受重力作用時"
+          },
+          "correct_answer": "A",
+          "distractor_rationale": "B、C、D均未準確描述動量守恆的條件，系統動量守恆的關鍵在於外力之和為零。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO1-M2",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "bloom_level": "Understand",
+          "stem": "兩個質量相等的滑塊在光滑水平面上發生完全非彈性碰撞，碰撞後的總動能與碰撞前相比會如何變化？",
+          "options": {
+            "A": "保持不變",
+            "B": "減少",
+            "C": "增加",
+            "D": "無法確定"
+          },
+          "correct_answer": "B",
+          "distractor_rationale": "完全非彈性碰撞中，動量守恆但動能不守恆，部分動能轉化為內能，因此總動能減少。A是完全彈性碰撞的特徵。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO1-M3",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "bloom_level": "Apply",
+          "stem": "一個靜止的炸彈突然爆炸成質量為 1:2 的兩塊碎片。若質量較小的碎片速度大小為 v，則質量較大的碎片速度大小為？",
+          "options": {
+            "A": "2v",
+            "B": "v",
+            "C": "0.5v",
+            "D": "0.25v"
+          },
+          "correct_answer": "C",
+          "distractor_rationale": "根據動量守恆，0 = m*v - 2m*v'，解得 v' = 0.5v。A選項是將質量與速度成正比計算的錯誤結果。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO2-M1",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Remember",
+          "stem": "下列哪一項現象不屬於反衝運動的應用？",
+          "options": {
+            "A": "烏賊噴水前進",
+            "B": "步槍射擊時向後退",
+            "C": "煙花升空",
+            "D": "蘋果從樹上掉落"
+          },
+          "correct_answer": "D",
+          "distractor_rationale": "蘋果掉落是受重力作用的自由落體運動，不涉及物體間相互作用產生的反衝。A、B、C均為反衝運動。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO2-M2",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Understand",
+          "stem": "火箭在太空中能夠加速前進，其主要原因是？",
+          "options": {
+            "A": "向後噴射高速氣體，氣體對火箭產生向前的反作用力",
+            "B": "火箭發動機推動周圍的空氣，空氣給火箭向前的推力",
+            "C": "太空中沒有阻力，火箭憑藉慣性加速",
+            "D": "火箭受到地球引力的彈弓效應"
+          },
+          "correct_answer": "A",
+          "distractor_rationale": "火箭在真空中飛行不依賴空氣，而是通過向後噴射氣體，根據動量守恆（或牛頓第三定律）獲得向前的動量。B是常見誤概念。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO2-M3",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Apply",
+          "stem": "某火箭發射時，若噴射氣體的速度相對於火箭增加為原來的兩倍，且每秒噴出的氣體質量不變，則火箭獲得的推力將如何變化？",
+          "options": {
+            "A": "保持不變",
+            "B": "變為原來的兩倍",
+            "C": "變為原來的四倍",
+            "D": "變為原來的一半"
+          },
+          "correct_answer": "B",
+          "distractor_rationale": "推力 F = Δp/Δt = (Δm/Δt) * v。當噴氣速度 v 變為兩倍時，推力也變為兩倍。C選項混淆了動能與動量的關係。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO1-S1",
+          "type": "SA",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "bloom_level": "Apply",
+          "stem": "一名太空人在艙外活動時，不慎與太空船分離且身上沒有任何推進裝置。他手中只有一個沉重的工具箱。請運用動量守恆定律，解釋他應該如何利用工具箱回到太空船。",
+          "rubric": {
+            "full_marks": "準確指出應將工具箱向背離太空船的方向拋出，並運用動量守恆定律解釋拋出後太空人會獲得朝向太空船的動量。",
+            "partial_marks": "知道要拋出工具箱，但未明確指出方向或未提及動量守恆定律。",
+            "no_marks": "回答錯誤或未作答。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO2-S1",
+          "type": "SA",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Analyze",
+          "stem": "為什麼現代運載火箭通常採用多級火箭的設計，而不是單級火箭？請從質量和速度的關係進行分析。",
+          "rubric": {
+            "full_marks": "準確指出多級火箭可以在飛行過程中拋棄已燃盡的燃料箱，減少無效質量，從而在相同的噴氣速度和燃料質量下獲得更高的最終速度。",
+            "partial_marks": "提到減輕重量或提高速度，但未深入分析質量減少對最終速度的影響。",
+            "no_marks": "回答錯誤或未作答。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        }
+      ],
+      "new_questions_post_only": [
+        {
+          "id": "LO1-M4-NEW",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "bloom_level": "Apply",
+          "stem": "溜冰場上，質量為 60 kg 的成年人與質量為 30 kg 的小孩靜止面對面站立。成年人將小孩向前推出，使小孩獲得相對於地面 2 m/s 的速度，則成年人自身的速度大小為？",
+          "options": {
+            "A": "2 m/s",
+            "B": "0 m/s",
+            "C": "1 m/s",
+            "D": "4 m/s"
+          },
+          "correct_answer": "C",
+          "distractor_rationale": "根據動量守恆，0 = 30*2 - 60*v，解得 v = 1 m/s。A選項認為兩人速度相同，D選項將質量比反向應用。",
+          "function": "Transfer",
+          "transfer_context": "將爆炸或碰撞的動量守恆概念遷移到日常溜冰推人的情境中。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO2-M4-NEW",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Understand",
+          "stem": "關於火箭在真空中的運動，下列說法正確的是？",
+          "options": {
+            "A": "火箭必須向後噴射氣體推動真空中的某種物質才能前進",
+            "B": "只要火箭的發動機停止工作，火箭就會立刻停止運動",
+            "C": "火箭噴出的氣體質量越大，火箭的最終速度一定越小",
+            "D": "火箭前進是因為噴出的氣體獲得向後的動量，根據動量守恆定律，火箭獲得向前的動量"
+          },
+          "correct_answer": "D",
+          "distractor_rationale": "A選項反映了「火箭需要推動空氣才能前進」的常見誤概念；B選項違背了慣性定律；C選項錯誤，噴出氣體質量越大，火箭獲得的動量越大。",
+          "function": "Misconception Probe",
+          "targeted_misconception": "學生常誤以為火箭需要推動周圍的空氣或物質才能產生向前的推力。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO1-S2-NEW",
+          "type": "SA",
+          "mapped_LO": [
+            "LO1",
+            "LO2"
+          ],
+          "bloom_level": "Analyze",
+          "stem": "某科幻電影中，一艘太空船為了躲避隕石，向前方發射了一枚質量巨大的攔截彈。請結合動量守恆定律和反衝運動的原理，分析發射攔截彈對太空船自身運動狀態的影響，並評估這種做法在緊急避險時的利弊。",
+          "rubric": {
+            "full_marks": "準確指出發射攔截彈會產生反衝作用，使太空船獲得向後的動量（減速或反向運動）；利在於能擊毀隕石且反衝有助於拉開距離，弊在於可能偏離原航線或消耗過多能量。",
+            "partial_marks": "僅指出太空船會減速或反向運動，未全面分析利弊；或僅分析利弊未結合物理原理。",
+            "no_marks": "回答錯誤或未作答。"
+          },
+          "function": "Extension",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        }
+      ]
+    },
+    {
+      "subject": "化學",
+      "grade": "F4",
+      "exam_type": "formal",
+      "topic": "第二章 分子結構與性質 — 共價鍵",
+      "quiz_name_pre": "化學F4第二章 分子結構與性質 — 共價鍵 Pre-Quiz",
+      "quiz_name_post": "化學F4第二章 分子結構與性質 — 共價鍵 Post-Quiz",
+      "learning_objectives": [
+        {
+          "id": "LO1",
+          "description": "說出共價鍵的定義（原子間通過共用電子對形成的化學鍵）及其本質（靜電相互作用）。"
+        },
+        {
+          "id": "LO2",
+          "description": "能使用電子式表示 H₂、HCl、Cl₂、H₂O、CO₂、NH₃ 等共價分子的形成過程。"
+        },
+        {
+          "id": "LO3",
+          "description": "能使用結構式來表示共價分子。"
+        }
+      ],
+      "shared_questions": [
+        {
+          "id": "LO1-M1",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "bloom_level": "Remember",
+          "stem": "下列關於共價鍵本質的敘述，哪一項是最準確的？",
+          "options": {
+            "A": "共用電子對與兩原子核之間的靜電相互作用",
+            "B": "陰陽離子之間的靜電吸引力",
+            "C": "原子核之間的直接吸引力",
+            "D": "電子之間的排斥力"
+          },
+          "correct_answer": "A",
+          "distractor_rationale": "B是離子鍵的本質；C和D不符合化學鍵的定義，共價鍵是共用電子對與原子核之間的吸引力。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO1-M2",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "bloom_level": "Understand",
+          "stem": "共價鍵的形成主要是通過下列哪一種方式？",
+          "options": {
+            "A": "電子的轉移",
+            "B": "中子的共用",
+            "C": "質子的轉移",
+            "D": "共用電子對"
+          },
+          "correct_answer": "D",
+          "distractor_rationale": "A是離子鍵的形成方式；C和D與化學鍵形成無關，共價鍵是通過共用電子對形成的。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO2-M1",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Apply",
+          "stem": "在水分子（H₂O）的電子式中，氧原子周圍共有多少對孤電子對？",
+          "options": {
+            "A": "1對",
+            "B": "2對",
+            "C": "3對",
+            "D": "4對"
+          },
+          "correct_answer": "B",
+          "distractor_rationale": "氧原子最外層有6個電子，與兩個氫原子共用2個電子形成兩對共用電子對，剩下4個電子形成2對孤電子對。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO2-M2",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Understand",
+          "stem": "下列哪一個分子含有雙鍵（即兩個原子之間共用兩對電子對）？",
+          "options": {
+            "A": "H₂",
+            "B": "HCl",
+            "C": "CO₂",
+            "D": "NH₃"
+          },
+          "correct_answer": "C",
+          "distractor_rationale": "H₂、HCl、NH₃均只含有單鍵，CO₂中碳原子與兩個氧原子分別形成雙鍵。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO3-M1",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO3"
+          ],
+          "bloom_level": "Remember",
+          "stem": "在結構式中，用來表示一對共用電子對的符號是甚麼？",
+          "options": {
+            "A": "「:」",
+            "B": "「·」",
+            "C": "「=」",
+            "D": "「—」"
+          },
+          "correct_answer": "D",
+          "distractor_rationale": "「:」和「·」用於電子式；「=」表示兩對共用電子對（雙鍵）；「—」表示一對共用電子對（單鍵）。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO3-M2",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO3"
+          ],
+          "bloom_level": "Apply",
+          "stem": "氨氣（NH₃）的正確結構式特徵是甚麼？",
+          "options": {
+            "A": "氮原子與三個氫原子之間各有一條短線",
+            "B": "氮原子與氫原子之間有雙鍵",
+            "C": "氮原子與氫原子之間沒有共價鍵",
+            "D": "氮原子與氫原子之間形成離子鍵"
+          },
+          "correct_answer": "A",
+          "distractor_rationale": "NH₃中氮原子與三個氫原子分別共用一對電子，形成三個單鍵，用三條短線表示。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO2-S1",
+          "type": "SA",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Apply",
+          "stem": "請簡述氯化氫（HCl）分子的形成過程，並說明其電子式的特點。",
+          "rubric": {
+            "full_marks": "能準確指出氫原子和氯原子各提供一個電子形成一對共用電子對，並說明電子式中氯原子周圍滿足八隅體結構。",
+            "partial_marks": "能指出共用電子對的形成，但未提及八隅體結構或描述不夠完整。",
+            "no_marks": "未能正確描述共價鍵的形成過程，或將其混淆為離子鍵。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO3-S1",
+          "type": "SA",
+          "mapped_LO": [
+            "LO3"
+          ],
+          "bloom_level": "Analyze",
+          "stem": "比較二氧化碳（CO₂）和水（H₂O）的結構式，說明它們在共價鍵類型（單鍵或雙鍵）上的差異。",
+          "rubric": {
+            "full_marks": "能準確指出CO₂中碳與氧之間是雙鍵（O=C=O），而H₂O中氧與氫之間是單鍵（H—O—H）。",
+            "partial_marks": "能指出其中一種分子的鍵型，或描述不夠準確。",
+            "no_marks": "未能正確區分單鍵和雙鍵，或結構式描述錯誤。"
+          },
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        }
+      ],
+      "new_questions_post_only": [
+        {
+          "id": "LO2-M3-NEW",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO2"
+          ],
+          "bloom_level": "Apply",
+          "stem": "若某元素X的最外層有7個電子，它與氫原子結合形成共價化合物時，最可能的電子式特徵是甚麼？",
+          "options": {
+            "A": "X與H之間形成雙鍵",
+            "B": "X與H之間共用一對電子",
+            "C": "X將一個電子完全轉移給H",
+            "D": "H將一個電子完全轉移給X"
+          },
+          "correct_answer": "B",
+          "distractor_rationale": "X最外層有7個電子，只需共用1個電子即可達到穩定結構，因此與H共用一對電子形成單鍵。C和D是離子鍵特徵。",
+          "function": "Transfer",
+          "transfer_context": "將具體元素（如Cl）的電子式書寫規則遷移到未知元素X上，考察對共價鍵形成條件的理解。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO1-M3-NEW",
+          "type": "MCQ",
+          "mapped_LO": [
+            "LO1"
+          ],
+          "bloom_level": "Understand",
+          "stem": "許多學生認為「共價鍵就是兩個原子把電子放在一起，沒有任何力在作用」。下列哪一項敘述能最有效地糾正這個觀念？",
+          "options": {
+            "A": "共價鍵是電子之間的排斥力",
+            "B": "共價鍵是原子核之間的吸引力",
+            "C": "共價鍵是共用電子對與兩原子核之間的靜電吸引力",
+            "D": "共價鍵是陰陽離子之間的靜電作用"
+          },
+          "correct_answer": "C",
+          "distractor_rationale": "學生常忽略共價鍵的本質是靜電相互作用。C正確指出了共用電子對與原子核之間的吸引力。D是離子鍵。",
+          "function": "Misconception Probe",
+          "targeted_misconception": "誤認為共價鍵僅僅是電子的共享，而忽略了其本質是共用電子對與兩原子核之間的靜電吸引力。",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        },
+        {
+          "id": "LO3-S2-NEW",
+          "type": "SA",
+          "mapped_LO": [
+            "LO2",
+            "LO3"
+          ],
+          "bloom_level": "Analyze",
+          "stem": "氮氣（N₂）分子非常穩定，在常溫下不易與其他物質發生反應。請根據氮原子的最外層電子數，推測氮氣分子的電子式和結構式，並解釋其化學性質穩定的原因。",
+          "rubric": {
+            "full_marks": "能指出氮原子最外層有5個電子，需共用3對電子形成三鍵（N≡N）。並解釋三鍵的鍵能大，難以斷裂，因此化學性質穩定。",
+            "partial_marks": "能寫出正確的結構式或電子式，但未能完整解釋穩定性原因；或解釋了穩定性但結構式描述有誤。",
+            "no_marks": "未能正確推測結構式，且無法解釋穩定性原因。"
+          },
+          "function": "Extension",
+          "confidence_rating": "請圈出您對此題答案的把握程度：○ L1 猜測  ○ L2 略有把握  ○ L3 非常確定"
+        }
+      ]
     }
   ]
 }

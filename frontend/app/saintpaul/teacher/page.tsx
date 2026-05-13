@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import SaintPaulRouteBuilder from "@/components/saint-paul-route-builder";
-import teachingObjectives from "@/data/saintpaul/teaching_objectives.json";
+import saintPaulQuizBank from "@/data/saintpaul/all_quizzes.json";
 import { normalizeSaintPaulSearchParams } from "@/lib/saint-paul";
+import { buildTeachingObjectivesData } from "@/lib/saint-paul-quiz-bank";
 
 export const metadata: Metadata = {
   title: "聖保祿老師連結產生器",
@@ -15,6 +16,8 @@ type PageProps = {
 export default function SaintPaulTeacherPage({
   searchParams,
 }: Readonly<PageProps>): JSX.Element {
+  const teachingObjectives = buildTeachingObjectivesData(saintPaulQuizBank);
+
   return (
     <SaintPaulRouteBuilder
       data={teachingObjectives}

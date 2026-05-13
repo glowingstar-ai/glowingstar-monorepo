@@ -10,6 +10,9 @@ import {
   SendHorizonal,
   X,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
 import {
   type ButtonHTMLAttributes,
   type Dispatch,
@@ -204,6 +207,31 @@ const CONFIDENCE_OPTIONS: Array<{
   { value: "somewhat-confident", label: "略有把握" },
   { value: "very-confident", label: "非常確定" },
 ];
+
+function normalizeMathDelimiters(content: string): string {
+  return content
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_match, formula: string) => {
+      return `\n\n$$\n${formula.trim()}\n$$\n\n`;
+    })
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_match, formula: string) => {
+      return `$${formula}$`;
+    });
+}
+
+function TutorMarkdownMessage({
+  content,
+}: Readonly<{ content: string }>): JSX.Element {
+  return (
+    <div className="saint-paul-markdown">
+      <ReactMarkdown
+        remarkPlugins={[remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+      >
+        {normalizeMathDelimiters(content)}
+      </ReactMarkdown>
+    </div>
+  );
+}
 
 function PrimaryButton({
   children,
@@ -1890,7 +1918,11 @@ export default function SaintPaulStudentExperience({
                 : "ml-auto bg-[#171717] text-white",
             )}
           >
-            {item.content}
+            {item.role === "assistant" ? (
+              <TutorMarkdownMessage content={item.content} />
+            ) : (
+              item.content
+            )}
           </div>
         );
       case "thinking":

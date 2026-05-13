@@ -175,6 +175,29 @@ button:focus-visible {
   color: var(--pg-foreground);
 }
 
+.saint-paul-markdown {
+  overflow-wrap: anywhere;
+}
+
+.saint-paul-markdown :where(p) {
+  margin: 0;
+}
+
+.saint-paul-markdown :where(p + p) {
+  margin-top: 0.75rem;
+}
+
+.saint-paul-markdown :where(.katex-display) {
+  margin: 0.75rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.125rem;
+}
+
+.saint-paul-markdown :where(.katex) {
+  font-size: 1.05em;
+}
+
 .saint-paul-shell a:focus-visible,
 .saint-paul-shell button:focus-visible {
   outline: 1px solid var(--pg-gold);

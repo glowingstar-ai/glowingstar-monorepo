@@ -1,4 +1,7 @@
-import { SUBJECT_LABELS } from "@/lib/saint-paul";
+import {
+  SUBJECT_LABELS,
+  type TeachingObjectivesData,
+} from "@/lib/saint-paul";
 
 type RawLearningObjective = {
   id: string;
@@ -57,6 +60,10 @@ export type SaintPaulLesson = {
   postQuestions: SaintPaulAssessmentQuestion[];
 };
 
+const SUBJECT_KEYS_BY_LABEL = Object.fromEntries(
+  Object.entries(SUBJECT_LABELS).map(([key, label]) => [label, key]),
+) as Record<string, string>;
+
 function normalizeQuestion(
   question: RawQuizQuestion,
 ): SaintPaulAssessmentQuestion {
@@ -110,4 +117,29 @@ export function findSaintPaulLesson(
     preQuestions: sharedQuestions,
     postQuestions: [...sharedQuestions, ...postOnlyQuestions],
   };
+}
+
+export function buildTeachingObjectivesData(
+  quizBank: SaintPaulQuizBank,
+): TeachingObjectivesData {
+  return quizBank.quizzes.reduce<TeachingObjectivesData>((data, quiz) => {
+    const subject = SUBJECT_KEYS_BY_LABEL[quiz.subject] ?? quiz.subject;
+
+    if (!data[subject]) {
+      data[subject] = {};
+    }
+
+    if (!data[subject][quiz.exam_type]) {
+      data[subject][quiz.exam_type] = {};
+    }
+
+    data[subject][quiz.exam_type][quiz.grade] = {
+      topic: quiz.topic,
+      objectives: quiz.learning_objectives.map(
+        (objective) => objective.description,
+      ),
+    };
+
+    return data;
+  }, {});
 }
