@@ -301,21 +301,44 @@ class TutorModeService:
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
+        body = self._build_chat_body(prompt, payload.reference_image_url)
+
+        async with httpx.AsyncClient(timeout=self.timeout) as client:
+            response = await client.post(
+                f"{self.base_url}/responses", headers=headers, json=body
+            )
+            if self._should_retry_chat_without_image(response, payload.reference_image_url):
+                logger.warning("Retrying tutor chat without reference image after OpenAI rejected the image payload")
+                response = await client.post(
+                    f"{self.base_url}/responses",
+                    headers=headers,
+                    json=self._build_chat_body(prompt, None),
+                )
+        response.raise_for_status()
+
+        data = response.json()
+        return self._extract_output_text(data)
+
+    def _build_chat_body(
+        self, prompt: str, reference_image_url: str | None
+    ) -> dict[str, Any]:
+        """Construct the Responses API payload for tutor chat."""
+
         content: list[dict[str, Any]] = [
             {
                 "type": "input_text",
                 "text": prompt,
             }
         ]
-        if payload.reference_image_url:
+        if reference_image_url:
             content.append(
                 {
                     "type": "input_image",
-                    "image_url": payload.reference_image_url,
+                    "image_url": reference_image_url,
                     "detail": "high",
                 }
             )
-        body: dict[str, Any] = {
+        return {
             "model": self.model,
             "input": [
                 {
@@ -327,14 +350,28 @@ class TutorModeService:
             "text": {"verbosity": "medium"},
         }
 
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            response = await client.post(
-                f"{self.base_url}/responses", headers=headers, json=body
-            )
-        response.raise_for_status()
+    def _should_retry_chat_without_image(
+        self, response: httpx.Response, reference_image_url: str | None
+    ) -> bool:
+        """Retry without the optional image when OpenAI rejects the image payload."""
 
-        data = response.json()
-        return self._extract_output_text(data)
+        if not reference_image_url or response.status_code != 400:
+            return False
+
+        try:
+            payload = response.json()
+        except json.JSONDecodeError:
+            return False
+
+        error = payload.get("error") if isinstance(payload, dict) else None
+        if not isinstance(error, dict):
+            return False
+
+        message = str(error.get("message", "")).lower()
+        return (
+            "does not represent a valid image" in message
+            or "invalid image" in message
+        )
 
     async def _call_openai_image(self, prompt: str) -> str:
         """Invoke the OpenAI image generation API and return a data URL."""
