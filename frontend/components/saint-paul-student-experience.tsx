@@ -10,12 +10,16 @@ import {
   SendHorizonal,
   X,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
 import {
   type ButtonHTMLAttributes,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import type {
@@ -110,6 +114,11 @@ type SaintPaulQuizAttemptResponse = {
   saved_at: string;
 };
 
+type SaintPaulSessionMessageResponse = {
+  persistence_enabled: boolean;
+  saved_at: string;
+};
+
 function getStudentFacingErrorMessage(
   feature: "chat" | "image" | "quiz",
 ): string {
@@ -198,6 +207,31 @@ const CONFIDENCE_OPTIONS: Array<{
   { value: "somewhat-confident", label: "略有把握" },
   { value: "very-confident", label: "非常確定" },
 ];
+
+function normalizeMathDelimiters(content: string): string {
+  return content
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_match, formula: string) => {
+      return `\n\n$$\n${formula.trim()}\n$$\n\n`;
+    })
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_match, formula: string) => {
+      return `$${formula}$`;
+    });
+}
+
+function TutorMarkdownMessage({
+  content,
+}: Readonly<{ content: string }>): JSX.Element {
+  return (
+    <div className="saint-paul-markdown">
+      <ReactMarkdown
+        remarkPlugins={[remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+      >
+        {normalizeMathDelimiters(content)}
+      </ReactMarkdown>
+    </div>
+  );
+}
 
 function PrimaryButton({
   children,
@@ -434,6 +468,7 @@ export default function SaintPaulStudentExperience({
   const [quizHistoryByObjective, setQuizHistoryByObjective] = useState<
     Record<number, TutorQuizHistoryItem[]>
   >({});
+  const persistedIntroMessageKeysRef = useRef<Set<string>>(new Set());
 
   const buildQuizContext = (objectiveIndex: number): TutorQuizHistoryItem[] => {
     const quizHistory = quizHistoryByObjective[objectiveIndex] ?? [];
@@ -532,6 +567,52 @@ export default function SaintPaulStudentExperience({
       console.error("無法記錄 Saint Paul 事件", error);
     }
   };
+
+  useEffect(() => {
+    if (!hasTutorStage || !sessionId || !studentId) {
+      return;
+    }
+
+    const objective = objectives[activeObjectiveIndex];
+    if (!objective) {
+      return;
+    }
+
+    const introMessage = buildIntroMessage(objective);
+    const messageKey = `0000-INTRO-${activeObjectiveIndex}`;
+    const persistenceKey = `${sessionId}:${messageKey}`;
+    if (persistedIntroMessageKeysRef.current.has(persistenceKey)) {
+      return;
+    }
+
+    persistedIntroMessageKeysRef.current.add(persistenceKey);
+
+    void fetch(`${API_BASE}/saintpaul/session/message`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        session_id: sessionId,
+        student_id: studentId,
+        objective_index: activeObjectiveIndex,
+        role: introMessage.role,
+        content: introMessage.content,
+        message_key: messageKey,
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Saint Paul intro message persist failed");
+        }
+
+        return (await response.json()) as SaintPaulSessionMessageResponse;
+      })
+      .catch((error) => {
+        persistedIntroMessageKeysRef.current.delete(persistenceKey);
+        console.error("無法儲存 Saint Paul 初始導學訊息", error);
+      });
+  }, [activeObjectiveIndex, hasTutorStage, objectives, sessionId, studentId]);
 
   useEffect(() => {
     if (!sessionId || !studentId) {
@@ -1837,7 +1918,11 @@ export default function SaintPaulStudentExperience({
                 : "ml-auto bg-[#171717] text-white",
             )}
           >
-            {item.content}
+            {item.role === "assistant" ? (
+              <TutorMarkdownMessage content={item.content} />
+            ) : (
+              item.content
+            )}
           </div>
         );
       case "thinking":
