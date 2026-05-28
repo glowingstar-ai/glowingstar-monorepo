@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock3,
+  Download,
   Loader2,
   MessageSquareText,
   RefreshCw,
@@ -12,6 +13,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import * as XLSX from "xlsx";
 import { cn } from "@/lib/utils";
 
 const API_BASE =
@@ -389,6 +391,8 @@ export default function UsfResearchDashboard(): JSX.Element {
           />
         </section>
 
+        <ReflectionExportPanel sessions={sessions} />
+
         <section className="mt-6 grid gap-6 lg:grid-cols-[390px_1fr]">
           <aside className="rounded-[2rem] border border-[#E4D8C8] bg-white p-5 shadow-[0_18px_60px_rgba(52,42,28,0.08)]">
             <div className="flex items-center gap-2 rounded-2xl border border-[#D8D2C7] px-3 py-2">
@@ -616,6 +620,102 @@ export default function UsfResearchDashboard(): JSX.Element {
         </section>
       </div>
     </main>
+  );
+}
+
+function ReflectionExportPanel({
+  sessions,
+}: Readonly<{ sessions: UsfResearchSessionSummary[] }>): JSX.Element {
+  const [selectedModule, setSelectedModule] = useState<string>("");
+
+  const moduleOptions = useMemo(() => {
+    const moduleMap = new Map<string, { number?: number | null; topic: string }>();
+    for (const session of sessions) {
+      const key = session.module_id ?? session.module_topic ?? "";
+      if (!key) continue;
+      if (!moduleMap.has(key)) {
+        moduleMap.set(key, { number: session.module_number, topic: session.module_topic ?? key });
+      }
+    }
+    return Array.from(moduleMap.entries())
+      .map(([key, value]) => ({ key, ...value }))
+      .sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity));
+  }, [sessions]);
+
+  const filteredSessions = useMemo(() => {
+    if (!selectedModule) return [];
+    return sessions.filter((s) => (s.module_id ?? s.module_topic) === selectedModule);
+  }, [sessions, selectedModule]);
+
+  const completedSessions = filteredSessions.filter(
+    (s) => s.learned_response || s.remaining_questions_response,
+  );
+
+  const handleExport = () => {
+    if (completedSessions.length === 0) return;
+
+    const rows = completedSessions.map((session) => ({
+      "Student ID": session.student_id ?? "Unknown",
+      Module: session.module_topic ?? selectedModule,
+      "Module Number": session.module_number ?? "",
+      "What They Learned": session.learned_response ?? "",
+      "Remaining Questions": session.remaining_questions_response ?? "",
+      "Completed At": session.completed_at ?? "",
+      "Session ID": session.session_id,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Reflections");
+
+    const moduleName =
+      moduleOptions.find((m) => m.key === selectedModule)?.topic ?? selectedModule;
+    const safeFileName = moduleName.replace(/[^a-zA-Z0-9_\- ]/g, "").slice(0, 50);
+    XLSX.writeFile(workbook, `reflections_${safeFileName}.xlsx`);
+  };
+
+  return (
+    <section className="mt-6 rounded-[2rem] border border-[#E4D8C8] bg-white p-5 shadow-[0_18px_60px_rgba(52,42,28,0.08)]">
+      <h2 className="text-lg font-bold">Export Reflections by Module</h2>
+      <div className="mt-4 flex flex-wrap items-end gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="module-select" className="text-sm font-semibold text-[#5F5D57]">
+            Module
+          </label>
+          <select
+            id="module-select"
+            value={selectedModule}
+            onChange={(e) => setSelectedModule(e.target.value)}
+            className="min-h-11 min-w-[260px] rounded-2xl border border-[#D8D2C7] bg-white px-4 py-2 text-sm outline-none focus:border-[#171717]"
+          >
+            <option value="">Select a module...</option>
+            {moduleOptions.map((mod) => (
+              <option key={mod.key} value={mod.key}>
+                {mod.number ? `Module ${mod.number}: ` : ""}
+                {mod.topic}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {selectedModule ? (
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-[#5F5D57]">
+              <strong className="text-[#171717]">{completedSessions.length}</strong> /{" "}
+              {filteredSessions.length} students completed reflections
+            </span>
+            <button
+              onClick={handleExport}
+              disabled={completedSessions.length === 0}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-[#171717] px-5 py-3 text-sm font-semibold text-white hover:bg-[#2A2A2A] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Download className="h-4 w-4" />
+              Download Excel
+            </button>
+          </div>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
