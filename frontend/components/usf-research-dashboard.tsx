@@ -654,15 +654,26 @@ function ReflectionExportPanel({
   const handleExport = () => {
     if (completedSessions.length === 0) return;
 
-    const rows = completedSessions.map((session) => ({
-      "Student ID": session.student_id ?? "Unknown",
-      Module: session.module_topic ?? selectedModule,
-      "Module Number": session.module_number ?? "",
-      "What They Learned": session.learned_response ?? "",
-      "Remaining Questions": session.remaining_questions_response ?? "",
-      "Completed At": session.completed_at ?? "",
-      "Session ID": session.session_id,
-    }));
+    const rows = completedSessions.map((session) => {
+      const defenseTurnColumns: Record<string, string | number> = {};
+      for (let i = 0; i < 5; i++) {
+        const turn = session.defense_turns[i];
+        defenseTurnColumns[`Round ${i + 1} Question`] = turn?.question ?? "";
+        defenseTurnColumns[`Round ${i + 1} Answer`] = turn?.answer_text ?? "";
+        defenseTurnColumns[`Round ${i + 1} Self Rating`] = turn?.self_rating ?? "";
+      }
+
+      return {
+        "Student ID": session.student_id ?? "Unknown",
+        Module: session.module_topic ?? selectedModule,
+        "Module Number": session.module_number ?? "",
+        "What They Learned": session.learned_response ?? "",
+        "Remaining Questions": session.remaining_questions_response ?? "",
+        ...defenseTurnColumns,
+        "Completed At": session.completed_at ?? "",
+        "Session ID": session.session_id,
+      };
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
