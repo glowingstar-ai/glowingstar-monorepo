@@ -660,7 +660,6 @@ function ReflectionExportPanel({
         const turn = session.defense_turns[i];
         defenseTurnColumns[`Round ${i + 1} Question`] = turn?.question ?? "";
         defenseTurnColumns[`Round ${i + 1} Answer`] = turn?.answer_text ?? "";
-        defenseTurnColumns[`Round ${i + 1} Self Rating`] = turn?.self_rating ?? "";
       }
 
       return {
