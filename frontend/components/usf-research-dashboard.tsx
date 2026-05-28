@@ -181,6 +181,8 @@ export default function UsfResearchDashboard(): JSX.Element {
   const [isLoadingOverview, setIsLoadingOverview] = useState(true);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showSummaries, setShowSummaries] = useState(false);
 
   const loadOverview = useCallback(async () => {
     setIsLoadingOverview(true);
@@ -330,6 +332,43 @@ export default function UsfResearchDashboard(): JSX.Element {
   const completedSessions = sessions.filter((session) => session.completed_at).length;
   const totalErrors = sessions.reduce((sum, session) => sum + session.error_count, 0);
   const totalTurns = sessions.reduce((sum, session) => sum + session.defense_turn_count, 0);
+
+  const moduleSummaries = useMemo(() => {
+    const moduleMap = new Map<
+      string,
+      {
+        moduleNumber?: number | null;
+        topic: string;
+        totalStudents: Set<string>;
+        completedStudents: Set<string>;
+        totalSessions: number;
+        completedSessions: number;
+      }
+    >();
+    for (const session of sessions) {
+      const key = session.module_id ?? session.module_topic ?? "";
+      if (!key) continue;
+      const entry = moduleMap.get(key) ?? {
+        moduleNumber: session.module_number,
+        topic: session.module_topic ?? key,
+        totalStudents: new Set<string>(),
+        completedStudents: new Set<string>(),
+        totalSessions: 0,
+        completedSessions: 0,
+      };
+      const studentId = session.student_id ?? "unknown";
+      entry.totalStudents.add(studentId);
+      entry.totalSessions += 1;
+      if (session.completed_at) {
+        entry.completedStudents.add(studentId);
+        entry.completedSessions += 1;
+      }
+      moduleMap.set(key, entry);
+    }
+    return Array.from(moduleMap.values()).sort(
+      (a, b) => (a.moduleNumber ?? Infinity) - (b.moduleNumber ?? Infinity),
+    );
+  }, [sessions]);
 
   return (
     <main className="min-h-screen bg-[#F6F1E8] px-4 py-8 text-[#171717] sm:px-6 lg:px-8">
@@ -547,73 +586,149 @@ export default function UsfResearchDashboard(): JSX.Element {
                   </div>
                 </div>
 
-                <div className="mt-6">
-                  <h3 className="text-lg font-bold">Defense Answers</h3>
-                  <div className="mt-3 space-y-4">
-                    {(detail?.defense_turns ?? []).length === 0 ? (
-                      <p className="text-sm text-[#5F5D57]">No defense answers saved yet.</p>
-                    ) : (
-                      detail?.defense_turns.map((turn) => (
-                        <article key={turn.item_key} className="rounded-3xl border border-[#E4D8C8] p-5">
-                          <div className="flex flex-wrap items-center justify-between gap-3">
-                            <p className="font-semibold">Round {(turn.round_index ?? 0) + 1}</p>
-                          </div>
-                          <p className="mt-3 font-semibold">{turn.question}</p>
-                          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#5F5D57]">
-                            {turn.answer_text}
-                          </p>
-                        </article>
-                      ))
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => setShowSummaries((v) => !v)}
+                    className={cn(
+                      "inline-flex min-h-10 items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-semibold transition",
+                      showSummaries
+                        ? "border-[#171717] bg-[#171717] text-white"
+                        : "border-[#D8D2C7] bg-white text-[#171717] hover:border-[#171717]",
                     )}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Show Summaries
+                  </button>
+                  <button
+                    onClick={() => setShowDetails((v) => !v)}
+                    className={cn(
+                      "inline-flex min-h-10 items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-semibold transition",
+                      showDetails
+                        ? "border-[#171717] bg-[#171717] text-white"
+                        : "border-[#D8D2C7] bg-white text-[#171717] hover:border-[#171717]",
+                    )}
+                  >
+                    <MessageSquareText className="h-4 w-4" />
+                    Show All Details
+                  </button>
+                </div>
+
+                {showSummaries ? (
+                  <div className="mt-6 rounded-3xl border border-[#E4D8C8] p-5">
+                    <h3 className="text-lg font-bold">Module Completion Summary</h3>
+                    <div className="mt-4 overflow-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-[#E6E0D5] text-left text-xs font-semibold uppercase tracking-wider text-[#8A5E2A]">
+                            <th className="pb-3 pr-4">Module</th>
+                            <th className="pb-3 pr-4">Students</th>
+                            <th className="pb-3 pr-4">Completed</th>
+                            <th className="pb-3">Completion Rate</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#F0EBE2]">
+                          {moduleSummaries.map((mod) => (
+                            <tr key={mod.topic}>
+                              <td className="py-3 pr-4 font-medium">
+                                {mod.moduleNumber ? `Module ${mod.moduleNumber}: ` : ""}
+                                {mod.topic}
+                              </td>
+                              <td className="py-3 pr-4">{mod.totalStudents.size}</td>
+                              <td className="py-3 pr-4">
+                                {mod.completedStudents.size} / {mod.totalStudents.size}
+                              </td>
+                              <td className="py-3">
+                                <span className="inline-flex items-center gap-2">
+                                  <span className="h-2 w-16 overflow-hidden rounded-full bg-[#E6E0D5]">
+                                    <span
+                                      className="block h-full rounded-full bg-[#8A5E2A]"
+                                      style={{
+                                        width: `${mod.totalStudents.size > 0 ? Math.round((mod.completedStudents.size / mod.totalStudents.size) * 100) : 0}%`,
+                                      }}
+                                    />
+                                  </span>
+                                  {formatPercent(mod.completedStudents.size, mod.totalStudents.size)}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                ) : null}
 
-                <div className="mt-6">
-                  <DetailList
-                    title="Generated Questions"
-                    items={detail?.generated_questions ?? []}
-                    render={(item) => (
-                      <>
-                        <p className="font-semibold">Round {(item.round_index ?? 0) + 1}</p>
-                        <p className="mt-2 text-sm leading-6 text-[#5F5D57]">{item.question}</p>
-                        <p className="mt-2 text-xs text-[#6B665E]">
-                          {item.model ?? "unknown model"} · {formatDateTime(item.created_at)}
-                        </p>
-                      </>
-                    )}
-                  />
-                </div>
+                {showDetails ? (
+                  <>
+                    <div className="mt-6">
+                      <h3 className="text-lg font-bold">Defense Answers</h3>
+                      <div className="mt-3 space-y-4">
+                        {(detail?.defense_turns ?? []).length === 0 ? (
+                          <p className="text-sm text-[#5F5D57]">No defense answers saved yet.</p>
+                        ) : (
+                          detail?.defense_turns.map((turn) => (
+                            <article key={turn.item_key} className="rounded-3xl border border-[#E4D8C8] p-5">
+                              <div className="flex flex-wrap items-center justify-between gap-3">
+                                <p className="font-semibold">Round {(turn.round_index ?? 0) + 1}</p>
+                              </div>
+                              <p className="mt-3 font-semibold">{turn.question}</p>
+                              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-[#5F5D57]">
+                                {turn.answer_text}
+                              </p>
+                            </article>
+                          ))
+                        )}
+                      </div>
+                    </div>
 
-                <div className="mt-6 grid gap-4 xl:grid-cols-2">
-                  <DetailList
-                    title="Events"
-                    items={detail?.events ?? []}
-                    render={(item) => (
-                      <>
-                        <p className="font-semibold">{item.event_type ?? "event"}</p>
-                        <p className="mt-1 text-xs text-[#6B665E]">
-                          {item.stage ?? "unknown stage"} · {formatDateTime(item.recorded_at)}
-                        </p>
-                        <JsonBlock value={item.payload} />
-                      </>
-                    )}
-                  />
-                  <DetailList
-                    title="Errors"
-                    items={detail?.errors ?? []}
-                    render={(item) => (
-                      <>
-                        <p className="font-semibold text-[#A43D36]">
-                          {item.stage ?? "error"} · {item.error_scope ?? "unknown"}
-                        </p>
-                        <p className="mt-2 text-sm leading-6 text-[#5F5D57]">
-                          {item.error_message}
-                        </p>
-                        <JsonBlock value={item.metadata} />
-                      </>
-                    )}
-                  />
-                </div>
+                    <div className="mt-6">
+                      <DetailList
+                        title="Generated Questions"
+                        items={detail?.generated_questions ?? []}
+                        render={(item) => (
+                          <>
+                            <p className="font-semibold">Round {(item.round_index ?? 0) + 1}</p>
+                            <p className="mt-2 text-sm leading-6 text-[#5F5D57]">{item.question}</p>
+                            <p className="mt-2 text-xs text-[#6B665E]">
+                              {item.model ?? "unknown model"} · {formatDateTime(item.created_at)}
+                            </p>
+                          </>
+                        )}
+                      />
+                    </div>
+
+                    <div className="mt-6 grid gap-4 xl:grid-cols-2">
+                      <DetailList
+                        title="Events"
+                        items={detail?.events ?? []}
+                        render={(item) => (
+                          <>
+                            <p className="font-semibold">{item.event_type ?? "event"}</p>
+                            <p className="mt-1 text-xs text-[#6B665E]">
+                              {item.stage ?? "unknown stage"} · {formatDateTime(item.recorded_at)}
+                            </p>
+                            <JsonBlock value={item.payload} />
+                          </>
+                        )}
+                      />
+                      <DetailList
+                        title="Errors"
+                        items={detail?.errors ?? []}
+                        render={(item) => (
+                          <>
+                            <p className="font-semibold text-[#A43D36]">
+                              {item.stage ?? "error"} · {item.error_scope ?? "unknown"}
+                            </p>
+                            <p className="mt-2 text-sm leading-6 text-[#5F5D57]">
+                              {item.error_message}
+                            </p>
+                            <JsonBlock value={item.metadata} />
+                          </>
+                        )}
+                      />
+                    </div>
+                  </>
+                ) : null}
               </div>
             )}
           </section>
