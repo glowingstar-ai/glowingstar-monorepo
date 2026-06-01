@@ -25,6 +25,7 @@ export const SUBJECT_LABELS: Record<string, string> = {
 export const VERSION_LABELS: Record<string, string> = {
   formal: "正式",
   preliminary: "預備",
+  june3: "6月3日測試",
   unspecified: "單一版本",
 };
 
