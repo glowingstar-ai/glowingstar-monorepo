@@ -229,22 +229,68 @@ const DATE_TIME_FORMATTER = new Intl.DateTimeFormat(undefined, {
   timeStyle: "short",
 });
 
+// Preferred display ordering. Anything not listed here (e.g. ad-hoc test
+// versions discovered in the data) is sorted alphabetically after the known
+// values so the table stays grouped and predictable.
+const SUBJECT_ORDER = ["geography", "history", "physics", "chemistry"];
+const VERSION_ORDER = ["preliminary", "formal", "june3"];
+const GRADE_ORDER = ["F4", "F5"];
+const MODE_ORDER = MODE_OPTIONS.map((option) => option.value);
+
+function orderIndex(value: string, order: string[]): number {
+  const index = order.indexOf(value);
+  return index === -1 ? order.length : index;
+}
+
+function compareCombinations(
+  left: SaintPaulDropdownCombination,
+  right: SaintPaulDropdownCombination,
+): number {
+  return (
+    orderIndex(left.subject, SUBJECT_ORDER) - orderIndex(right.subject, SUBJECT_ORDER) ||
+    left.subject.localeCompare(right.subject) ||
+    orderIndex(left.version, VERSION_ORDER) - orderIndex(right.version, VERSION_ORDER) ||
+    left.version.localeCompare(right.version) ||
+    orderIndex(left.grade, GRADE_ORDER) - orderIndex(right.grade, GRADE_ORDER) ||
+    left.grade.localeCompare(right.grade) ||
+    orderIndex(left.mode, MODE_ORDER) - orderIndex(right.mode, MODE_ORDER) ||
+    left.mode.localeCompare(right.mode)
+  );
+}
+
+function buildDropdownCombination(
+  subject: string,
+  version: string,
+  grade: string,
+  mode: string,
+): SaintPaulDropdownCombination {
+  const modeOption = MODE_OPTIONS.find((option) => option.value === mode);
+
+  return {
+    key: [subject, version, grade, mode].join("::"),
+    subject,
+    version,
+    grade,
+    mode,
+    subjectLabel: getLabel(subject, SUBJECT_LABELS),
+    versionLabel: getLabel(version, VERSION_LABELS),
+    gradeLabel: getLabel(grade, GRADE_LABELS),
+    modeLabel: modeOption?.label ?? mode,
+  };
+}
+
+// Predefined combinations sourced from the teaching objectives catalog. These
+// are always shown (even with zero students) so the configured curriculum is
+// visible. Combinations discovered in the live session data are merged in at
+// runtime so every recorded subject/version/grade/mode appears too.
 const SAINT_PAUL_DROPDOWN_COMBINATIONS = Object.entries(
   teachingObjectives as TeachingObjectivesData,
 ).flatMap(([subject, versions]) =>
   Object.entries(versions).flatMap(([version, grades]) =>
     Object.keys(grades).flatMap((grade) =>
-      MODE_OPTIONS.map((modeOption) => ({
-        key: [subject, version, grade, modeOption.value].join("::"),
-        subject,
-        version,
-        grade,
-        mode: modeOption.value,
-        subjectLabel: getLabel(subject, SUBJECT_LABELS),
-        versionLabel: getLabel(version, VERSION_LABELS),
-        gradeLabel: getLabel(grade, GRADE_LABELS),
-        modeLabel: modeOption.label,
-      })),
+      MODE_OPTIONS.map((modeOption) =>
+        buildDropdownCombination(subject, version, grade, modeOption.value),
+      ),
     ),
   ),
 ) satisfies SaintPaulDropdownCombination[];
@@ -731,8 +777,36 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
     );
   }, [indexedStudents, selectedSessionId, selectedStudent]);
 
+  const dropdownCombinations = useMemo(() => {
+    const combinations = new Map<string, SaintPaulDropdownCombination>();
+
+    for (const combination of SAINT_PAUL_DROPDOWN_COMBINATIONS) {
+      combinations.set(combination.key, combination);
+    }
+
+    indexedStudents.forEach((student) => {
+      student.sessions.forEach((session) => {
+        const subject = session.subject?.trim();
+        const version = session.version?.trim();
+        const grade = session.grade?.trim();
+        const mode = session.mode?.trim();
+
+        if (!subject || !version || !grade || !mode) {
+          return;
+        }
+
+        const key = [subject, version, grade, mode].join("::");
+        if (!combinations.has(key)) {
+          combinations.set(key, buildDropdownCombination(subject, version, grade, mode));
+        }
+      });
+    });
+
+    return [...combinations.values()].sort(compareCombinations);
+  }, [indexedStudents]);
+
   const completionRows = useMemo(() => {
-    return SAINT_PAUL_DROPDOWN_COMBINATIONS.map((combination) => {
+    return dropdownCombinations.map((combination) => {
       const totalStudents = new Set<string>();
       const preQuizStudents = new Set<string>();
       const aiTutorStudents = new Set<string>();
@@ -780,7 +854,7 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
         postQuizCompleted: postQuizStudents.size,
       };
     });
-  }, [indexedStudents]);
+  }, [dropdownCombinations, indexedStudents]);
 
   const visibleCompletionRows = useMemo(() => {
     if (!hideZeroStudentRows) {
@@ -1132,7 +1206,8 @@ export default function SaintPaulResearchDashboard(): JSX.Element {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <p className="max-w-3xl text-sm text-slate-400">
                 Counts are grouped by the exact subject, version, grade, and mode combinations from
-                the Saint Paul dropdown. Each count is a distinct student total, not session count.
+                the teaching objectives catalog plus any additional combinations found in the
+                recorded sessions. Each count is a distinct student total, not session count.
               </p>
               {showValidStudentIdsOnly && hiddenInvalidStudentCount > 0 ? (
                 <Badge tone="amber">{`${formatNumber(hiddenInvalidStudentCount)} non-7-digit ids hidden`}</Badge>
