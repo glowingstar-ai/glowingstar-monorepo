@@ -47,3 +47,17 @@ Open `http://localhost:8000/docs` for interactive OpenAPI documentation.
 - Connect the frontend to backend APIs using `@tanstack/react-query`.
 - Add CI workflows for linting, testing, and type checking.
 - Configure deployment infrastructure (e.g., Vercel for frontend, Fly.io/Render for backend).
+
+## Research data exports
+
+The Saint Paul AI-tutor study data (DynamoDB tables + S3 image assets) has been exported
+locally for analysis. It is **not** committed to this repo — it is ≈800 MB and contains
+sensitive student session content (chat, quiz responses, generated images).
+
+- **Local export path:** `~/glowingstar-saintpaul-export/20260609T132143Z/` — DynamoDB JSONL
+  backup (`dynamodb/`), S3 assets (`s3/`), answer key (`answer_key/all_quizzes.json`),
+  analysis scripts (`analyze_*.py`), result tables (`out_*.csv`), and `FINDINGS.md`.
+- **Re-export from AWS:** `backend/scripts/export_dynamodb_backup.py`
+  (`AWS_PROFILE=glowingstar`, region `us-east-2`).
+- **Findings & publication-venue analysis:**
+  `agent-decisions/saintpaul-ai-tutor-research-findings.md`.
