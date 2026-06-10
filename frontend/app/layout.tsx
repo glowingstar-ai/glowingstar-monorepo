@@ -16,11 +16,11 @@ import {
 
 export const metadata: Metadata = {
   title: {
-    default: "GlowingStar Experience Studio",
-    template: "%s | GlowingStar Studio",
+    default: "GlowingStar",
+    template: "%s | GlowingStar",
   },
   description:
-    "Command center for emotionally intelligent customer experiences—monitor sessions, review insights, and launch guided playbooks.",
+    "GlowingStar builds an AI tutoring platform for schools and universities and instruments every session, so institutions see measured learning outcomes.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",

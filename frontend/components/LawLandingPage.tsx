@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { teamLogoList } from "@/lib/site-content";
 
-const LAW_CONTACT_EMAIL = "chenyu@glowingstar.ai";
+const LAW_CONTACT_EMAIL = "support@glowingstar.ai";
 const LAW_CONTACT_HREF = `mailto:${LAW_CONTACT_EMAIL}`;
 
 const paperTextureSvg = `
