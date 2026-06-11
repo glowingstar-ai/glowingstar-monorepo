@@ -119,6 +119,6 @@ The reasoning:
 - Position: "AI learning programs with the evidence built in" — product company, not consultancy.
 - Describe the business plainly (GFSCP: no "coming soon", no agency-sounding copy).
 - Showcase product pillars grounded in shipped surfaces; show deployment stats honestly.
-- Name the founder (Charlie Chenyu Zhang) and team affiliations; keep the mission quote.
+- Describe the team via affiliations (founder name kept off public pages by preference); keep the mission quote.
 - Contact: support@glowingstar.ai (domain-matching email is a hard GFSCP rule).
 - Add privacy + terms pages; keep the site live at glowingstar.ai (verified live, CloudFront).
