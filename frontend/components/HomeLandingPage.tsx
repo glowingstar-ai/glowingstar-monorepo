@@ -114,7 +114,9 @@ function WordCascade({
   const highlightWords = highlight ? highlight.split(" ") : [];
   const highlightStart = highlight ? text.indexOf(highlight) : -1;
   const firstHighlightIndex =
-    highlightStart >= 0 ? text.slice(0, highlightStart).trim().split(" ").filter(Boolean).length : -1;
+    highlightStart >= 0
+      ? text.slice(0, highlightStart).trim().split(" ").filter(Boolean).length
+      : -1;
 
   const sweepDelay = delay + words.length * 0.06 + 0.6;
 
@@ -126,7 +128,10 @@ function WordCascade({
           i >= firstHighlightIndex &&
           i < firstHighlightIndex + highlightWords.length;
         const wordNode = (
-          <span key={`${word}-${i}`} className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+          <span
+            key={`${word}-${i}`}
+            className="inline-block overflow-hidden pb-[0.08em] align-bottom"
+          >
             <m.span
               className="inline-block"
               initial={reduced ? false : { y: "110%", opacity: 0 }}
@@ -142,11 +147,7 @@ function WordCascade({
           </span>
         );
         if (!inHighlight) {
-          return (
-            <span key={`${word}-${i}`}>
-              {wordNode}{" "}
-            </span>
-          );
+          return <span key={`${word}-${i}`}>{wordNode} </span>;
         }
         const isFirstOfHighlight = i === firstHighlightIndex;
         if (!isFirstOfHighlight) return null;
@@ -154,7 +155,10 @@ function WordCascade({
           <span key={`hl-${i}`} className="whitespace-nowrap">
             <Sweep delay={sweepDelay}>
               {highlightWords.map((hw, j) => (
-                <span key={`${hw}-${j}`} className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+                <span
+                  key={`${hw}-${j}`}
+                  className="inline-block overflow-hidden pb-[0.08em] align-bottom"
+                >
                   <m.span
                     className="inline-block"
                     initial={reduced ? false : { y: "110%", opacity: 0 }}
@@ -403,20 +407,24 @@ function Constellation({
                   r="26"
                   fill={`url(#${glowId})`}
                   animate={reduced ? undefined : { opacity: [0.7, 1, 0.7] }}
-                  transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
+                  transition={{
+                    duration: 5,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                  }}
                 />
                 {/* Faint cross rays, breathing slowly. */}
                 <m.path
                   d="M0 -22 L0 22 M-22 0 L22 0"
                   stroke={gold}
                   strokeWidth="0.5"
-                  animate={
-                    reduced
-                      ? undefined
-                      : { opacity: [0.12, 0.3, 0.12] }
-                  }
+                  animate={reduced ? undefined : { opacity: [0.12, 0.3, 0.12] }}
                   style={{ opacity: 0.2 }}
-                  transition={{ duration: 7, ease: "easeInOut", repeat: Infinity }}
+                  transition={{
+                    duration: 7,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                  }}
                 />
                 {/* Dotted orbit ring — dash offset crawl makes the dots circle
                     the star (origin-safe, no rotation transform needed). */}
@@ -428,14 +436,24 @@ function Constellation({
                   strokeDasharray="0.5 5.4"
                   strokeLinecap="round"
                   fill="none"
-                  animate={reduced ? undefined : { strokeDashoffset: [0, -94.2] }}
-                  transition={{ duration: 36, ease: "linear", repeat: Infinity }}
+                  animate={
+                    reduced ? undefined : { strokeDashoffset: [0, -94.2] }
+                  }
+                  transition={{
+                    duration: 36,
+                    ease: "linear",
+                    repeat: Infinity,
+                  }}
                 />
                 <m.path
                   d={SPARKLE_PATH}
                   fill={gold}
                   animate={reduced ? undefined : { y: [0, -5, 0] }}
-                  transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
+                  transition={{
+                    duration: 6,
+                    ease: "easeInOut",
+                    repeat: Infinity,
+                  }}
                 />
               </m.g>
             ) : (
@@ -516,7 +534,12 @@ const DUST = [
 function ConstellationDust({ className }: { className?: string }): JSX.Element {
   const reduced = useReducedMotion();
   return (
-    <svg viewBox="0 0 400 400" className={className} aria-hidden="true" fill="none">
+    <svg
+      viewBox="0 0 400 400"
+      className={className}
+      aria-hidden="true"
+      fill="none"
+    >
       {DUST.map((dust, i) => (
         <m.circle
           key={`dust-${i}`}
@@ -699,7 +722,9 @@ function Header({ dark }: { dark: boolean }): JSX.Element {
               key={link.href}
               href={link.href}
               className={`gs-underline font-mono text-[11px] uppercase tracking-[0.14em] ${
-                dark ? "text-[#f1e9da]/70 hover:text-[#f1e9da]" : "text-[#17120f]/65 hover:text-[#17120f]"
+                dark
+                  ? "text-[#f1e9da]/70 hover:text-[#f1e9da]"
+                  : "text-[#17120f]/65 hover:text-[#17120f]"
               } transition-colors`}
             >
               {link.label}
@@ -723,13 +748,20 @@ function Header({ dark }: { dark: boolean }): JSX.Element {
             onClick={() => setMenuOpen((v) => !v)}
             className="md:hidden"
           >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {menuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
       <m.div
         className="absolute inset-x-0 bottom-[-1px] h-[2px] origin-left"
-        style={{ scaleX: progress, backgroundColor: dark ? GOLD_DARK_BG : GOLD }}
+        style={{
+          scaleX: progress,
+          backgroundColor: dark ? GOLD_DARK_BG : GOLD,
+        }}
       />
       <AnimatePresence>
         {menuOpen && (
@@ -746,7 +778,11 @@ function Header({ dark }: { dark: boolean }): JSX.Element {
                   key={link.href}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.06 * i, duration: 0.5, ease: EASE_OUT_QUINT }}
+                  transition={{
+                    delay: 0.06 * i,
+                    duration: 0.5,
+                    ease: EASE_OUT_QUINT,
+                  }}
                 >
                   <a
                     href={link.href}
@@ -856,7 +892,7 @@ function Hero(): JSX.Element {
           transition={{ duration: 1, delay: 1, ease: EASE_OUT_QUINT }}
         >
           We run AI tutoring for schools and instrument every session, so
-          institutions see measured outcomes — not vendor claims.
+          institutions see measured outcomes, not vendor claims.
         </m.p>
         <m.div
           className="mt-9 flex flex-wrap items-center gap-4"
@@ -895,7 +931,7 @@ function Hero(): JSX.Element {
       </div>
 
       <Marginalia className="absolute bottom-6 left-6 sm:left-10">
-        Fig. 01 — The GlowingStar constellation
+        Fig. 01 · The GlowingStar constellation
       </Marginalia>
       <div className="absolute bottom-6 right-6 hidden flex-col items-center gap-2 sm:flex sm:right-10">
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#17120f]/40">
@@ -914,9 +950,18 @@ function Hero(): JSX.Element {
 /* ------------------------------ problem band ------------------------------ */
 
 const WHAT_WE_DO_ROWS = [
-  { label: "Tutoring engine", clause: "multi-agent plans, explanations, practice" },
-  { label: "Classroom deployment", clause: "teacher-controlled, runs as coursework" },
-  { label: "Pre/post assessment", clause: "with per-question confidence ratings" },
+  {
+    label: "Tutoring engine",
+    clause: "multi-agent plans, explanations, practice",
+  },
+  {
+    label: "Classroom deployment",
+    clause: "teacher-controlled, runs as coursework",
+  },
+  {
+    label: "Pre/post assessment",
+    clause: "with per-question confidence ratings",
+  },
   { label: "Full telemetry", clause: "every message and attempt, logged" },
 ];
 
@@ -937,7 +982,7 @@ function ProblemBand(): JSX.Element {
                 Learning that is measured, not assumed.
               </p>
               <Marginalia className="mt-10">
-                Fig. 02 — The calibration gap
+                Fig. 02 · The calibration gap
               </Marginalia>
             </div>
 
@@ -946,13 +991,13 @@ function ProblemBand(): JSX.Element {
                 <RiseItem>
                   <p className="text-base leading-8 text-[#17120f]/75 sm:text-lg">
                     Generic AI study tools are everywhere. Whether students
-                    actually learn — or just feel like they did — goes
+                    actually learn, or just feel like they did, goes
                     unmeasured. In our own classroom study, AI-tutored practice
                     matched quiz-only practice on scores, while students grew
                     more confident on the answers they got wrong.
                     <Footnote
                       index={1}
-                      note="Within-student comparison at one Hong Kong secondary school: 323 students, four subjects, ~1,150 sessions. Reported with limitations — not a causal claim."
+                      note="Within-student comparison at one Hong Kong secondary school: 323 students, four subjects, ~1,150 sessions. Reported with limitations, not a causal claim."
                     />
                   </p>
                 </RiseItem>
@@ -997,7 +1042,7 @@ function ProblemBand(): JSX.Element {
                     </div>
                   </div>
                   <p className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#17120f]/40">
-                    Illustrative proportions — full figures in the evidence
+                    Illustrative proportions; full figures in the evidence
                     section
                   </p>
                 </RiseItem>
@@ -1050,7 +1095,7 @@ const PRODUCT_PILLARS = [
   {
     name: "Evidence Layer",
     description:
-      "Every message, attempt, and confidence rating captured — dashboards show what worked, per cohort and student.",
+      "Every message, attempt, and confidence rating is captured. Dashboards show what worked, per cohort and student.",
     chips: ["Full telemetry", "Confidence tracking", "Dashboards"],
   },
   {
@@ -1066,7 +1111,10 @@ function ProductIndex(): JSX.Element {
   const canHover = useCanHover();
 
   return (
-    <section id="product" className="relative mx-auto w-full max-w-6xl scroll-mt-2 px-6 py-20 sm:px-10">
+    <section
+      id="product"
+      className="relative mx-auto w-full max-w-6xl scroll-mt-2 px-6 py-20 sm:px-10"
+    >
       <Eyebrow>Product</Eyebrow>
       <h2 className="font-editorial-display mt-6 max-w-2xl text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.02] text-[#17120f]">
         One platform, indexed.
@@ -1151,14 +1199,14 @@ function ProductIndex(): JSX.Element {
 
       <SessionReplay />
 
-      <p className="mt-8 text-center">
+      {/* <p className="mt-8 text-center">
         <Link
           href="/tutor-mode"
           className="gs-underline font-mono text-[12px] uppercase tracking-[0.14em] text-[#17120f]/75 transition-colors hover:text-[#17120f]"
         >
           Try Tutor Mode Studio →
         </Link>
-      </p>
+      </p> */}
     </section>
   );
 }
@@ -1182,11 +1230,14 @@ const STEP_DURATIONS = [1600, 900, 3400, 1700, 700, 1000, 700, 1500, 4200];
 const FINAL_STEP = 8;
 
 const TUTOR_REPLY =
-  "Water is unusual: as it freezes, hydrogen bonds lock molecules into an open lattice, so ice is less dense than liquid water — and floats.";
+  "Water is unusual: as it freezes, hydrogen bonds lock molecules into an open lattice, so ice is less dense than liquid water, and it floats.";
 
 const QUIZ_OPTIONS = [
   { text: "Ice is colder, and cold things rise", wrong: true },
-  { text: "Its crystal lattice is less dense than liquid water", correct: true },
+  {
+    text: "Its crystal lattice is less dense than liquid water",
+    correct: true,
+  },
   { text: "Air bubbles trapped in ice lift it", picked: true },
   { text: "Surface tension holds it up" },
 ];
@@ -1230,7 +1281,7 @@ function SessionReplay(): JSX.Element {
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <Marginalia>
-          Fig. 02a — Session replay (reconstructed from real telemetry)
+          Fig. 02a · Session replay (reconstructed from real telemetry)
         </Marginalia>
         <button
           type="button"
@@ -1270,7 +1321,11 @@ function SessionReplay(): JSX.Element {
                   key={i}
                   className="h-1.5 w-1.5 rounded-full bg-[#17120f]/40"
                   animate={{ opacity: [0.25, 1, 0.25] }}
-                  transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.18 }}
+                  transition={{
+                    duration: 0.9,
+                    repeat: Infinity,
+                    delay: i * 0.18,
+                  }}
                 />
               ))}
             </div>
@@ -1327,7 +1382,9 @@ function SessionReplay(): JSX.Element {
                         </span>
                         <span
                           className={`${
-                            struck ? "text-[#17120f]/40 line-through decoration-[#b57900] decoration-2" : ""
+                            struck
+                              ? "text-[#17120f]/40 line-through decoration-[#b57900] decoration-2"
+                              : ""
                           } ${isCorrect ? "underline decoration-[#b57900] decoration-2 underline-offset-4" : ""} ${
                             isPicked && !struck ? "bg-[#b57900]/15 px-1" : ""
                           }`}
@@ -1375,7 +1432,7 @@ function SessionReplay(): JSX.Element {
               transition={{ duration: 0.6 }}
               className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#17120f]/45"
             >
-              Every event above is logged — 253,000+ and counting.
+              Every event above is logged: 253,000+ and counting.
             </m.p>
           )}
         </div>
@@ -1409,7 +1466,7 @@ function SessionReplay(): JSX.Element {
                 className="mt-5 border border-[#b57900]/50 bg-[#b57900]/10 px-4 py-3"
               >
                 <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#8a5d00]">
-                  <Sweep delay={0.2}>Confidently wrong — flagged</Sweep>
+                  <Sweep delay={0.2}>Confidently wrong: flagged</Sweep>
                 </p>
                 <p className="mt-1 font-mono text-[9.5px] text-[#17120f]/55">
                   High confidence + incorrect answer. A score alone would miss
@@ -1426,8 +1483,8 @@ function SessionReplay(): JSX.Element {
         Demo transcript: a student asks why ice floats on water. The tutor
         explains hydrogen bonding and density, then serves a quiz. The student
         picks a wrong answer with high confidence. The system logs every event
-        and flags the confidently-wrong response — the calibration signal a
-        test score alone would miss.
+        and flags the confidently-wrong response, the calibration signal a test
+        score alone would miss.
       </p>
     </div>
   );
@@ -1481,8 +1538,11 @@ function Evidence({
       <div className="mx-auto w-full max-w-6xl px-6 py-24 sm:px-10 sm:py-28">
         <Eyebrow dark>Evidence</Eyebrow>
         <h2 className="font-editorial-display mt-6 max-w-3xl text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.02]">
-          We report the <Sweep dark delay={0.5}>inconvenient</Sweep> results
-          too.
+          We report the{" "}
+          <Sweep dark delay={0.5}>
+            inconvenient
+          </Sweep>{" "}
+          results too.
         </h2>
 
         <Reveal className="mt-14 grid grid-cols-2 gap-x-8 gap-y-10 lg:grid-cols-4">
@@ -1513,7 +1573,12 @@ function Evidence({
               <span className="font-editorial-display text-lg italic text-[#f1e9da]/85">
                 {row.clause}
               </span>
-              <MicroBar widthPercent={row.width} gold={row.gold} dark delay={i * 0.12} />
+              <MicroBar
+                widthPercent={row.width}
+                gold={row.gold}
+                dark
+                delay={i * 0.12}
+              />
             </RiseItem>
           ))}
           <RiseItem className="pt-6">
@@ -1525,13 +1590,13 @@ function Evidence({
                 note="~1,150 sessions across physics, chemistry, geography, and history at one Hong Kong secondary school; pre/post tests with per-question confidence ratings. Findings reported with stated limitations."
               />{" "}
               That honesty is the product: institutions should demand evidence
-              from any AI learning tool they adopt — including ours.
+              from any AI learning tool they adopt, including ours.
             </p>
           </RiseItem>
         </Reveal>
 
         <Marginalia dark className="mt-14">
-          Fig. 03 — Field study, Hong Kong, N=323
+          Fig. 03 · Field study, Hong Kong, N=323
         </Marginalia>
       </div>
       <div
@@ -1549,12 +1614,15 @@ function Team(): JSX.Element {
   const logos = [...teamLogoList, ...teamLogoList];
 
   return (
-    <section id="team" className="mx-auto w-full max-w-6xl scroll-mt-2 px-6 py-20 sm:px-10 sm:py-24">
+    <section
+      id="team"
+      className="mx-auto w-full max-w-6xl scroll-mt-2 px-6 py-20 sm:px-10 sm:py-24"
+    >
       <Eyebrow>Builders × Researchers</Eyebrow>
       <Reveal>
         <RiseItem>
           <h2 className="font-editorial-display mt-6 max-w-3xl text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.02] text-[#17120f]">
-            The people who ship the tutoring engine also design the studies —
+            The people who ship the tutoring engine also design the studies
             and publish the caveats.
           </h2>
         </RiseItem>
@@ -1585,7 +1653,7 @@ function Team(): JSX.Element {
                 alt={logo.alt}
                 width={120}
                 height={48}
-                className={`max-h-9 w-auto object-contain mix-blend-multiply ${logo.className ?? ""} ${"imageClassName" in logo ? logo.imageClassName ?? "" : ""}`}
+                className={`max-h-9 w-auto object-contain mix-blend-multiply ${logo.className ?? ""} ${"imageClassName" in logo ? (logo.imageClassName ?? "") : ""}`}
               />
             ))}
           </div>
@@ -1603,7 +1671,7 @@ function Team(): JSX.Element {
                 aria-hidden={i >= teamLogoList.length}
                 width={120}
                 height={48}
-                className={`max-h-9 w-auto shrink-0 object-contain mix-blend-multiply ${logo.className ?? ""} ${"imageClassName" in logo ? logo.imageClassName ?? "" : ""}`}
+                className={`max-h-9 w-auto shrink-0 object-contain mix-blend-multiply ${logo.className ?? ""} ${"imageClassName" in logo ? (logo.imageClassName ?? "") : ""}`}
               />
             ))}
           </m.div>
@@ -1613,9 +1681,8 @@ function Team(): JSX.Element {
       <Reveal className="mt-16">
         <RiseItem className="border-y border-dotted border-[#17120f]/20 py-10 text-center">
           <p className="font-editorial-display mx-auto max-w-2xl text-2xl italic leading-snug text-[#17120f] sm:text-3xl">
-            &ldquo;Every student is a{" "}
-            <Sweep delay={0.5}>glowing star</Sweep>. Our job is to help them
-            shine.&rdquo;
+            &ldquo;Every student is a <Sweep delay={0.5}>glowing star</Sweep>.
+            Our job is to help them shine.&rdquo;
           </p>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[#17120f]/45">
             Our founding conviction
@@ -1623,7 +1690,7 @@ function Team(): JSX.Element {
         </RiseItem>
       </Reveal>
 
-      <Marginalia className="mt-10">Fig. 04 — The workshop</Marginalia>
+      <Marginalia className="mt-10">Fig. 04 · The workshop</Marginalia>
     </section>
   );
 }
@@ -1684,7 +1751,7 @@ function Footer(): JSX.Element {
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">
           {[
             { href: "/manifesto", label: "Manifesto" },
-            { href: "/law", label: "For law firms" },
+            // { href: "/law", label: "For law firms" },
             { href: "/privacy", label: "Privacy" },
             { href: "/terms", label: "Terms" },
           ].map((link) => (
@@ -1750,7 +1817,7 @@ export default function HomeLandingPage(): JSX.Element {
         box-shadow: 0 0 25px rgba(181, 121, 0, 0.35);
       }
     `,
-    []
+    [],
   );
 
   return (
