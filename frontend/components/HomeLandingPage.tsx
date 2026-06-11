@@ -177,7 +177,24 @@ function WordCascade({
   );
 }
 
-/** Gold highlighter sweep — a marker stroke wiping across the text. */
+/** True when the primary input can hover (gate mouseenter handlers so touch
+ * taps don't double-fire against onClick). */
+function useCanHover(): boolean {
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover)");
+    setCanHover(mq.matches);
+    const onChange = (e: MediaQueryListEvent): void => setCanHover(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return canHover;
+}
+
+/** Gold highlighter sweep — a marker stroke wiping across the text.
+ * The band is a transform-animated overlay (compositor-friendly, unlike
+ * background-position) sized in em so it hugs the glyphs instead of the
+ * full line box. */
 function Sweep({
   children,
   delay = 0.3,
@@ -192,19 +209,23 @@ function Sweep({
   const reduced = useReducedMotion();
   const color = dark ? "rgba(208,154,46,0.30)" : "rgba(181,121,0,0.26)";
   return (
-    <m.span
-      className={`rounded-[3px] box-decoration-clone px-[0.06em] ${className ?? ""}`}
-      style={{
-        backgroundImage: `linear-gradient(to left, transparent 50%, ${color} 50%)`,
-        backgroundSize: "200% 100%",
-      }}
-      initial={reduced ? { backgroundPosition: "0% 0%" } : { backgroundPosition: "100% 0%" }}
-      whileInView={{ backgroundPosition: "0% 0%" }}
-      viewport={{ once: true, margin: "-10%" }}
-      transition={{ duration: 0.6, ease: "linear", delay }}
-    >
-      {children}
-    </m.span>
+    <span className={`relative inline ${className ?? ""}`}>
+      <m.span
+        aria-hidden="true"
+        className="absolute -inset-x-[0.06em] rounded-[3px]"
+        style={{
+          top: "0.14em",
+          bottom: "0.02em",
+          backgroundColor: color,
+          transformOrigin: "0% 50%",
+        }}
+        initial={reduced ? { scaleX: 1 } : { scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true, margin: "-10%" }}
+        transition={{ duration: 0.5, ease: "linear", delay }}
+      />
+      <span className="relative">{children}</span>
+    </span>
   );
 }
 
@@ -415,14 +436,15 @@ function Footnote({
   note: string;
 }): JSX.Element {
   const [open, setOpen] = useState(false);
+  const canHover = useCanHover();
   return (
     <span className="relative inline-block">
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        onMouseEnter={canHover ? () => setOpen(true) : undefined}
+        onMouseLeave={canHover ? () => setOpen(false) : undefined}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
         className="-translate-y-1 cursor-help border border-dotted border-[#17120f]/30 px-1 font-mono text-[10px] text-[#b57900] align-super"
@@ -431,15 +453,18 @@ function Footnote({
       </button>
       <AnimatePresence>
         {open && (
-          <m.span
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="absolute bottom-full left-1/2 z-20 mb-2 block w-64 -translate-x-1/2 -rotate-1 border border-dotted border-[#17120f]/25 bg-[#fbf6ea] p-4 font-mono text-[10.5px] normal-case leading-relaxed tracking-normal text-[#17120f]/75 shadow-[0_14px_30px_rgba(93,66,35,0.18)]"
-          >
-            {note}
-          </m.span>
+          <span className="absolute bottom-full left-1/2 z-20 mb-2 block -translate-x-1/2">
+            <m.span
+              style={{ rotate: -1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="block w-64 max-w-[75vw] border border-dotted border-[#17120f]/25 bg-[#fbf6ea] p-4 font-mono text-[10.5px] normal-case leading-relaxed tracking-normal text-[#17120f]/75 shadow-[0_14px_30px_rgba(93,66,35,0.18)]"
+            >
+              {note}
+            </m.span>
+          </span>
         )}
       </AnimatePresence>
     </span>
@@ -609,8 +634,10 @@ function Hero(): JSX.Element {
     if (!rect) return;
     mx.set((e.clientX - rect.left) / rect.width - 0.5);
     my.set((e.clientY - rect.top) / rect.height - 0.5);
-    spotX.set(e.clientX - rect.left);
-    spotY.set(e.clientY - rect.top);
+    // Center the 600px spotlight on the cursor; framer owns this element's
+    // transform, so the offset can't come from translate utility classes.
+    spotX.set(e.clientX - rect.left - 300);
+    spotY.set(e.clientY - rect.top - 300);
   };
 
   return (
@@ -621,7 +648,7 @@ function Hero(): JSX.Element {
     >
       <m.div
         aria-hidden="true"
-        className="pointer-events-none absolute left-0 top-0 z-0 hidden h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full lg:block"
+        className="pointer-events-none absolute left-0 top-0 z-0 hidden h-[600px] w-[600px] rounded-full lg:block"
         style={{
           x: spotX,
           y: spotY,
@@ -630,13 +657,14 @@ function Hero(): JSX.Element {
           mixBlendMode: "soft-light",
         }}
       />
-      <m.div
+      <div
         aria-hidden="true"
         className="absolute right-[-4%] top-1/2 z-0 w-[58%] max-w-[560px] -translate-y-1/2 opacity-30 sm:opacity-60 lg:opacity-100"
-        style={{ x: sx, y: sy }}
       >
-        <Constellation className="h-auto w-full" />
-      </m.div>
+        <m.div style={{ x: sx, y: sy }}>
+          <Constellation className="h-auto w-full" />
+        </m.div>
+      </div>
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-16 pt-28 sm:px-10">
         <Eyebrow>AI-native learning, measured</Eyebrow>
@@ -719,7 +747,7 @@ const WHAT_WE_DO_ROWS = [
 
 function ProblemBand(): JSX.Element {
   return (
-    <section id="about" className="relative scroll-mt-20">
+    <section id="about" className="relative scroll-mt-2">
       <div className="h-24 bg-gradient-to-b from-transparent to-[#e6dcc8]/70" />
       <div className="bg-[#e6dcc8]/70">
         <div className="mx-auto w-full max-w-6xl border-y border-dotted border-[#17120f]/20 px-6 py-20 sm:px-10 sm:py-24">
@@ -860,9 +888,10 @@ const PRODUCT_PILLARS = [
 
 function ProductIndex(): JSX.Element {
   const [active, setActive] = useState<number | null>(null);
+  const canHover = useCanHover();
 
   return (
-    <section id="product" className="relative mx-auto w-full max-w-6xl scroll-mt-24 px-6 py-20 sm:px-10">
+    <section id="product" className="relative mx-auto w-full max-w-6xl scroll-mt-2 px-6 py-20 sm:px-10">
       <Eyebrow>Product</Eyebrow>
       <h2 className="font-editorial-display mt-6 max-w-2xl text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.02] text-[#17120f]">
         One platform, indexed.
@@ -875,8 +904,12 @@ function ProductIndex(): JSX.Element {
             <RiseItem key={pillar.name}>
               <div
                 className="group border-b border-dashed border-[#17120f]/20 first:border-t"
-                onMouseEnter={() => setActive(i)}
-                onMouseLeave={() => setActive((v) => (v === i ? null : v))}
+                onMouseEnter={canHover ? () => setActive(i) : undefined}
+                onMouseLeave={
+                  canHover
+                    ? () => setActive((v) => (v === i ? null : v))
+                    : undefined
+                }
               >
                 <button
                   type="button"
@@ -985,6 +1018,7 @@ const QUIZ_OPTIONS = [
 
 function SessionReplay(): JSX.Element {
   const reduced = useReducedMotion();
+  const canHover = useCanHover();
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { margin: "-15%" });
   const [paused, setPaused] = useState(false);
@@ -1015,8 +1049,8 @@ function SessionReplay(): JSX.Element {
   return (
     <div
       ref={ref}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      onMouseEnter={canHover ? () => setPaused(true) : undefined}
+      onMouseLeave={canHover ? () => setPaused(false) : undefined}
       className="relative mt-16 rounded-[2.5rem] rounded-bl-none border border-dotted border-[#17120f]/25 bg-[#f3ecdc]/70 p-6 sm:p-9"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -1193,10 +1227,11 @@ function SessionReplay(): JSX.Element {
           <AnimatePresence>
             {step >= 7 && (
               <m.div
+                style={{ rotate: -1 }}
                 initial={reduced ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: EASE_OUT_QUINT }}
-                className="mt-5 -rotate-1 border border-[#b57900]/50 bg-[#b57900]/10 px-4 py-3"
+                className="mt-5 border border-[#b57900]/50 bg-[#b57900]/10 px-4 py-3"
               >
                 <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#8a5d00]">
                   <Sweep delay={0.2}>Confidently wrong — flagged</Sweep>
@@ -1262,7 +1297,7 @@ function Evidence({
     <section
       id="evidence"
       ref={sectionRef}
-      className="relative scroll-mt-20 bg-[#1a140e] text-[#f1e9da]"
+      className="relative scroll-mt-2 bg-[#1a140e] text-[#f1e9da]"
     >
       <div
         aria-hidden="true"
@@ -1339,7 +1374,7 @@ function Team(): JSX.Element {
   const logos = [...teamLogoList, ...teamLogoList];
 
   return (
-    <section id="team" className="mx-auto w-full max-w-6xl scroll-mt-24 px-6 py-20 sm:px-10 sm:py-24">
+    <section id="team" className="mx-auto w-full max-w-6xl scroll-mt-2 px-6 py-20 sm:px-10 sm:py-24">
       <Eyebrow>Builders × Researchers</Eyebrow>
       <Reveal>
         <RiseItem>
@@ -1424,7 +1459,7 @@ function Contact(): JSX.Element {
   return (
     <section
       id="contact"
-      className="relative mx-auto flex min-h-[88svh] w-full max-w-6xl scroll-mt-20 items-center overflow-hidden px-6 py-20 sm:px-10"
+      className="relative mx-auto flex min-h-[88svh] w-full max-w-6xl scroll-mt-2 items-center overflow-hidden px-6 py-20 sm:px-10"
     >
       <div
         aria-hidden="true"

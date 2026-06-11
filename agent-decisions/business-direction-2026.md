@@ -114,6 +114,46 @@ The reasoning:
    matched (didn't beat) quiz practice on scores while shifting calibration. That is a reason
    institutions need measurement — i.e., a reason they need us.
 
+## Why this is the most investable direction in 2026
+
+Four conditions make a direction "most investable," and evidence-instrumented AI education is
+the only direction available to GlowingStar that satisfies all four:
+
+1. **It rides the dominant capital thesis instead of fighting it.** ~80% of Q1 2026's record
+   ~$300B venture quarter went to AI, and the application-layer consensus is
+   "sell the work/outcome, not the tool" (Sequoia, Foundation Capital — see sources). Pricing
+   instrumented learning programs per deployment-with-verified-outcomes is that thesis, applied
+   to education. A generic tutor subscription is the opposite: a seat-priced copilot in a
+   category the labs give away for free.
+2. **It attacks the scarce layer, not the crowded one.** The chat layer is commoditized
+   (OpenAI Study Mode, Google Guided Learning, Anthropic Learning Mode; Chegg's collapse). The
+   layers investors reward in 2026 are evaluation, outcomes, and trust — the same logic that
+   priced Harvey at $11B (workflow + trust in legal) and Sierra at $15.8B (outcome-priced
+   agents). In education, the trust/evidence layer is nearly empty: vendors assert efficacy,
+   buyers can't verify it, and the canonical research result (Wharton/PNAS "students feel they
+   learn while learning less") makes unverified AI tutoring a liability for districts and
+   universities. Whoever owns measurement becomes the procurement gatekeeper.
+3. **The asset already exists and is hard to copy.** GlowingStar's school deployment + 323-student
+   within-student study + ~253k-event telemetry pipeline is a real, operating instance of the
+   product — not a deck. Replicating it requires school relationships, multilingual classroom
+   deployment rails, and a defensible measurement methodology: relationship + data moats, not
+   prompt engineering.
+4. **The honest-null finding is the wedge, not a weakness.** Our own data shows AI tutoring
+   matching quiz practice on scores while inflating confidence on wrong answers. That is
+   simultaneously the problem statement, the proof we can measure what others can't, and the
+   reason every AI-education buyer needs an independent evidence layer. Counter-positioning
+   against "2x learning gains" vendor claims is the most credible story a seed-stage company in
+   this category can tell in 2026.
+
+The honest counter-case: aggregate edtech VC is at decade lows (~$2.4–3B/yr vs. $16.7B in 2021),
+and median pure-play AI-education rounds are small (~$8M). That is why the framing matters —
+the fundable story is "outcome-verified AI deployments for institutions" (services thesis,
+extensible to labs, school operators, and corporate L&D), not "edtech." Within education, the
+shapes that DO raise — teacher copilots converting to district contracts (MagicSchool, $45M),
+institutional software (EdSights, $80M), engagement-proven consumer learning (Speak, $1B), and
+RCT-backed efficacy stories — all point to the same buyer demand GlowingStar's evidence layer
+serves.
+
 ## Landing-page implications (applied June 2026)
 
 - Position: "AI learning programs with the evidence built in" — product company, not consultancy.
@@ -122,3 +162,43 @@ The reasoning:
 - Describe the team via affiliations (founder name kept off public pages by preference); keep the mission quote.
 - Contact: support@glowingstar.ai (domain-matching email is a hard GFSCP rule).
 - Add privacy + terms pages; keep the site live at glowingstar.ai (verified live, CloudFront).
+
+## Sources (researched and adversarially cross-checked, June 10, 2026)
+
+**Macro: AI's share of venture capital**
+- Crunchbase, "Record-breaking funding: AI global Q1 2026" — ~$300B quarter, ~80% AI:
+  https://news.crunchbase.com/venture/record-breaking-funding-ai-global-q1-2026/
+- PitchBook, Q1 2026 AI funding analysis: https://pitchbook.com/news/articles/q1-2026-ai-funding-blows-past-2025-total-with-three-deals-accounting-for-67-of-capital
+- OECD, "AI firms capture 61% of global venture capital in 2025": https://www.oecd.org/en/about/news/announcements/2026/02/ai-firms-capture-61-percent-of-global-venture-capital-in-2025.html
+
+**The "sell the work, not the tool" thesis**
+- Sequoia, "Services: The New Software" (Julien Bek, March 2026) — "for every dollar spent on
+  software, six are spent on services"; "a copilot sells the tool, an autopilot sells the work":
+  https://www.sequoiacap.com/article/services-the-new-software/
+- Foundation Capital, "AI: Service-as-Software" ($4.6T sizing): https://foundationcapital.com/ai-service-as-software/
+- Foundation Capital, "A System of Agents": https://foundationcapital.com/system-of-agents/
+
+**Proof the thesis pays (professional-services verticals, all independently verified)**
+- Harvey $200M at $11B (CNBC, March 25, 2026): https://www.cnbc.com/2026/03/25/legal-ai-startup-harvey-raises-200-million-at-11-billion-valuation.html
+- Legora $550M Series D at $5.55B (TechCrunch, March 10, 2026): https://techcrunch.com/2026/03/10/legora-reaches-5-55-billion-valuation-as-ai-legaltech-boom-endures/
+- Sierra $950M at $15.8B, outcome-based pricing (TechCrunch, May 4, 2026): https://techcrunch.com/2026/05/04/sierra-raises-950m-as-the-race-to-own-enterprise-ai-gets-serious/
+- Rogo $160M Series D (~$2B; PR Newswire, April 29, 2026): https://www.prnewswire.com/news-releases/rogo-raises-160m-series-d-to-scale-the-agentic-platform-for-finance-302756546.html
+- Long Lake / Amex GBT $6.3B take-private (Skift, May 4, 2026): https://skift.com/2026/05/04/amex-gbt-acquired-general-catalyst-long-lake-6-3-billion/
+- General Catalyst Creation strategy and rollups (TechCrunch, Sept 28, 2025): https://techcrunch.com/2025/09/28/the-ai-services-transformation-may-be-harder-than-vcs-think/
+
+**Education: the winter, and what still raises**
+- Crunchbase, "Edtech funding stays low": https://news.crunchbase.com/venture/edtech-funding-stays-low/
+- Rest of World, edtech funding collapse + AI/workforce pivot: https://restofworld.org/2026/edtech-funding-collapse-k12-startups-ai-workforce/
+- Speak $78M Series C at $1B (TechCrunch, Dec 2024): https://techcrunch.com/2024/12/10/openai-backed-speak-raises-78m-at-1b-valuation-to-help-users-learn-languages-by-talking-out-loud/
+- MagicSchool $45M Series B (company announcement, Feb 2025): https://www.magicschool.ai/blog-posts/series-b-fundraise-for-teacher-ai
+- SchoolAI $25M Series A (GlobeNewswire, April 2025): https://www.globenewswire.com/news-release/2025/04/02/3054126/0/en/SchoolAI-Secures-25-Million-to-Help-Teachers-and-Schools-Reach-Every-Student.html
+- Gizmo $22M Series A, 13M users (TechCrunch, April 2026): https://techcrunch.com/2026/04/15/ai-learning-app-gizmo-levels-up-with-13m-users-and-a-22m-investment/
+
+**First-party evidence (this repo)**
+- `agent-decisions/saintpaul-ai-tutor-research-findings.md` — deployment scale, study design,
+  efficacy null, calibration effect, and stated limitations.
+
+*Method note: claims above were gathered by parallel web research and then adversarially
+re-verified against independent sources; "partially confirmed" nuances (e.g., exact quote
+attributions inside Sequoia's AI Ascent coverage, Q1 2026 ~$291B vs ~$300B totals) are recorded
+in the research transcript and do not change the direction of any conclusion.*
