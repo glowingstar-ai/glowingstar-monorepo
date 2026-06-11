@@ -210,12 +210,14 @@ function Sweep({
   const reduced = useReducedMotion();
   const color = dark ? "rgba(208,154,46,0.30)" : "rgba(181,121,0,0.26)";
   return (
-    <span className={`relative inline ${className ?? ""}`}>
+    // nowrap: the marker band is positioned over the span's bounding box, so a
+    // line break inside it would smear the band across both lines.
+    <span className={`relative inline whitespace-nowrap ${className ?? ""}`}>
       <m.span
         aria-hidden="true"
         className="absolute -inset-x-[0.06em] rounded-[3px]"
         style={{
-          top: "0.14em",
+          top: "0.18em",
           bottom: "0.02em",
           backgroundColor: color,
           transformOrigin: "0% 50%",
@@ -273,17 +275,18 @@ const SPARKLE_PATH =
   "M0,-6 C1,-1.5 1.5,-1 6,0 C1.5,1 1,1.5 0,6 C-1,1.5 -1.5,1 -6,0 C-1.5,-1 -1,-1.5 0,-6 Z";
 
 // kind: "sparkle" renders the four-point star, "dot" a small circle.
+// gold: secondary gold accents; glintDelay: occasional bright flash.
 const STARS = [
-  { x: 300, y: 88, scale: 2.8, kind: "north" },
-  { x: 196, y: 56, scale: 1.1, kind: "sparkle" },
-  { x: 116, y: 124, scale: 1, kind: "dot" },
-  { x: 220, y: 168, scale: 1.4, kind: "sparkle" },
-  { x: 332, y: 208, scale: 1, kind: "dot" },
-  { x: 138, y: 252, scale: 1.2, kind: "sparkle" },
-  { x: 248, y: 296, scale: 1, kind: "dot" },
-  { x: 64, y: 196, scale: 0.9, kind: "dot" },
-  { x: 352, y: 320, scale: 1, kind: "sparkle" },
-  { x: 176, y: 348, scale: 1.1, kind: "dot" },
+  { x: 300, y: 88, scale: 2.8, kind: "north", gold: false, glintDelay: 0 },
+  { x: 196, y: 56, scale: 1.1, kind: "sparkle", gold: false, glintDelay: 3.8 },
+  { x: 116, y: 124, scale: 1, kind: "dot", gold: false, glintDelay: 0 },
+  { x: 220, y: 168, scale: 1.4, kind: "sparkle", gold: true, glintDelay: 0 },
+  { x: 332, y: 208, scale: 1, kind: "dot", gold: false, glintDelay: 0 },
+  { x: 138, y: 252, scale: 1.2, kind: "sparkle", gold: false, glintDelay: 0 },
+  { x: 248, y: 296, scale: 1, kind: "dot", gold: false, glintDelay: 0 },
+  { x: 64, y: 196, scale: 0.9, kind: "dot", gold: false, glintDelay: 0 },
+  { x: 352, y: 320, scale: 1, kind: "sparkle", gold: false, glintDelay: 8.6 },
+  { x: 176, y: 348, scale: 1.1, kind: "dot", gold: false, glintDelay: 0 },
 ] as const;
 
 // A branching chain (no closed loops — reads as a star chart, not a polygon).
@@ -402,6 +405,32 @@ function Constellation({
                   animate={reduced ? undefined : { opacity: [0.7, 1, 0.7] }}
                   transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
                 />
+                {/* Faint cross rays, breathing slowly. */}
+                <m.path
+                  d="M0 -22 L0 22 M-22 0 L22 0"
+                  stroke={gold}
+                  strokeWidth="0.5"
+                  animate={
+                    reduced
+                      ? undefined
+                      : { opacity: [0.12, 0.3, 0.12] }
+                  }
+                  style={{ opacity: 0.2 }}
+                  transition={{ duration: 7, ease: "easeInOut", repeat: Infinity }}
+                />
+                {/* Dotted orbit ring — dash offset crawl makes the dots circle
+                    the star (origin-safe, no rotation transform needed). */}
+                <m.circle
+                  r="15"
+                  stroke={gold}
+                  strokeOpacity="0.45"
+                  strokeWidth="0.6"
+                  strokeDasharray="0.5 5.4"
+                  strokeLinecap="round"
+                  fill="none"
+                  animate={reduced ? undefined : { strokeDashoffset: [0, -94.2] }}
+                  transition={{ duration: 36, ease: "linear", repeat: Infinity }}
+                />
                 <m.path
                   d={SPARKLE_PATH}
                   fill={gold}
@@ -412,14 +441,14 @@ function Constellation({
             ) : (
               <m.g
                 initial={reduced ? false : { opacity: 0 }}
-                whileInView={{ opacity: dim ? 0.5 : 0.7 }}
+                whileInView={{ opacity: star.gold ? 0.85 : dim ? 0.5 : 0.7 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.7 + i * 0.1 }}
               >
                 {star.kind === "sparkle" ? (
                   <m.path
                     d={SPARKLE_PATH}
-                    fill={fill}
+                    fill={star.gold ? gold : fill}
                     animate={reduced ? undefined : { opacity: [1, 0.4, 1] }}
                     transition={{
                       duration: 2.4,
@@ -443,11 +472,71 @@ function Constellation({
                     }}
                   />
                 )}
+                {/* Occasional gold glint flash on select stars. */}
+                {star.glintDelay > 0 && !reduced && (
+                  <m.path
+                    d={SPARKLE_PATH}
+                    fill={gold}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 0.85, 0] }}
+                    transition={{
+                      duration: 1.4,
+                      ease: "easeInOut",
+                      repeat: Infinity,
+                      repeatDelay: 5.2 + star.glintDelay,
+                      delay: star.glintDelay,
+                    }}
+                  />
+                )}
               </m.g>
             )}
           </g>
         ))}
       </m.g>
+    </svg>
+  );
+}
+
+// Faint background star-dust (fixed coords/delays so SSR markup matches).
+const DUST = [
+  { x: 40, y: 60, r: 1.2, d: 0.2 },
+  { x: 120, y: 30, r: 0.9, d: 1.3 },
+  { x: 260, y: 24, r: 1.1, d: 2.6 },
+  { x: 368, y: 70, r: 0.8, d: 3.4 },
+  { x: 30, y: 150, r: 0.9, d: 4.1 },
+  { x: 90, y: 210, r: 1.3, d: 0.8 },
+  { x: 30, y: 300, r: 1, d: 2.2 },
+  { x: 110, y: 360, r: 0.8, d: 5.0 },
+  { x: 220, y: 388, r: 1.2, d: 1.7 },
+  { x: 330, y: 376, r: 0.9, d: 3.9 },
+  { x: 384, y: 250, r: 1.1, d: 4.6 },
+  { x: 386, y: 150, r: 0.8, d: 0.4 },
+];
+
+function ConstellationDust({ className }: { className?: string }): JSX.Element {
+  const reduced = useReducedMotion();
+  return (
+    <svg viewBox="0 0 400 400" className={className} aria-hidden="true" fill="none">
+      {DUST.map((dust, i) => (
+        <m.circle
+          key={`dust-${i}`}
+          cx={dust.x}
+          cy={dust.y}
+          r={dust.r}
+          fill={INK}
+          initial={reduced ? { opacity: 0.22 } : { opacity: 0 }}
+          whileInView={{ opacity: 0.22 }}
+          viewport={{ once: true }}
+          animate={reduced ? undefined : { opacity: [0.22, 0.1, 0.22] }}
+          transition={{
+            duration: 5,
+            ease: "easeInOut",
+            repeat: Infinity,
+            repeatDelay: 1.4,
+            delay: dust.d,
+          }}
+        />
+      ))}
     </svg>
   );
 }
@@ -694,6 +783,15 @@ function Hero(): JSX.Element {
     stiffness: 50,
     damping: 20,
   });
+  // Background dust drifts the opposite way, at lower amplitude — parallax depth.
+  const dx = useSpring(useTransform(mx, [-0.5, 0.5], [4, -4]), {
+    stiffness: 40,
+    damping: 22,
+  });
+  const dy = useSpring(useTransform(my, [-0.5, 0.5], [4, -4]), {
+    stiffness: 40,
+    damping: 22,
+  });
   const spotX = useSpring(useMotionValue(0), { stiffness: 60, damping: 22 });
   const spotY = useSpring(useMotionValue(0), { stiffness: 60, damping: 22 });
 
@@ -713,7 +811,7 @@ function Hero(): JSX.Element {
     <section
       ref={ref}
       onMouseMove={handleMouse}
-      className="relative flex min-h-[92svh] items-center overflow-hidden"
+      className="relative flex min-h-[92svh] items-center overflow-clip"
     >
       <m.div
         aria-hidden="true"
@@ -728,7 +826,15 @@ function Hero(): JSX.Element {
       />
       <div
         aria-hidden="true"
-        className="absolute right-[-4%] top-1/2 z-0 w-[58%] max-w-[560px] -translate-y-1/2 opacity-30 sm:opacity-60 lg:opacity-100"
+        className="pointer-events-none absolute right-[-7%] top-1/2 z-0 w-[64%] max-w-[640px] -translate-y-1/2 opacity-25 sm:opacity-50 lg:opacity-100"
+      >
+        <m.div style={{ x: dx, y: dy }}>
+          <ConstellationDust className="h-auto w-full" />
+        </m.div>
+      </div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[-4%] top-1/2 z-0 w-[58%] max-w-[560px] -translate-y-1/2 opacity-30 sm:opacity-60 lg:opacity-100"
       >
         <m.div style={{ x: sx, y: sy }}>
           <Constellation className="h-auto w-full" />
@@ -737,7 +843,7 @@ function Hero(): JSX.Element {
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-16 pt-28 sm:px-10">
         <Eyebrow>AI-native learning, measured</Eyebrow>
-        <h1 className="font-editorial-display mt-7 max-w-[14ch] text-[clamp(2.9rem,7.5vw,6.25rem)] leading-[0.97] tracking-[-0.02em] text-[#17120f]">
+        <h1 className="font-editorial-display mt-7 max-w-[14ch] text-[clamp(2.9rem,7.5vw,6.25rem)] leading-[1.05] tracking-[-0.02em] text-[#17120f]">
           <WordCascade
             text="AI learning programs with the evidence built in."
             highlight="evidence built in."
@@ -823,9 +929,9 @@ function ProblemBand(): JSX.Element {
           <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
             <div className="lg:sticky lg:top-[22vh] lg:self-start">
               <Eyebrow>The problem</Eyebrow>
-              <h2 className="font-editorial-display mt-6 text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.02] text-[#17120f]">
-                AI tutoring is everywhere.{" "}
-                <Sweep delay={0.5}>The evidence is not.</Sweep>
+              <h2 className="font-editorial-display mt-6 text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.08] text-[#17120f]">
+                AI tutoring is everywhere. The evidence{" "}
+                <Sweep delay={0.5}>is not.</Sweep>
               </h2>
               <p className="font-editorial-display mt-8 text-xl italic text-[#17120f]/65">
                 Learning that is measured, not assumed.
@@ -1538,7 +1644,7 @@ function Contact(): JSX.Element {
       </div>
       <div className="relative z-10 w-full">
         <Eyebrow>Contact</Eyebrow>
-        <h2 className="font-editorial-display mt-7 max-w-[14ch] text-[clamp(2.5rem,6.5vw,5rem)] leading-[0.98] text-[#17120f]">
+        <h2 className="font-editorial-display mt-7 max-w-[14ch] text-[clamp(2.5rem,6.5vw,5rem)] leading-[1.05] text-[#17120f]">
           <WordCascade
             text="Bring measured learning to your institution."
             highlight="measured"

@@ -36,10 +36,11 @@ body {
   color: #e2e8f0;
 }
 
-/* Prevent scroll chaining on mobile */
-.overflow-hidden {
-  overscroll-behavior: contain;
-}
+/* NOTE: a previous `.overflow-hidden { overscroll-behavior: contain }` rule
+   was removed here — it piggybacked on the Tailwind utility class, so ANY
+   clipped element (e.g. a full-viewport hero) swallowed wheel/touch scroll
+   instead of letting it chain to the page. Scope overscroll containment to
+   actual scrollable overlays if it is ever needed again. */
 
 /* Glowing star animation */
 .glowing-star {
