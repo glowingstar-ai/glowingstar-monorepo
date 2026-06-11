@@ -9,8 +9,10 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 80px; /* Account for fixed header */
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  /* Enable hardware acceleration for smooth scrolling */
+  /* `clip` prevents horizontal scroll WITHOUT creating a scroll container —
+     `hidden` here plus `hidden` on body demoted page scrolling to an inner
+     body scroller and left the viewport with almost no scroll range. */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -18,9 +20,7 @@ html {
 body {
   min-height: 100vh;
   background-color: #020617; /* Default to dark background */
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-x: clip; /* Prevent horizontal scroll; keep viewport as scroller */
   font-family:
     var(--font-inter),
     system-ui,
@@ -36,10 +36,11 @@ body {
   color: #e2e8f0;
 }
 
-/* Prevent scroll chaining on mobile */
-.overflow-hidden {
-  overscroll-behavior: contain;
-}
+/* NOTE: a previous `.overflow-hidden { overscroll-behavior: contain }` rule
+   was removed here — it piggybacked on the Tailwind utility class, so ANY
+   clipped element (e.g. a full-viewport hero) swallowed wheel/touch scroll
+   instead of letting it chain to the page. Scope overscroll containment to
+   actual scrollable overlays if it is ever needed again. */
 
 /* Glowing star animation */
 .glowing-star {
@@ -108,13 +109,10 @@ section {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Optimize elements that might cause repaints during scroll */
-[class*="blur"],
-[class*="backdrop"] {
-  /* Force GPU layer for better scroll performance */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
+/* NOTE: a previous [class*="blur"] { transform: translateZ(0) } rule was
+   removed here — a transform on those elements turned them into containing
+   blocks, breaking position: fixed for any descendant (e.g. menus inside a
+   backdrop-blur header). */
 
 /* Smooth transitions for all interactive elements */
 a,
