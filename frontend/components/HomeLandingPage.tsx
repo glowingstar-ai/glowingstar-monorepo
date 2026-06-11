@@ -19,6 +19,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -271,23 +272,24 @@ function CountUp({
 const SPARKLE_PATH =
   "M0,-6 C1,-1.5 1.5,-1 6,0 C1.5,1 1,1.5 0,6 C-1,1.5 -1.5,1 -6,0 C-1.5,-1 -1,-1.5 0,-6 Z";
 
+// kind: "sparkle" renders the four-point star, "dot" a small circle.
 const STARS = [
-  { x: 300, y: 88, scale: 2.6, north: true },
-  { x: 196, y: 56, scale: 1.1 },
-  { x: 116, y: 124, scale: 0.9 },
-  { x: 220, y: 168, scale: 1.3 },
-  { x: 332, y: 208, scale: 1 },
-  { x: 138, y: 252, scale: 1.2 },
-  { x: 248, y: 296, scale: 0.9 },
-  { x: 64, y: 196, scale: 0.8 },
-  { x: 352, y: 320, scale: 1.1 },
-  { x: 176, y: 348, scale: 1 },
-];
+  { x: 300, y: 88, scale: 2.8, kind: "north" },
+  { x: 196, y: 56, scale: 1.1, kind: "sparkle" },
+  { x: 116, y: 124, scale: 1, kind: "dot" },
+  { x: 220, y: 168, scale: 1.4, kind: "sparkle" },
+  { x: 332, y: 208, scale: 1, kind: "dot" },
+  { x: 138, y: 252, scale: 1.2, kind: "sparkle" },
+  { x: 248, y: 296, scale: 1, kind: "dot" },
+  { x: 64, y: 196, scale: 0.9, kind: "dot" },
+  { x: 352, y: 320, scale: 1, kind: "sparkle" },
+  { x: 176, y: 348, scale: 1.1, kind: "dot" },
+] as const;
 
+// A branching chain (no closed loops — reads as a star chart, not a polygon).
 const EDGES: Array<[number, number]> = [
   [1, 0],
   [2, 1],
-  [3, 0],
   [3, 2],
   [4, 0],
   [5, 3],
@@ -295,6 +297,14 @@ const EDGES: Array<[number, number]> = [
   [7, 2],
   [8, 6],
   [9, 5],
+];
+
+// Gold "signal" dots that travel along an edge, like data flowing through
+// the constellation. Fixed timings so SSR and client markup match.
+const PULSES = [
+  { from: 1, to: 0, delay: 2.2, rest: 4.4 },
+  { from: 5, to: 3, delay: 5.1, rest: 5.8 },
+  { from: 6, to: 4, delay: 7.6, rest: 3.6 },
 ];
 
 // Fixed (not random) so server and client render identical markup.
@@ -308,8 +318,10 @@ function Constellation({
   dim?: boolean;
 }): JSX.Element {
   const reduced = useReducedMotion();
-  const stroke = dim ? "rgba(241,233,218,0.22)" : "rgba(23,18,15,0.20)";
+  const glowId = useId();
+  const stroke = dim ? "rgba(241,233,218,0.28)" : "rgba(23,18,15,0.26)";
   const fill = dim ? "#f1e9da" : INK;
+  const gold = dim ? GOLD_DARK_BG : GOLD;
   return (
     <svg
       viewBox="0 0 400 400"
@@ -317,68 +329,125 @@ function Constellation({
       aria-hidden="true"
       fill="none"
     >
-      {EDGES.map(([a, b], i) => (
-        <m.line
-          key={`edge-${i}`}
-          x1={STARS[a].x}
-          y1={STARS[a].y}
-          x2={STARS[b].x}
-          y2={STARS[b].y}
-          stroke={stroke}
-          strokeWidth="1"
-          strokeDasharray="2 5"
-          initial={reduced ? false : { pathLength: 0 }}
-          whileInView={{ pathLength: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, ease: "easeInOut", delay: 0.8 + i * 0.12 }}
-        />
-      ))}
-      {STARS.map((star, i) => (
-        // Position and scale live on the static SVG attribute; animated
-        // properties stay origin-independent (opacity, translate) so framer's
-        // style.transform never clobbers the placement.
-        <g
-          key={`star-${i}`}
-          transform={`translate(${star.x} ${star.y}) scale(${star.scale})`}
-        >
-          {star.north ? (
-            <m.g
-              initial={reduced ? false : { opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.8 + i * 0.12 }}
-            >
-              <circle r="14" fill={dim ? "rgba(208,154,46,0.18)" : "rgba(181,121,0,0.18)"} />
-              <m.path
-                d={SPARKLE_PATH}
-                fill={dim ? GOLD_DARK_BG : GOLD}
-                animate={reduced ? undefined : { y: [0, -6, 0] }}
-                transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
-              />
-            </m.g>
-          ) : (
-            <m.g
-              initial={reduced ? false : { opacity: 0 }}
-              whileInView={{ opacity: dim ? 0.5 : 0.65 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.8 + i * 0.12 }}
-            >
-              <m.path
-                d={SPARKLE_PATH}
-                fill={fill}
-                animate={reduced ? undefined : { opacity: [1, 0.4, 1] }}
-                transition={{
-                  duration: 2.4,
-                  ease: "easeInOut",
-                  repeat: Infinity,
-                  repeatDelay: 1.2,
-                  delay: TWINKLE_DELAYS[i % TWINKLE_DELAYS.length],
-                }}
-              />
-            </m.g>
-          )}
-        </g>
-      ))}
+      <defs>
+        <radialGradient id={glowId}>
+          <stop offset="0%" stopColor={gold} stopOpacity="0.35" />
+          <stop offset="45%" stopColor={gold} stopOpacity="0.14" />
+          <stop offset="100%" stopColor={gold} stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* Slow breathing float of the whole chart (translate only — origin-safe). */}
+      <m.g
+        animate={reduced ? undefined : { y: [0, -7, 0] }}
+        transition={{ duration: 11, ease: "easeInOut", repeat: Infinity }}
+      >
+        {EDGES.map(([a, b], i) => (
+          <m.line
+            key={`edge-${i}`}
+            x1={STARS[a].x}
+            y1={STARS[a].y}
+            x2={STARS[b].x}
+            y2={STARS[b].y}
+            stroke={stroke}
+            strokeWidth="1.2"
+            strokeDasharray="0.5 7"
+            strokeLinecap="round"
+            initial={reduced ? false : { opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, delay: 0.7 + i * 0.1 }}
+          />
+        ))}
+
+        {!reduced &&
+          PULSES.map((pulse, i) => (
+            <m.circle
+              key={`pulse-${i}`}
+              r="2.6"
+              fill={gold}
+              initial={{ opacity: 0 }}
+              animate={{
+                cx: [STARS[pulse.from].x, STARS[pulse.to].x],
+                cy: [STARS[pulse.from].y, STARS[pulse.to].y],
+                opacity: [0, 0.9, 0.9, 0],
+              }}
+              transition={{
+                duration: 2.4,
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatDelay: pulse.rest,
+                delay: pulse.delay,
+              }}
+            />
+          ))}
+
+        {STARS.map((star, i) => (
+          // Position and scale live on the static SVG attribute; animated
+          // properties stay origin-independent (opacity, translate) so
+          // framer's style.transform never clobbers the placement.
+          <g
+            key={`star-${i}`}
+            transform={`translate(${star.x} ${star.y}) scale(${star.scale})`}
+          >
+            {star.kind === "north" ? (
+              <m.g
+                initial={reduced ? false : { opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+              >
+                <m.circle
+                  r="26"
+                  fill={`url(#${glowId})`}
+                  animate={reduced ? undefined : { opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 5, ease: "easeInOut", repeat: Infinity }}
+                />
+                <m.path
+                  d={SPARKLE_PATH}
+                  fill={gold}
+                  animate={reduced ? undefined : { y: [0, -5, 0] }}
+                  transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
+                />
+              </m.g>
+            ) : (
+              <m.g
+                initial={reduced ? false : { opacity: 0 }}
+                whileInView={{ opacity: dim ? 0.5 : 0.7 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.7 + i * 0.1 }}
+              >
+                {star.kind === "sparkle" ? (
+                  <m.path
+                    d={SPARKLE_PATH}
+                    fill={fill}
+                    animate={reduced ? undefined : { opacity: [1, 0.4, 1] }}
+                    transition={{
+                      duration: 2.4,
+                      ease: "easeInOut",
+                      repeat: Infinity,
+                      repeatDelay: 1.2,
+                      delay: TWINKLE_DELAYS[i % TWINKLE_DELAYS.length],
+                    }}
+                  />
+                ) : (
+                  <m.circle
+                    r="2.4"
+                    fill={fill}
+                    animate={reduced ? undefined : { opacity: [1, 0.45, 1] }}
+                    transition={{
+                      duration: 3,
+                      ease: "easeInOut",
+                      repeat: Infinity,
+                      repeatDelay: 1.6,
+                      delay: TWINKLE_DELAYS[(i + 4) % TWINKLE_DELAYS.length],
+                    }}
+                  />
+                )}
+              </m.g>
+            )}
+          </g>
+        ))}
+      </m.g>
     </svg>
   );
 }
