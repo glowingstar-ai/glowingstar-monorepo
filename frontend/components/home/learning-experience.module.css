@@ -1,0 +1,322 @@
+.experience {
+  --learning-gold: #aa8440;
+  min-width: 0;
+  padding: 4px 4px 0;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding-inline: 6px;
+}
+
+.heading p {
+  color: #efeee4;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.heading div > span {
+  display: block;
+  margin-top: 3px;
+  color: #b4b9aa;
+  font-family: var(--font-plex), monospace;
+  font-size: 9px;
+  letter-spacing: 0.3px;
+}
+
+.headingIndex {
+  margin-left: auto;
+  color: #c2b48f;
+  font-family: var(--font-plex), monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.perspective {
+  padding: 8px 8px 16px;
+  perspective: 1100px;
+}
+
+.stack {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  transform-style: preserve-3d;
+}
+
+.backSheet {
+  position: absolute;
+  inset: 8px 14px -8px 8px;
+  border: 1px solid #bdad7638;
+  border-radius: 10px;
+  background: linear-gradient(140deg, #b8ab7430, #8b937914);
+  box-shadow: 0 25px 34px -20px #0a100ba8;
+  transform: translateZ(-28px) rotate(3deg);
+  pointer-events: none;
+}
+
+.card {
+  position: relative;
+  padding: 22px 24px;
+  border: 1px solid #d6d0bd;
+  border-radius: 8px;
+  color: #30342b;
+  background: linear-gradient(130deg, #faf9f3, #edeadd);
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 3px 0 #d6d0bc,
+    0 12px 22px -14px #090e0bd9;
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms ease,
+    border-color 250ms ease;
+  backface-visibility: hidden;
+}
+
+.question {
+  margin-right: 20px;
+  transform: translateZ(5px) rotate(-1.3deg);
+}
+
+.reflect {
+  margin-left: 17px;
+  background: linear-gradient(125deg, #f5eedb, #e6ddc2);
+  transform: translateZ(12px) rotate(1deg);
+}
+
+.understand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-right: 11px;
+  padding-block: 18px;
+  background: linear-gradient(130deg, #f8f6ec, #e5e8dc);
+  transform: translateZ(5px) rotate(-0.7deg);
+}
+
+.card[data-active="true"] {
+  border-color: #ba924c;
+  box-shadow:
+    inset 0 1px 0 #fffdf4,
+    0 3px 0 #bca16b,
+    0 18px 26px -15px #070e0cc9,
+    0 0 0 1px #d7b56833;
+  transform: translateZ(28px) rotate(0deg);
+}
+
+.cardHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.speaker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #676448;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.cardIndex {
+  color: #726950;
+  font-family: var(--font-plex), monospace;
+  font-size: 8px;
+  line-height: 1.5;
+  letter-spacing: 0.75px;
+  text-transform: uppercase;
+}
+
+.learnerQuestion {
+  font-size: clamp(17px, 1.55vw, 21px);
+  line-height: 1.5;
+  letter-spacing: -0.55px;
+}
+
+.tutorResponse {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(18px, 1.55vw, 21px);
+  line-height: 1.55;
+  letter-spacing: -0.35px;
+}
+
+.practiceIcon {
+  flex-shrink: 0;
+}
+
+.practicePrompt {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.stepControls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 5px;
+  margin-top: 16px;
+  padding: 5px;
+  border: 1px solid #d4d1aa25;
+  border-radius: 8px;
+  background: #c9cbaa08;
+}
+
+.stepButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px 5px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: #c7cbbc;
+  font-family: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.stepButton:hover {
+  background: #f3e5bc0c;
+  color: #f7edd2;
+}
+
+.stepButton[aria-pressed="true"] {
+  border-color: #e6ce9442;
+  background: linear-gradient(135deg, #ede3b926, #d1b57212);
+  box-shadow: inset 0 1px 0 #fff1c319;
+  color: #f4e4bd;
+}
+
+.stepButton:focus-visible {
+  outline: 2px solid #e9cd89 !important;
+  outline-offset: 3px !important;
+}
+
+.stepNumber {
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-family: var(--font-plex), monospace;
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+.stepNote {
+  min-height: 42px;
+  margin-top: 13px;
+  padding-inline: 8px;
+  color: #b9bfae;
+  font-size: 10px;
+  line-height: 1.7;
+  text-align: center;
+  text-wrap: balance;
+}
+
+@media (max-width: 1000px) and (min-width: 761px) {
+  .card {
+    padding-inline: 18px;
+  }
+
+  .cardHeading {
+    gap: 6px;
+  }
+
+  .cardIndex {
+    font-size: 7px;
+  }
+
+  .stepNumber {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .experience {
+    max-width: 520px;
+    width: 100%;
+    justify-self: center;
+    padding-inline: 0;
+  }
+
+  .learnerQuestion,
+  .tutorResponse {
+    font-size: 19px;
+  }
+}
+
+@media (max-width: 380px) {
+  .perspective {
+    padding-inline: 4px;
+  }
+
+  .card {
+    padding: 18px 16px;
+  }
+
+  .question {
+    margin-right: 9px;
+  }
+
+  .reflect {
+    margin-left: 7px;
+  }
+
+  .understand {
+    gap: 10px;
+    margin-right: 5px;
+    padding-inline: 12px;
+  }
+
+  .cardHeading {
+    gap: 5px;
+  }
+
+  .cardIndex {
+    font-size: 7px;
+  }
+
+  .learnerQuestion,
+  .tutorResponse {
+    font-size: 17px;
+  }
+
+  .stepControls {
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .stepButton {
+    gap: 4px;
+    padding-inline: 2px;
+    font-size: 9px;
+  }
+
+  .stepNumber {
+    width: 14px;
+    height: 14px;
+    font-size: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card[data-active="true"] {
+    transform: none;
+    transition: none;
+  }
+}

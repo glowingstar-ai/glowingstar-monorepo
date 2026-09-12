@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useAnimate, stagger } from "framer-motion";
 import LiquidGlassIcon from "./LiquidGlassIcon";
+import SculptedIcon from "./SculptedIcon";
 import useReducedEffects from "./useReducedEffects";
 import styles from "./home.module.css";
 
@@ -14,23 +15,6 @@ const links = [
   { href: "#work", label: "Our work" },
   { href: "#about", label: "About" },
 ];
-
-export function StarMark(): JSX.Element {
-  return (
-    <svg
-      viewBox="0 0 32 32"
-      width="28"
-      height="28"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M16 1.5 19.1 11l8.6-5.7L22 13.9l9.5 2.1L22 19.1l5.7 8.6-8.6-5.7-3.1 9.5-2.1-9.5-8.6 5.7 5.7-8.6L1.5 16l9.5-2.1-5.7-8.6 8.6 5.7L16 1.5Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
 
 export default function HomeNavigation(): JSX.Element {
   const [open, setOpen] = useState(false);
@@ -99,7 +83,7 @@ export default function HomeNavigation(): JSX.Element {
           onClick={() => setOpen(false)}
         >
           <LiquidGlassIcon size="lg">
-            <StarMark />
+            <SculptedIcon kind="star" size={32} />
           </LiquidGlassIcon>{" "}
           GlowingStar
         </Link>

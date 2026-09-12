@@ -190,20 +190,21 @@
   position: relative;
   align-self: stretch;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   min-width: 0;
-  margin: -28px -35px -5px -35px;
+  margin: -28px -25px -5px -25px;
 }
 .fieldMotion {
   position: relative;
   width: 100%;
-  aspect-ratio: 620 / 680;
-  max-height: 600px;
+  aspect-ratio: 620 / 540;
+  max-height: 490px;
   isolation: isolate;
 }
 .sculptureCanvas,
-.sculptureFallback,
-.sculptureAnnotations {
+.sculptureFallback {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -218,6 +219,27 @@
 }
 .fieldMotion[data-sculpture-renderer="webgl"] .sculptureFallback {
   visibility: hidden;
+}
+.fieldMotion[data-sculpture-renderer="fallback"] .sculptureMarker {
+  display: none;
+}
+.sculptureMarker {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border: 1px solid #fff9e8;
+  border-radius: 50%;
+  background: #735018;
+  color: #fff8e7;
+  box-shadow:
+    0 2px 8px #684c3b30,
+    inset 0 1px 2px #fff6ce55;
+  font-family: var(--font-plex), monospace;
+  font-size: 10px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 .sculptureAtmosphere {
   position: absolute;
@@ -236,19 +258,65 @@
   background: #8e784520;
   filter: blur(15px);
 }
-.fieldCaption {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
+.sculptureControls {
+  width: min(100% - 42px, 440px);
+  margin: -9px auto 8px;
+  position: relative;
+}
+.sculptureControlHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--muted);
+  font-family: var(--font-plex), monospace;
+  font-size: 9px;
+  letter-spacing: 0.75px;
+}
+.sculptureTabs {
+  display: grid;
+  grid-template-columns: 1fr 1.36fr 1fr;
+  gap: 5px;
+  padding: 4px;
+  border: 1px solid #d9d5c7;
+  border-radius: 10px;
+  background: #eeece28a;
+}
+.sculptureTabs button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  text-align: center;
-  color: var(--muted);
+  gap: 8px;
+  min-width: 0;
+  min-height: 44px;
+  border-radius: 7px;
+  padding: 7px 8px;
+  color: #636155;
+  font-size: 11px;
+}
+.sculptureTabs button > span {
   font-family: var(--font-plex), monospace;
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 9px;
+  color: #867554;
+}
+.sculptureTabs button[aria-selected="true"] {
+  background: linear-gradient(145deg, #fffdf5, #f1e7ce);
+  color: #523d16;
+  box-shadow:
+    0 1px 4px #77603b22,
+    inset 0 1px 0 #fff;
+}
+.sculptureTabs button[aria-selected="true"] > span {
+  color: #755217;
+}
+.sculptureExplanation {
+  min-height: 53px;
+  padding: 13px 5px 0;
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--muted);
+  text-align: center;
 }
 .fieldPlayback {
   display: inline-flex;
@@ -294,11 +362,21 @@
   gap: 35px;
   padding-block: 118px 125px;
 }
-.mission > .eyebrow,
-.about > .eyebrow {
+.sectionRail {
   align-self: start;
   padding-top: 10px;
   color: var(--muted);
+}
+.railSculpture {
+  margin-top: 32px;
+  margin-left: -10px;
+}
+.contactSignature {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-left: -10px;
+  margin-bottom: 6px;
 }
 .missionBody {
   display: grid;
@@ -364,7 +442,7 @@
 }
 .researchItem summary {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 34px;
+  grid-template-columns: 64px 1fr 1fr 34px;
   gap: 24px;
   align-items: center;
   padding-block: 31px;
@@ -379,7 +457,7 @@
 }
 .researchNumber {
   align-self: start;
-  padding-top: 8px;
+  padding-top: 0;
   color: var(--gold);
   font-size: 11px;
   font-family: var(--font-plex), monospace;
@@ -480,89 +558,6 @@
 }
 .workCopy .textLink:hover {
   color: #fff;
-}
-.learningExample {
-  background: #f2f0e6;
-  color: var(--ink);
-  rotate: -1deg;
-}
-.exampleHeader {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 20px 25px;
-  border-bottom: 1px solid #d8d6ca;
-  font-size: 10px;
-}
-.exampleHeader svg {
-  width: 18px;
-  height: 18px;
-  color: var(--gold);
-}
-.exampleHeader > span:last-child {
-  margin-left: auto;
-  color: var(--muted);
-  font-size: 8px;
-}
-.conversation {
-  padding: 30px 32px 25px;
-}
-.speaker {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--muted);
-}
-.learnerQuestion {
-  margin-top: 14px;
-  font-size: 20px;
-  line-height: 1.55;
-  letter-spacing: -0.6px;
-}
-.tutorResponse {
-  margin-top: 27px;
-  padding: 24px 23px;
-  background: #e7e5d8;
-}
-.tutorResponse .speaker svg {
-  width: 14px;
-  height: 14px;
-  color: var(--gold);
-}
-.tutorResponse > p:last-child {
-  margin-top: 12px;
-  font-family: var(--font-playfair), Georgia, serif;
-  font-size: 18px;
-  line-height: 1.6;
-}
-.reflection {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 24px;
-  font-size: 9px;
-  color: var(--muted);
-}
-.reflectionLine {
-  height: 1px;
-  width: 23px;
-  background: var(--gold);
-}
-.learningLoop {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  padding: 21px 32px;
-  border-top: 1px solid #d8d6ca;
-  font-size: 9px;
-  letter-spacing: 0.4px;
-}
-.learningLoop svg {
-  color: var(--gold);
 }
 .researchPrinciple {
   display: grid;
@@ -667,10 +662,6 @@
 .footer .wordmark {
   font-size: 20px;
 }
-.footer .wordmark svg {
-  width: 23px;
-  height: 23px;
-}
 .footer p {
   margin-top: 14px;
   color: var(--muted);
@@ -720,7 +711,7 @@
     gap: 45px;
   }
   .researchItem summary {
-    grid-template-columns: 34px 1fr 1fr 34px;
+    grid-template-columns: 64px 1fr 1fr 34px;
     gap: 18px;
   }
   .researchDetail {
@@ -819,14 +810,23 @@
   .learningField {
     width: min(100%, 460px);
     justify-self: center;
-    margin: -5px 0 15px;
+    margin: 5px 0 23px;
   }
   .fieldMotion {
-    margin-block: -15px;
+    margin-block: -8px;
   }
-  .fieldCaption {
-    bottom: -1px;
-    font-size: 9px;
+  .sculptureControls {
+    width: 100%;
+    margin-top: -8px;
+  }
+  .sculptureTabs button {
+    flex-direction: column;
+    gap: 3px;
+    font-size: 10px;
+    padding-inline: 4px;
+  }
+  .sculptureExplanation {
+    min-height: 65px;
   }
   .heroFootnote {
     bottom: 14px;
@@ -844,10 +844,20 @@
   .mission {
     padding-block: 65px 70px;
   }
-  .mission > .eyebrow,
-  .about > .eyebrow,
+  .sectionRail,
   .sectionHeading > .eyebrow {
     padding-top: 0;
+  }
+  .sectionRail {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .railSculpture {
+    width: 64px !important;
+    height: 64px !important;
+    margin: 0;
   }
   .missionBody {
     grid-template-columns: 1fr;
@@ -868,10 +878,14 @@
     margin-top: 35px;
   }
   .researchItem summary {
-    grid-template-columns: 34px 1fr 34px;
+    grid-template-columns: 48px 1fr 34px;
     column-gap: 12px;
     row-gap: 15px;
     padding-block: 25px;
+  }
+  .researchSculpture {
+    width: 48px !important;
+    height: 48px !important;
   }
   .researchTitle {
     grid-column: 2;
@@ -909,31 +923,6 @@
   }
   .workCopy > p {
     max-width: 540px;
-  }
-  .learningExample {
-    margin: 0 3px;
-  }
-  .exampleHeader {
-    padding: 16px;
-    gap: 6px;
-  }
-  .exampleHeader > span:last-child {
-    font-size: 7px;
-  }
-  .conversation {
-    padding: 24px 20px;
-  }
-  .learnerQuestion {
-    font-size: 18px;
-  }
-  .tutorResponse {
-    padding: 20px 16px;
-  }
-  .tutorResponse > p:last-child {
-    font-size: 17px;
-  }
-  .learningLoop {
-    padding: 20px;
   }
   .researchPrinciple {
     grid-template-columns: 1fr;

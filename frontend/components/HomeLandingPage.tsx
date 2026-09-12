@@ -1,17 +1,13 @@
-import {
-  ArrowDown,
-  ArrowRight,
-  ArrowUpRight,
-  Brain,
-  Compass,
-  Focus,
-  Plus,
-} from "lucide-react";
+import { ArrowDown, ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
-import HomeNavigation, { StarMark } from "@/components/home/HomeNavigation";
+import HomeNavigation from "@/components/home/HomeNavigation";
 import styles from "@/components/home/home.module.css";
 import HomeMotion from "@/components/home/HomeMotion";
 import LearningSculpture from "@/components/home/LearningSculpture";
+import LearningExperience from "@/components/home/LearningExperience";
+import SculptedIcon, {
+  type SculptedIconKind,
+} from "@/components/home/SculptedIcon";
 import LiquidGlassIcon from "@/components/home/LiquidGlassIcon";
 
 const CONTACT_HREF = "mailto:support@glowingstar.ai";
@@ -19,7 +15,7 @@ const CONTACT_HREF = "mailto:support@glowingstar.ai";
 const researchDirections = [
   {
     number: "01",
-    icon: Brain,
+    icon: "understanding" as SculptedIconKind,
     category: "Understanding",
     title: "Learning that lasts.",
     description:
@@ -30,7 +26,7 @@ const researchDirections = [
   },
   {
     number: "02",
-    icon: Focus,
+    icon: "metacognition" as SculptedIconKind,
     category: "Metacognition",
     title: "Knowing what you know.",
     description:
@@ -41,7 +37,7 @@ const researchDirections = [
   },
   {
     number: "03",
-    icon: Compass,
+    icon: "agency" as SculptedIconKind,
     category: "Agency",
     title: "People in the driver’s seat.",
     description:
@@ -97,7 +93,14 @@ export default function HomeLandingPage(): JSX.Element {
           className={`${styles.mission} ${styles.container}`}
           aria-labelledby="mission-heading"
         >
-          <p className={styles.eyebrow}>01 / Our conviction</p>
+          <div className={styles.sectionRail}>
+            <p className={styles.eyebrow}>01 / Our conviction</p>
+            <SculptedIcon
+              kind="curiosity"
+              size={112}
+              className={styles.railSculpture}
+            />
+          </div>
           <div>
             <h2 id="mission-heading" data-motion-reveal>
               The next breakthrough
@@ -161,9 +164,11 @@ export default function HomeLandingPage(): JSX.Element {
               >
                 <summary>
                   <span className={styles.researchNumber}>
-                    <LiquidGlassIcon>
-                      <direction.icon strokeWidth={1.5} aria-hidden="true" />
-                    </LiquidGlassIcon>
+                    <SculptedIcon
+                      kind={direction.icon}
+                      size={64}
+                      className={styles.researchSculpture}
+                    />
                   </span>
                   <span className={styles.researchTitle}>
                     <span className={styles.eyebrow}>
@@ -237,55 +242,7 @@ export default function HomeLandingPage(): JSX.Element {
                   </LiquidGlassIcon>
                 </a>
               </div>
-              <div
-                className={styles.learningExample}
-                data-motion-reveal
-                data-motion-delay="0.12"
-              >
-                <div className={styles.exampleHeader}>
-                  <LiquidGlassIcon size="sm">
-                    <StarMark />
-                  </LiquidGlassIcon>
-                  <span>A moment of learning</span>
-                  <span>Illustrative exchange</span>
-                </div>
-                <div className={styles.conversation}>
-                  <p className={styles.speaker}>Learner</p>
-                  <p className={styles.learnerQuestion}>
-                    If AI can give me the answer,
-                    <br />
-                    why do I need to understand it?
-                  </p>
-                  <div className={styles.tutorResponse}>
-                    <p className={styles.speaker}>
-                      <LiquidGlassIcon size="sm">
-                        <StarMark />
-                      </LiquidGlassIcon>{" "}
-                      GlowingStar
-                    </p>
-                    <p>
-                      Let’s start with a different question.
-                      <br />
-                      How would you know if the answer was wrong?
-                    </p>
-                  </div>
-                  <div className={styles.reflection}>
-                    <span className={styles.reflectionLine} />
-                    <span>A prompt to think a little further.</span>
-                  </div>
-                </div>
-                <div className={styles.learningLoop}>
-                  <span>Question</span>
-                  <LiquidGlassIcon size="sm">
-                    <ArrowRight aria-hidden="true" />
-                  </LiquidGlassIcon>
-                  <span>Reflect</span>
-                  <LiquidGlassIcon size="sm">
-                    <ArrowRight aria-hidden="true" />
-                  </LiquidGlassIcon>
-                  <span>Understand</span>
-                </div>
-              </div>
+              <LearningExperience />
             </div>
             <div className={styles.researchPrinciple}>
               <span className={styles.eyebrow}>Our standard</span>
@@ -302,7 +259,14 @@ export default function HomeLandingPage(): JSX.Element {
           className={`${styles.about} ${styles.container}`}
           aria-labelledby="about-heading"
         >
-          <p className={styles.eyebrow}>04 / The people behind the work</p>
+          <div className={styles.sectionRail}>
+            <p className={styles.eyebrow}>04 / The people behind the work</p>
+            <SculptedIcon
+              kind="connection"
+              size={112}
+              className={styles.railSculpture}
+            />
+          </div>
           <div>
             <h2 id="about-heading" data-motion-reveal>
               Researchers. Builders.
@@ -341,7 +305,10 @@ export default function HomeLandingPage(): JSX.Element {
         >
           <div className={`${styles.container} ${styles.contactInner}`}>
             <div>
-              <p className={styles.eyebrow}>The frontier is open</p>
+              <div className={styles.contactSignature}>
+                <SculptedIcon kind="star" size={68} />
+                <p className={styles.eyebrow}>The frontier is open</p>
+              </div>
               <h2 id="contact-heading" data-motion-reveal>
                 Let’s advance
                 <br />
@@ -382,8 +349,8 @@ export default function HomeLandingPage(): JSX.Element {
             href="/"
             aria-label="GlowingStar home"
           >
-            <LiquidGlassIcon>
-              <StarMark />
+            <LiquidGlassIcon size="lg">
+              <SculptedIcon kind="star" size={32} />
             </LiquidGlassIcon>{" "}
             GlowingStar
           </Link>

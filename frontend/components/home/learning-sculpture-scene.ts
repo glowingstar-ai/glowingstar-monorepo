@@ -1,17 +1,29 @@
 import * as THREE from "three";
 
 const TAU = Math.PI * 2;
+const BAND_SEGMENTS = 192;
+const BAND_SIDES = 16;
+
+export interface LearningSculptureAnchor {
+  /** Normalized canvas coordinates, measured from the top-left corner. */
+  x: number;
+  y: number;
+  visible: boolean;
+}
 
 export interface LearningSculptureScene {
   render: (progress: number) => void;
   resize: (width: number, height: number) => void;
+  /** Outer, middle, and inner bands represent Curiosity, Understanding, Agency. */
+  focus: (index: number) => void;
+  getAnchor: () => LearningSculptureAnchor;
   dispose: () => void;
 }
 
 /** A flattened, gently tapered torus, with rounded edges that catch the light. */
 function createBandGeometry(radius: number, width: number, seed: number) {
-  const segments = 192;
-  const sides = 16;
+  const segments = BAND_SEGMENTS;
+  const sides = BAND_SIDES;
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
@@ -216,20 +228,36 @@ export function createLearningSculpture(
     const sculpture = new THREE.Group();
     scene.add(sculpture);
 
+    let focusedBand = 0;
+    const bandAnchors: THREE.Vector3[] = [];
+    const projectedAnchor = new THREE.Vector3();
     const bands = [
-      { radius: 1.52, width: 0.14, color: 0xcaa260 },
-      { radius: 1.2, width: 0.115, color: 0xb98d42 },
-      { radius: 0.89, width: 0.09, color: 0xd5b577 },
-    ].map(({ radius, width, color }, index) => {
+      { radius: 1.52, width: 0.14 },
+      { radius: 1.2, width: 0.115 },
+      { radius: 0.89, width: 0.09 },
+    ].map(({ radius, width }, index) => {
       const geometry = createBandGeometry(radius, width, index * 1.7);
       geometries.push(geometry);
+      // Attach the annotation to an actual surface vertex, not an approximate
+      // orbit. Its world position follows both this band and the sculpture.
+      const anchorVertex =
+        Math.round(BAND_SEGMENTS / 6) * (BAND_SIDES + 1) + BAND_SIDES / 4;
+      bandAnchors.push(
+        new THREE.Vector3().fromBufferAttribute(
+          geometry.getAttribute("position"),
+          anchorVertex,
+        ),
+      );
+      const selected = index === focusedBand;
       const material = new THREE.MeshPhysicalMaterial({
-        color,
-        metalness: 0.96,
-        roughness: 0.24,
+        color: selected ? 0xc58a24 : 0xd8d2c2,
+        metalness: selected ? 0.96 : 0.5,
+        roughness: selected ? 0.24 : 0.38,
         clearcoat: 0.35,
         clearcoatRoughness: 0.2,
-        envMapIntensity: 1.6,
+        envMapIntensity: selected ? 1.7 : 0.85,
+        emissive: 0xd69221,
+        emissiveIntensity: selected ? 0.055 : 0,
         anisotropy: 0.35,
       });
       materials.push(material);
@@ -294,6 +322,57 @@ export function createLearningSculpture(
       renderer.render(scene, camera);
     };
 
+    const focus = (index: number) => {
+      if (
+        disposed ||
+        !Number.isInteger(index) ||
+        index < 0 ||
+        index >= bands.length
+      ) {
+        return;
+      }
+      focusedBand = index;
+      bands.forEach((band, bandIndex) => {
+        const selected = bandIndex === focusedBand;
+        band.material.color.setHex(selected ? 0xc58a24 : 0xd8d2c2);
+        band.material.metalness = selected ? 0.96 : 0.5;
+        band.material.roughness = selected ? 0.24 : 0.38;
+        band.material.envMapIntensity = selected ? 1.7 : 0.85;
+        band.material.emissiveIntensity = selected ? 0.055 : 0;
+      });
+      // Selection still responds when the caller has paused its Motion clock.
+      render(lastProgress);
+    };
+
+    const getAnchor = (): LearningSculptureAnchor => {
+      if (disposed) return { x: 0.5, y: 0.5, visible: false };
+      const band = bands[focusedBand];
+      projectedAnchor.copy(bandAnchors[focusedBand]);
+      band.localToWorld(projectedAnchor);
+      camera.updateMatrixWorld();
+      projectedAnchor.project(camera);
+      if (
+        !Number.isFinite(projectedAnchor.x) ||
+        !Number.isFinite(projectedAnchor.y) ||
+        !Number.isFinite(projectedAnchor.z)
+      ) {
+        return { x: 0.5, y: 0.5, visible: false };
+      }
+      const x = (projectedAnchor.x + 1) / 2;
+      const y = (1 - projectedAnchor.y) / 2;
+      return {
+        x: THREE.MathUtils.clamp(x, 0, 1),
+        y: THREE.MathUtils.clamp(y, 0, 1),
+        visible:
+          x >= 0 &&
+          x <= 1 &&
+          y >= 0 &&
+          y <= 1 &&
+          projectedAnchor.z >= -1 &&
+          projectedAnchor.z <= 1,
+      };
+    };
+
     const resize = (width: number, height: number) => {
       if (disposed || !Number.isFinite(width) || !Number.isFinite(height))
         return;
@@ -323,7 +402,7 @@ export function createLearningSculpture(
       render(lastProgress);
     };
 
-    return { render, resize, dispose };
+    return { render, resize, focus, getAnchor, dispose };
   } catch (error) {
     dispose();
     throw error;

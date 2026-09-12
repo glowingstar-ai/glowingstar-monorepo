@@ -1,5 +1,15 @@
 # Development log
 
+## 2026-09-12: Connected 3D learning interface
+
+- Task: User-requested clarification of the moving sculpture's labels and expansion of suitable 3D visuals throughout the landing page, including the GlowingStar icon. No Linear ticket was supplied.
+- Status: Implementation and validation complete for PR #72.
+- Replaced fixed leader labels with keyboard-accessible concept tabs, selected-ring highlighting, a numbered marker attached to the physical ring, and matching explanations. Selection also works while paused.
+- Added beveled gold brand stars and sculpted SVG icons across conviction, research, team, collaboration, and footer. Replaced the learning example with three visible CSS 3D paper layers and meaningful step controls. Kept one WebGL canvas.
+- Validation: production build, TypeScript, scoped ESLint, Prettier, and whitespace checks pass; all 24 static pages generated. Existing Saint Paul hook warnings remain unchanged.
+- Browser checks verified moving and paused markers, ring selection and explanations, arrow/End keyboard focus, raised learning cards, mobile menu Escape/focus return, unique SVG IDs, and responsive widths of 320, 390, 768, 1024, and 1260px without overflow. Corrected tablet icon spacing and a legacy footer icon size override. Production route navigation produced no browser warnings or errors.
+- Geometry review verified anchors across all three bands, 121 poses, and four aspect ratios, including seamless endpoints and paused selection.
+
 ## 2026-09-12: 3D learning sculpture
 
 - Task: User-requested replacement of the hero ribbon with a new animated 3D form. No Linear ticket was supplied.

@@ -41,9 +41,17 @@ The abstract artwork is an original orbital sculpture representing human potenti
 
 ## Motion and icon materials
 
-The page uses the existing Motion dependency for staggered hero entrances, one-time scroll reveals, reading progress, disclosure feedback, and mobile navigation. The hero is a Three.js sculpture with three sculpted metal bands around a pearl core, procedural studio reflections, and real depth and shadows. Motion drives a seamless 24-second rotation with gentle precession. Labels remain stationary. A glass playback control pauses and resumes at the same phase. The animation stops when offscreen, when the browser tab is hidden, or when reduced motion is enabled. Content remains visible in server-rendered HTML, and motion preferences are observed throughout the session. See [Motion's React animation documentation](https://motion.dev/docs/react-use-animate).
+The page uses the existing Motion dependency for staggered hero entrances, one-time scroll reveals, reading progress, disclosure feedback, and mobile navigation. The hero is a Three.js sculpture with three sculpted metal bands around a pearl core, procedural studio reflections, and real depth and shadows. Motion drives a seamless 24-second rotation with gentle precession. A glass playback control pauses and resumes at the same phase. The animation stops when offscreen, when the browser tab is hidden, or when reduced motion is enabled. Content remains visible in server-rendered HTML, and motion preferences are observed throughout the session. See [Motion's React animation documentation](https://motion.dev/docs/react-use-animate).
 
 Icons sit in reusable liquid glass surfaces with translucent gold-tinted backgrounds, layered rim highlights, hover reflections, and blur where supported. A solid fallback preserves clarity in browsers without backdrop filtering. Light and dark versions match their surrounding sections.
+
+## Connected interactions and dimensional visual system
+
+The hero's fixed leader lines have been replaced by three concept controls: Curiosity, Understanding, and Agency. Selecting a concept highlights its physical ring in gold and gives the remaining rings a subdued pearl treatment. One numbered marker is projected from a real point on the selected ring, so it travels with that ring. The matching control displays a concise explanation, and selection continues to work while the animation is paused. The controls use accessible tab semantics with Arrow, Home, and End key support. The sculpture is a conceptual metaphor for learning capacities.
+
+The eight-point GlowingStar mark now has a beveled gold surface. Matching sculpted icons depict curiosity in the conviction section, interlocking ideas / reflection / direction in the research rows, and human connections in the team section. The star repeats in the navigation, learning example, collaboration section, and footer. These small illustrations use server-rendered SVG facets, gradients, depth, and shadows with restrained CSS 3D hover feedback. They do not create additional WebGL contexts.
+
+The learning example uses three visible paper layers for Question, Reflect, and Understand. Selecting a step raises the corresponding layer and explains its purpose. The original learner and tutor exchange stays visible, and the new practice prompt is part of the explicitly illustrative example. Subtle pointer tilt uses CSS perspective and Motion; reduced motion disables the moving transforms. Primary reading text and action controls retain familiar layouts and liquid glass surfaces.
 
 ## 3D library selection
 
