@@ -1,0 +1,79 @@
+# Frontier Lab for Human Learning: landing page direction
+
+Reference review: 2026-09-12. Sources were read on their official websites and inspected visually in a browser.
+
+## Positioning
+
+The user's title: **Frontier Lab for Human Learning**
+
+The user's mission: **we work to ensure that as machines get smarter, humans do too.**
+
+The homepage presents GlowingStar as a lab with a clear purpose, specific research questions, and a current product through which to explore them. Human learning is the organizing idea across the page.
+
+## References
+
+| Official website | Narrative lesson | Visual lesson |
+| --- | --- | --- |
+| [OpenAI: About](https://openai.com/about/) | Establish identity and mission before explaining the work and inviting contributors. Connect a long-term purpose to research and products. | Strong typographic hierarchy and generous spacing make the central purpose easy to find. |
+| [Anthropic](https://www.anthropic.com/) | Connect research and products to a lasting public purpose, then show concrete work. | A warm background, editorial typography, and clear feature sections create an approachable research identity. |
+| [Thinking Machines Lab](https://thinkingmachines.ai/) | Explain the gap that motivates the lab, then describe how research, products, and collaboration address it. | Sparse presentation and a readable serif text column give the argument room to develop. |
+| [Safe Superintelligence](https://ssi.inc/) | Let one mission determine the company's scope and invitation to join. | A narrow text column and minimal ornament concentrate attention on the thesis. |
+| [Humans&](https://humansand.ai/) | Begin with an account of human progress, then explain the technical work that follows from it. | Warm paper and an expressive abstract brand visual connect technical ambition to people. |
+| [World Labs](https://www.worldlabs.ai/) | Name a distinct field, explain what it enables, and introduce a concrete product. | An expansive serif category statement establishes the field before product details appear. |
+| [Periodic Labs](https://periodic.com/) | Explain the mechanism, the unresolved bottleneck, the initial focus, and practical applications. | Restrained labels, warm neutrals, and readable prose support a focused scientific story. |
+
+These are references for narrative organization and general visual principles. The homepage uses original wording and artwork.
+
+## Applied homepage sequence
+
+1. **Mission:** Establish the human learning frontier with the title and mission above. Offer a clear route into the work.
+2. **Conviction:** Explain why expanding machine capability makes human understanding and growth an important area of work.
+3. **Research directions:** Frame understanding, metacognition, and agency as questions the lab wants to investigate. Make each direction concrete enough for a reader to understand its relevance to learning.
+4. **Current tutoring platform:** Show the existing learning product as the current expression of the mission. Describe what learners can do and provide a direct route to discuss a learning research partnership.
+5. **Team:** Introduce the people behind the work using supported information already present in the project.
+6. **Collaboration:** Invite people to help develop the work through an existing contact destination.
+
+## Claims and visual treatment
+
+Research directions describe aspirations and open questions. They should not imply published results, measured learning gains, validated interventions, or a completed research program. Product descriptions should reflect functionality supported by the current platform. Team credentials should remain grounded in existing information.
+
+The abstract artwork is an original orbital sculpture representing human potential. It is decorative and conceptual, not a chart, benchmark, experiment, or scientific result. The visual system uses warm neutrals, clear type hierarchy, generous space, and restrained separators to keep attention on the mission and the work.
+
+## Readable type scale
+
+The page uses rem-based sizes with a default 18px for body paragraphs, 16px for navigation, actions, and explanatory controls, and a 14px minimum for short labels, numbers, and footnotes. Body line heights are unitless and generally 1.65 to 1.85. Fluid headings retain rem bounds. Mobile layouts rearrange content instead of reducing the reading size: research descriptions span the available width, card headings wrap, compact controls become vertical, and the navigation collapses at 1000px. The hero footnote stays in document flow so wrapping cannot collide with adjacent content. Manifesto paragraphs use 18px with 14px labels and stronger label contrast.
+
+The sizing follows [USWDS typography guidance](https://designsystem.digital.gov/components/typography/), which recommends at least 16px for most text and sparing use of smaller companion text. Relative units, flexible containers, and unclipped controls support the enlargement goal described by [WCAG's Resize Text guidance](https://www.w3.org/WAI/WCAG21/Understanding/resize-text). These choices are not a claim of a complete accessibility audit.
+
+## Motion and icon materials
+
+The page uses the existing Motion dependency for staggered hero entrances, one-time scroll reveals, reading progress, disclosure feedback, and mobile navigation. The hero is a Three.js sculpture with three sculpted metal bands around a pearl core, procedural studio reflections, and real depth and shadows. Motion drives a seamless 24-second rotation with gentle precession. A glass playback control pauses and resumes at the same phase. The animation stops when offscreen, when the browser tab is hidden, or when reduced motion is enabled. Content remains visible in server-rendered HTML, and motion preferences are observed throughout the session. See [Motion's React animation documentation](https://motion.dev/docs/react-use-animate).
+
+Icons sit in reusable liquid glass surfaces with translucent gold-tinted backgrounds, layered rim highlights, hover reflections, and blur where supported. A solid fallback preserves clarity in browsers without backdrop filtering. Light and dark versions match their surrounding sections.
+
+## Connected interactions and dimensional visual system
+
+The hero's fixed leader lines have been replaced by three concept controls: Curiosity, Understanding, and Agency. Selecting a concept highlights its physical ring in gold and gives the remaining rings a subdued pearl treatment. One numbered marker is projected from a real point on the selected ring, so it travels with that ring. The matching control displays a concise explanation, and selection continues to work while the animation is paused. The controls use accessible tab semantics with Arrow, Home, and End key support. The sculpture is a conceptual metaphor for learning capacities.
+
+The GlowingStar mark is a rounded, smiling five-point gold mascot based on the user's visual reference. It repeats in the navigation, learning example, collaboration section, footer, and manifesto, with matching favicon and organization metadata. The transparent 256px PNG is about 59 KB and shares restrained CSS 3D hover feedback with the sculpted icons. Other icons depict curiosity in the conviction section, interlocking ideas / reflection / direction in the research rows, and human connections in the team section using server-rendered SVG facets, gradients, depth, and shadows. These small illustrations do not create additional WebGL contexts.
+
+The learning example uses three visible paper layers for Question, Reflect, and Understand. Selecting a step raises the corresponding layer and explains its purpose. The original learner and tutor exchange stays visible, and the new practice prompt is part of the explicitly illustrative example. Subtle pointer tilt uses CSS perspective and Motion; reduced motion disables the moving transforms. Primary reading text and action controls retain familiar layouts and liquid glass surfaces.
+
+### Mascot asset provenance
+
+Asset: `frontend/public/glowingstar-mascot.png`. Generated with the built-in imagegen tool from the user-supplied smiling gold star reference, then resized to 256px with alpha preserved. Existing product logo files remain available to their current consumers.
+
+Final generation prompt:
+
+> Use case: stylized-concept. Asset type: transparent 3D mascot icon for the GlowingStar landing page, displayed at 32px to 68px. Input image is a visual reference for the rounded gold five-point smiling star, not for its background. Create one original polished 3D star mascot matching the reference's warm friendly character: plump inflated rounded FIVE-point star, glossy golden yellow body, soft honey amber shaded edges, buttery cream highlights, two small dark brown glossy eyes with tiny white glints and a simple curved little smiling mouth. Slightly rounded cheeks, no arms, no legs, no accessories. Front facing, upright, centered, recognizable silhouette, wide cheeks and stubby round bottom points. Gently lit from upper left with enough soft fill to remain readable on both ivory and dark olive backgrounds. Smooth sculptural surface without glitter or texture noise. Close square framing with the star occupying 88 percent of the image width and height and all tips fully inside the canvas. Crucial: genuinely transparent alpha background, clean antialiased cutout edges; no black scene, no floor, no background reflection, no baked drop shadow, no border, no lettering, no watermark. One icon only.
+
+## 3D library selection
+
+| Library | Fit for this page |
+| --- | --- |
+| [Three.js](https://threejs.org/docs/pages/WebGLRenderer.html) | Selected for direct control of custom geometry, physical materials, lighting, and the existing Motion playback lifecycle. |
+| [React Three Fiber](https://r3f.docs.pmnd.rs/getting-started/installation) and [Drei](https://github.com/pmndrs/drei) | Useful when expanding to several reusable React scenes. Fiber 8 supports this project's React 18; Fiber 9 requires React 19. |
+| [Spline](https://github.com/splinetool/react-spline) | Suitable for an editor-led scene design workflow with React/Next.js embedding. This sculpture is defined in source and does not require an external scene. |
+| [OGL](https://github.com/oframe/ogl) | A smaller WebGL abstraction suited to custom shader effects, with fewer ready-made materials than Three.js. |
+
+The renderer is dynamically imported when the artwork enters view. An SVG still is present in the initial HTML and remains available if WebGL cannot initialize or its context is lost. Device pixel ratio is capped at 1.75. Geometry, materials, environment maps, shadows, and the renderer are disposed on unmount. The sculpture uses no downloaded models or textures. See Three.js guidance on [on-demand rendering](https://threejs.org/manual/en/rendering-on-demand.html) and [resource cleanup](https://threejs.org/manual/en/cleanup.html).

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { teamLogoList, WAITLIST_URL } from "@/lib/site-content";
+import { teamLogoList } from "@/lib/site-content";
+import SculptedIcon from "./home/SculptedIcon";
 
 type ManifestoSection = {
   heading: string;
@@ -69,71 +71,65 @@ const paperTextureSvg = `
   .replace(/\s{2,}/g, " ");
 
 const paperTextureDataUri = `url("data:image/svg+xml,${encodeURIComponent(
-  paperTextureSvg
+  paperTextureSvg,
 )}")`;
 
 const sections: ManifestoSection[] = [
   {
-    heading: "A New Kind of Institution",
+    heading: "Human Capability Is a Frontier",
     paragraphs: [
-      "Knowledge is no longer scarce. Access is no longer the main bottleneck. The challenge now is helping people learn continuously, think clearly, stay grounded, and use AI responsibly in a world where every learner will have intelligent support close at hand.",
-      "That requires a different institution. Not a traditional university with AI bolted on. Not a digital campus that simply automates lectures, assignments, and grading. An AI-native university is designed from the ground up for co-creation, judgment, and lifelong growth.",
+      "GlowingStar is a frontier lab for human learning. We build and study AI learning systems with a long-term ambition: to expand what people can understand, create, and do.",
+      "As machines become more capable, we believe human learning deserves the same depth of ambition. Progress should mean more people able to ask good questions, reason through uncertainty, and contribute ideas of their own.",
     ],
   },
   {
-    heading: "A New Social Contract",
+    heading: "Build for the Person Who Is Learning",
     paragraphs: [
-      "The old model fit a slower world: students received content, teachers delivered it, schools certified it, and society decided what counted. That world assumed knowledge changed gradually and institutions could update themselves slowly without losing relevance.",
-      "In the GenAI era, the learner becomes the owner of a living learning journey. Memorization matters less than the ability to ask better questions, evaluate evidence, synthesize insight, collaborate across disciplines, and turn ideas into real-world impact.",
-      "Teachers do not disappear. Their role becomes more important and more human: learning architect, mentor, coach, and guardian of standards. Institutions become trusted platforms for human development rather than gatekeepers of scarce knowledge.",
+      "An answer can resolve a question. A learning experience should help someone handle the next question with greater understanding. We design around that ambition, creating opportunities to practice, explain, receive feedback, and try again.",
+      "Our work begins with AI tutoring and assessment. We want these systems to adapt to learners while preserving the effort, curiosity, and reflection through which capability develops.",
     ],
   },
   {
-    heading: "Learning Across a Lifetime",
+    heading: "Bring Research Into Practice",
     paragraphs: [
-      "Education can no longer be treated as a phase at the beginning of life. Careers are longer, less linear, and more unstable. The ability to learn, unlearn, and relearn is becoming more valuable than any static body of knowledge.",
-      "An AI-native university should be a lifelong relationship. It should support learners through school, work, career transitions, entrepreneurship, leadership, and reinvention. Continuous learning is not a slogan. It is the core product.",
-      "At the center of that model sits a personal learning context layer: a living record of goals, strengths, struggles, preferences, constraints, and growth. It is more than a transcript or dashboard. It is a map of who the learner is becoming, and it should belong to the learner.",
+      "We connect building with studying how people learn. Classroom deployments bring our systems into real learning settings, where teachers, students, and researchers can help identify what works, what breaks, and what deserves a closer look.",
+      "Our standard is to test our assumptions, make limitations clear, and let the evidence shape the next iteration. A promising interaction is a starting point for investigation. Durable learning remains something to demonstrate.",
     ],
   },
   {
-    heading: "A Faculty of Humans and Agents",
+    heading: "Protect Independent Judgment",
     paragraphs: [
-      "On top of that context sits a new kind of faculty: specialized AI agents working under human guidance. One agent can transform trusted material into adaptive lessons and simulations. Another can keep the curriculum current. Another can coach motivation, reflection, and momentum. Another can track mastery and recommend the next stretch of work.",
-      "These systems expand what good teaching can look like at scale, but they do not replace educators. Humans remain responsible for standards, ethics, interpretation, mentorship, and the design of meaningful learning experiences.",
+      "We want people to collaborate with AI while remaining able to question it. That means practicing how to check a claim, explain a choice, recognize uncertainty, and decide when an answer needs more scrutiny.",
+      "Assessment should help us understand those abilities. Alongside answers and scores, we study the learning process: the questions people ask, the reasoning they share, and how their confidence relates to their understanding.",
     ],
   },
   {
-    heading: "Speed With Depth",
+    heading: "Keep Learning Across a Lifetime",
     paragraphs: [
-      "The promise is not convenience for its own sake. It is a dramatic reduction in the time between curiosity and capability. AI can compress feedback loops from weeks to moments, helping learners practice more, get explanations in the right form, and progress at a pace that is demanding without becoming crushing.",
-      "But speed alone is not enough. Emotion, motivation, confidence, and belonging shape whether learning actually sticks. A serious learning system must be affect-aware without becoming invasive or manipulative. It should support the inner conditions that make growth possible.",
-      "Learning should feel rewarding, not punitive. It can be rigorous without being deadening. The point is not to remove challenge. The point is to make challenge meaningful, visible, and energizing.",
+      "Our horizon extends beyond a course or a credential. We want learning systems to support people as they enter new fields, take on harder problems, and find new directions throughout their lives.",
+      "That requires attention to motivation, confidence, and belonging alongside intellectual rigor. Our goal is to make meaningful challenge more accessible and help people build the capacity to keep learning.",
     ],
   },
   {
-    heading: "Social, Ethical, and Real",
+    heading: "Keep People in Control",
     paragraphs: [
-      "An AI-native university cannot become a solitary tutoring machine. Humans are social animals. We learn through dialogue, apprenticeship, collaboration, critique, and shared purpose. AI should reduce administrative friction so human time can shift toward mentorship, studio work, community, and conversation.",
-      "Real-world contribution must be part of the curriculum. Learners should build products, conduct research, support organizations, and work on real problems early and often. This is where motivation deepens and ethics becomes concrete.",
-      "The goal is not simply employability. It is whole-person flourishing: people who are more grounded, capable, connected, resilient, and able to contribute with dignity.",
+      "Learners should have a meaningful role in setting their goals and choosing how to pursue them. Educators should retain responsibility for standards, interpretation, and the human relationships at the center of teaching.",
+      "We believe useful personalization depends on trust. People should understand what information a learning system uses and why, and have clear ways to question its guidance. Agency is a design principle we intend to carry through every stage of our work.",
     ],
   },
   {
-    heading: "Trust, Judgment, and What Comes Next",
+    heading: "Build This Future Together",
     paragraphs: [
-      "Assessment must evolve. When AI can generate polished outputs in seconds, the final artifact alone no longer proves understanding. What matters is how learners frame problems, verify claims, document reasoning, navigate uncertainty, and use AI responsibly.",
-      "Trust is part of the product. A persistent learning context is only legitimate if learners understand what is stored, why it exists, how it is used, and how it can be corrected, exported, or deleted. Without trust, personalization becomes surveillance.",
-      "The goal is not to create students who merely survive the AI era. The goal is to cultivate people who can collaborate with AI without surrendering judgment, move faster without becoming shallower, and create value without losing care, character, or agency.",
-      "Not education as compliance. Education as awakening. Not credentials alone. Capability with character. Not narrow achievement. Whole-person flourishing. This is the university the AI era demands.",
+      "Human learning grows through conversation, mentorship, collaboration, and shared work. We want AI to strengthen those relationships and create more room for people to learn with and from one another.",
+      "This work calls for researchers, educators, builders, and learners to shape it together. We invite people who share our ambition to help us explore what learning can become, and what it will take to make that future useful to more people.",
     ],
   },
 ];
 
 export const manifestoMetadata: Metadata = {
-  title: "Manifesto",
+  title: "Human Learning Manifesto",
   description:
-    "A concise vision for an AI-native university built for lifelong learning, judgment, and human flourishing.",
+    "GlowingStar is a frontier lab for human learning. We work to ensure that as machines get smarter, humans do too.",
 };
 
 export default function ManifestoLandingPage(): JSX.Element {
@@ -161,24 +157,21 @@ export default function ManifestoLandingPage(): JSX.Element {
       <main className="relative mx-auto flex min-h-screen w-full max-w-3xl px-6 py-20 sm:px-10 sm:py-24 lg:py-28">
         <article className="w-full">
           <header className="border-b border-[#17120f]/10 pb-10">
-            <div className="inline-flex items-center gap-3">
-              <Image
-                src="/logo.png"
-                alt="GlowingStar"
-                width={40}
-                height={40}
-                priority
-                className="h-10 w-10 object-contain drop-shadow-[0_4px_12px_rgba(235,179,43,0.18)]"
-              />
-              <p className="font-heading text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
+            <Link
+              href="/"
+              aria-label="GlowingStar home"
+              className="inline-flex items-center gap-3"
+            >
+              <SculptedIcon kind="star" size={40} />
+              <p className="font-heading text-sm leading-6 uppercase tracking-[0.12em] text-[#17120f]/70">
                 Manifesto
               </p>
-            </div>
+            </Link>
             <h1 className="mt-4 font-heading text-4xl leading-tight sm:text-5xl">
-              The AI-Native University Manifesto
+              A Frontier Lab for Human Learning
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-[#17120f]/70">
-              Learning faster. Living fuller. Becoming more human.
+              We work to ensure that as machines get smarter, humans do too.
             </p>
           </header>
 
@@ -191,7 +184,7 @@ export default function ManifestoLandingPage(): JSX.Element {
                 {section.paragraphs.map((paragraph) => (
                   <p
                     key={paragraph}
-                    className="text-base leading-8 text-[#17120f]/78 sm:text-[1.05rem] sm:leading-9"
+                    className="text-lg leading-8 text-[#17120f]/78"
                   >
                     {paragraph}
                   </p>
@@ -202,8 +195,8 @@ export default function ManifestoLandingPage(): JSX.Element {
 
           <footer className="space-y-8 border-t border-[#17120f]/10 pt-12">
             <section className="rounded-[2rem] border border-[#17120f]/12 bg-[linear-gradient(180deg,rgba(252,247,239,0.86),rgba(245,237,225,0.92))] px-6 py-8 shadow-[0_20px_60px_rgba(93,66,35,0.08)] sm:px-8">
-              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/58">
-                Team From
+              <p className="text-sm leading-6 uppercase tracking-[0.12em] text-[#17120f]/70">
+                Team backgrounds
               </p>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {teamLogoList.map((logo) => (
@@ -217,7 +210,7 @@ export default function ManifestoLandingPage(): JSX.Element {
                       width={120}
                       height={48}
                       loading="eager"
-                      className={`max-h-10 w-auto object-contain opacity-100 ${logo.className ?? ""} ${"imageClassName" in logo ? logo.imageClassName ?? "" : ""}`}
+                      className={`max-h-10 w-auto object-contain opacity-100 ${logo.className ?? ""} ${"imageClassName" in logo ? (logo.imageClassName ?? "") : ""}`}
                     />
                   </div>
                 ))}
@@ -225,26 +218,27 @@ export default function ManifestoLandingPage(): JSX.Element {
             </section>
 
             <section className="rounded-[2rem] border border-[#17120f]/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.9),rgba(243,234,220,0.92))] px-6 py-8 shadow-[0_24px_70px_rgba(107,79,45,0.08)] sm:px-8">
-              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
+              <p className="text-sm leading-6 uppercase tracking-[0.12em] text-[#17120f]/70">
                 GlowingStar
               </p>
               <h2 className="mt-4 font-heading text-2xl text-[#17120f] sm:text-[2rem]">
-                Join the waitlist
+                Explore the frontier with us
               </h2>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-[#17120f]/72 sm:text-[1.05rem]">
-                GlowingStar is building AI-native learning experiences designed
-                for the next era of education. Join the waitlist to hear when
-                private beta opens and follow our progress.
+              <p className="mt-4 max-w-2xl text-lg leading-8 text-[#17120f]/72">
+                We welcome researchers, educators, builders, and institutions
+                who want to help advance human learning. Tell us what you’re
+                exploring and where our work might meet.
               </p>
               <div className="mt-6">
                 <a
-                  href={WAITLIST_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex min-h-12 items-center gap-3 rounded-full border border-[#17120f]/10 bg-[#17120f] px-6 py-3 text-sm font-semibold text-[#f6efe4] transition hover:bg-[#2b211b]"
+                  href="mailto:support@glowingstar.ai"
+                  className="inline-flex min-h-12 max-w-full items-center gap-3 rounded-full border border-[#17120f]/10 bg-[#17120f] px-6 py-3 text-base font-semibold text-[#f6efe4] transition hover:bg-[#2b211b]"
                 >
-                  <span>Join the waitlist</span>
-                  <ArrowUpRight className="h-4 w-4 shrink-0" />
+                  <span>Start a conversation</span>
+                  <ArrowUpRight
+                    className="h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                  />
                 </a>
               </div>
             </section>

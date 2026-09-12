@@ -1,0 +1,176 @@
+.glass {
+  --glass-size: 34px;
+  --icon-size: 16px;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--glass-size);
+  height: var(--glass-size);
+  overflow: hidden;
+  vertical-align: middle;
+  border: 1px solid rgb(255 255 255 / 85%);
+  border-radius: 34%;
+  background-color: #eeece0;
+  background-image:
+    radial-gradient(
+      ellipse at 85% 100%,
+      rgb(190 156 77 / 24%),
+      transparent 67%
+    ),
+    linear-gradient(145deg, rgb(255 255 255 / 80%), rgb(255 255 255 / 8%) 62%);
+  color: var(--gold, #896522);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 90%),
+    inset 0 -1px 1px rgb(137 101 34 / 12%),
+    0 2px 5px rgb(65 54 28 / 6%),
+    0 7px 16px -9px rgb(65 54 28 / 26%);
+  transition:
+    transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 320ms ease;
+}
+
+.glass::before,
+.glass::after {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+}
+
+.glass::before {
+  inset: 2px;
+  border: 1px solid rgb(255 255 255 / 38%);
+  border-bottom-color: rgb(255 255 255 / 10%);
+  border-radius: calc(var(--glass-size) * 0.27);
+}
+
+.glass::after {
+  inset: -55% -30%;
+  background: linear-gradient(
+    115deg,
+    transparent 34%,
+    rgb(255 255 255 / 62%) 46%,
+    rgb(255 255 255 / 10%) 57%,
+    transparent 65%
+  );
+  transform: translateX(-28%) rotate(-12deg);
+  opacity: 0.65;
+  transition:
+    transform 550ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 400ms ease;
+}
+
+.glass > svg {
+  position: relative;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 45%));
+}
+
+.sm {
+  --glass-size: 26px;
+  --icon-size: 13px;
+}
+
+.md {
+  --glass-size: 34px;
+  --icon-size: 16px;
+}
+
+.lg {
+  --glass-size: 44px;
+  --icon-size: 21px;
+}
+
+.light {
+  color: var(--gold, #896522);
+}
+
+.dark {
+  border-color: rgb(255 255 255 / 28%);
+  background-color: #4b4d40;
+  background-image:
+    radial-gradient(
+      ellipse at 85% 100%,
+      rgb(217 188 115 / 20%),
+      transparent 67%
+    ),
+    linear-gradient(145deg, rgb(255 255 255 / 20%), rgb(255 255 255 / 2%) 65%);
+  color: #f8f7f1;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 24%),
+    inset 0 -1px 1px rgb(0 0 0 / 15%),
+    0 2px 5px rgb(0 0 0 / 10%),
+    0 7px 16px -9px rgb(0 0 0 / 35%);
+}
+
+.dark::before {
+  border-color: rgb(255 255 255 / 10%);
+  border-top-color: rgb(255 255 255 / 22%);
+}
+
+.dark::after {
+  opacity: 0.2;
+}
+
+.dark > svg {
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 16%));
+}
+
+@supports (
+  (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))
+) {
+  .glass {
+    -webkit-backdrop-filter: blur(10px) saturate(135%);
+    backdrop-filter: blur(10px) saturate(135%);
+    background-color: rgb(244 240 224 / 36%);
+  }
+
+  .dark {
+    background-color: rgb(255 255 255 / 7%);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :global(a:hover) .glass,
+  :global(button:hover) .glass,
+  :global(summary:hover) .glass {
+    transform: translateY(-1px);
+  }
+
+  :global(a:hover) .glass::after,
+  :global(button:hover) .glass::after,
+  :global(summary:hover) .glass::after {
+    transform: translateX(28%) rotate(-12deg);
+    opacity: 0.85;
+  }
+
+  :global(a:hover) .dark::after,
+  :global(button:hover) .dark::after,
+  :global(summary:hover) .dark::after {
+    opacity: 0.32;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass,
+  .glass::after {
+    transition: none;
+  }
+
+  :global(a:hover) .glass,
+  :global(button:hover) .glass,
+  :global(summary:hover) .glass {
+    transform: none;
+  }
+
+  :global(a:hover) .glass::after,
+  :global(button:hover) .glass::after,
+  :global(summary:hover) .glass::after {
+    transform: translateX(-28%) rotate(-12deg);
+  }
+}
