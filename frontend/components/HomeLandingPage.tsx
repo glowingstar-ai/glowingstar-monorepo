@@ -1,13 +1,24 @@
-import { ArrowDown, ArrowRight, ArrowUpRight, Plus } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Brain,
+  Compass,
+  Focus,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 import HomeNavigation, { StarMark } from "@/components/home/HomeNavigation";
 import styles from "@/components/home/home.module.css";
+import HomeMotion, { MovingLearningField } from "@/components/home/HomeMotion";
+import LiquidGlassIcon from "@/components/home/LiquidGlassIcon";
 
 const CONTACT_HREF = "mailto:support@glowingstar.ai";
 
 const researchDirections = [
   {
     number: "01",
+    icon: Brain,
     category: "Understanding",
     title: "Learning that lasts.",
     description:
@@ -18,6 +29,7 @@ const researchDirections = [
   },
   {
     number: "02",
+    icon: Focus,
     category: "Metacognition",
     title: "Knowing what you know.",
     description:
@@ -28,6 +40,7 @@ const researchDirections = [
   },
   {
     number: "03",
+    icon: Compass,
     category: "Agency",
     title: "People in the driver’s seat.",
     description:
@@ -42,86 +55,89 @@ const researchDirections = [
 function LearningField(): JSX.Element {
   return (
     <div className={styles.learningField} aria-hidden="true">
-      <svg viewBox="0 0 620 680" fill="none" className={styles.fieldSvg}>
-        <defs>
-          <radialGradient id="gs-field-glow">
-            <stop stopColor="#e4b344" stopOpacity="0.3" />
-            <stop offset="1" stopColor="#e4b344" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient
-            id="gs-field-line"
-            x1="140"
-            y1="570"
-            x2="460"
-            y2="110"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stopColor="#ab741b" stopOpacity="0.15" />
-            <stop offset="0.48" stopColor="#a96f16" stopOpacity="0.8" />
-            <stop offset="1" stopColor="#d5a63c" stopOpacity="0.45" />
-          </linearGradient>
-        </defs>
-        <ellipse
-          cx="325"
-          cy="337"
-          rx="293"
-          ry="305"
-          fill="url(#gs-field-glow)"
-        />
-        <g stroke="#b5aa8d" strokeWidth="0.7" opacity="0.38">
-          <path
-            d="M50 170H580M50 340H580M50 510H580M150 70V610M320 70V610M490 70V610"
-            strokeDasharray="2 7"
+      <MovingLearningField>
+        <svg viewBox="0 0 620 680" fill="none" className={styles.fieldSvg}>
+          <defs>
+            <radialGradient id="gs-field-glow">
+              <stop stopColor="#e4b344" stopOpacity="0.3" />
+              <stop offset="1" stopColor="#e4b344" stopOpacity="0" />
+            </radialGradient>
+            <linearGradient
+              id="gs-field-line"
+              x1="140"
+              y1="570"
+              x2="460"
+              y2="110"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stopColor="#ab741b" stopOpacity="0.15" />
+              <stop offset="0.48" stopColor="#a96f16" stopOpacity="0.8" />
+              <stop offset="1" stopColor="#d5a63c" stopOpacity="0.45" />
+            </linearGradient>
+          </defs>
+          <ellipse
+            cx="325"
+            cy="337"
+            rx="293"
+            ry="305"
+            fill="url(#gs-field-glow)"
           />
-          <path d="M44 170h12m-6-6v12M314 70h12m-6-6v12M484 610h12m-6-6v12M574 510h12m-6-6v12" />
-        </g>
-        <g stroke="url(#gs-field-line)" strokeWidth="1.1">
-          {Array.from({ length: 34 }, (_, index) => {
-            const spread = index * 5.3;
-            return (
-              <path
-                key={index}
-                d={`M ${295 - spread * 0.23} ${558 + spread * 0.08} C ${85 - spread * 0.23} ${444 - spread * 0.13}, ${159 - spread * 0.37} ${223 - spread * 0.37}, ${304 + spread * 0.41} ${145 - spread * 0.2} C ${456 + spread * 0.7} ${65 + spread * 0.32}, ${559 + spread * 0.2} ${280 + spread * 0.79}, ${415 - spread * 0.22} ${391 + spread * 0.48} C ${348 - spread * 0.14} ${446 + spread * 0.4}, ${249 + spread * 0.12} ${457 + spread * 0.4}, ${295 - spread * 0.23} ${558 + spread * 0.08}`}
-              />
-            );
-          })}
-        </g>
-        <path
-          d="M205 514C158 366 308 429 359 281S459 203 467 181"
-          stroke="#9b6a18"
-          strokeWidth="1.2"
-          strokeDasharray="3 6"
-        />
-        <g fill="#f8f7f1" stroke="#9b6a18" strokeWidth="1.3">
-          <circle cx="205" cy="514" r="5" />
-          <circle cx="359" cy="281" r="5" />
-          <circle cx="467" cy="181" r="5" />
-        </g>
-        <circle
-          cx="359"
-          cy="281"
-          r="13"
-          stroke="#9b6a18"
-          strokeOpacity="0.24"
-        />
-        <g
-          fill="#77613c"
-          fontFamily="monospace"
-          fontSize="10"
-          letterSpacing="1.7"
-        >
-          <text x="95" y="551">
-            CURIOSITY
-          </text>
-          <text x="379" y="277">
-            UNDERSTANDING
-          </text>
-          <text x="485" y="169">
-            AGENCY
-          </text>
-        </g>
-        <path d="M307 343h26m-13-13v26" stroke="#ad7b24" strokeWidth="1" />
-      </svg>
+          <g stroke="#b5aa8d" strokeWidth="0.7" opacity="0.38">
+            <path
+              d="M50 170H580M50 340H580M50 510H580M150 70V610M320 70V610M490 70V610"
+              strokeDasharray="2 7"
+            />
+            <path d="M44 170h12m-6-6v12M314 70h12m-6-6v12M484 610h12m-6-6v12M574 510h12m-6-6v12" />
+          </g>
+          <g data-field-contours stroke="url(#gs-field-line)" strokeWidth="1.1">
+            {Array.from({ length: 34 }, (_, index) => {
+              const spread = index * 5.3;
+              return (
+                <path
+                  key={index}
+                  d={`M ${295 - spread * 0.23} ${558 + spread * 0.08} C ${85 - spread * 0.23} ${444 - spread * 0.13}, ${159 - spread * 0.37} ${223 - spread * 0.37}, ${304 + spread * 0.41} ${145 - spread * 0.2} C ${456 + spread * 0.7} ${65 + spread * 0.32}, ${559 + spread * 0.2} ${280 + spread * 0.79}, ${415 - spread * 0.22} ${391 + spread * 0.48} C ${348 - spread * 0.14} ${446 + spread * 0.4}, ${249 + spread * 0.12} ${457 + spread * 0.4}, ${295 - spread * 0.23} ${558 + spread * 0.08}`}
+                />
+              );
+            })}
+          </g>
+          <path
+            data-field-trace
+            d="M205 514C158 366 308 429 359 281S459 203 467 181"
+            stroke="#9b6a18"
+            strokeWidth="1.2"
+            strokeDasharray="3 6"
+          />
+          <g fill="#f8f7f1" stroke="#9b6a18" strokeWidth="1.3">
+            <circle cx="205" cy="514" r="5" />
+            <circle cx="359" cy="281" r="5" />
+            <circle cx="467" cy="181" r="5" />
+          </g>
+          <circle
+            cx="359"
+            cy="281"
+            r="13"
+            stroke="#9b6a18"
+            strokeOpacity="0.24"
+          />
+          <g
+            fill="#77613c"
+            fontFamily="monospace"
+            fontSize="10"
+            letterSpacing="1.7"
+          >
+            <text x="95" y="551">
+              CURIOSITY
+            </text>
+            <text x="379" y="277">
+              UNDERSTANDING
+            </text>
+            <text x="485" y="169">
+              AGENCY
+            </text>
+          </g>
+          <path d="M307 343h26m-13-13v26" stroke="#ad7b24" strokeWidth="1" />
+        </svg>
+      </MovingLearningField>
       <span className={styles.fieldCaption}>
         An open frontier. A human one.
       </span>
@@ -131,7 +147,7 @@ function LearningField(): JSX.Element {
 
 export default function HomeLandingPage(): JSX.Element {
   return (
-    <div className={styles.page}>
+    <HomeMotion>
       <a className={styles.skipLink} href="#main-content">
         Skip to content
       </a>
@@ -143,22 +159,23 @@ export default function HomeLandingPage(): JSX.Element {
           aria-labelledby="hero-heading"
         >
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>
+            <p className={styles.eyebrow} data-hero-enter>
               <span className={styles.statusDot} /> GlowingStar · Research &
               applied AI
             </p>
             <h1 id="hero-heading">
-              Frontier lab
-              <br />
-              for human
-              <br />
-              <em>learning.</em>
+              <span data-hero-enter>Frontier lab</span>{" "}
+              <span data-hero-enter>for human</span>{" "}
+              <em data-hero-enter>learning.</em>
             </h1>
-            <p className={styles.heroMission}>
+            <p className={styles.heroMission} data-hero-enter>
               We work to ensure that as machines get smarter, humans do too.
             </p>
-            <a className={styles.primaryLink} href="#mission">
-              Explore our mission <ArrowDown size={17} aria-hidden="true" />
+            <a className={styles.primaryLink} href="#mission" data-hero-enter>
+              Explore our mission{" "}
+              <LiquidGlassIcon tone="dark">
+                <ArrowDown aria-hidden="true" />
+              </LiquidGlassIcon>
             </a>
           </div>
           <LearningField />
@@ -175,12 +192,12 @@ export default function HomeLandingPage(): JSX.Element {
         >
           <p className={styles.eyebrow}>01 / Our conviction</p>
           <div>
-            <h2 id="mission-heading">
+            <h2 id="mission-heading" data-motion-reveal>
               The next breakthrough
               <br />
               should be <em>human.</em>
             </h2>
-            <div className={styles.missionBody}>
+            <div className={styles.missionBody} data-motion-reveal>
               <p>
                 AI is changing what machines can do. We ask what it can help
                 people become.
@@ -199,7 +216,9 @@ export default function HomeLandingPage(): JSX.Element {
                 </p>
                 <Link className={styles.textLink} href="/manifesto">
                   Read our founding manifesto{" "}
-                  <ArrowUpRight size={17} aria-hidden="true" />
+                  <LiquidGlassIcon size="sm">
+                    <ArrowUpRight aria-hidden="true" />
+                  </LiquidGlassIcon>
                 </Link>
               </div>
             </div>
@@ -211,7 +230,7 @@ export default function HomeLandingPage(): JSX.Element {
           className={`${styles.research} ${styles.container}`}
           aria-labelledby="research-heading"
         >
-          <div className={styles.sectionHeading}>
+          <div className={styles.sectionHeading} data-motion-reveal>
             <p className={styles.eyebrow}>02 / Research directions</p>
             <div>
               <h2 id="research-heading">
@@ -226,27 +245,38 @@ export default function HomeLandingPage(): JSX.Element {
             </div>
           </div>
           <div className={styles.researchList}>
-            {researchDirections.map((direction) => (
-              <details className={styles.researchItem} key={direction.number}>
+            {researchDirections.map((direction, index) => (
+              <details
+                className={styles.researchItem}
+                key={direction.number}
+                data-motion-reveal
+                data-motion-delay={index * 0.07}
+              >
                 <summary>
                   <span className={styles.researchNumber}>
-                    {direction.number}
+                    <LiquidGlassIcon>
+                      <direction.icon strokeWidth={1.5} aria-hidden="true" />
+                    </LiquidGlassIcon>
                   </span>
                   <span className={styles.researchTitle}>
-                    <span className={styles.eyebrow}>{direction.category}</span>
+                    <span className={styles.eyebrow}>
+                      {direction.number} / {direction.category}
+                    </span>
                     <h3>{direction.title}</h3>
                   </span>
                   <span className={styles.researchDescription}>
                     {direction.description}
                   </span>
-                  <Plus
-                    className={styles.expandIcon}
-                    size={21}
-                    strokeWidth={1.3}
-                    aria-hidden="true"
-                  />
+                  <LiquidGlassIcon className={styles.expandControl}>
+                    <Plus
+                      className={styles.expandIcon}
+                      size={21}
+                      strokeWidth={1.3}
+                      aria-hidden="true"
+                    />
+                  </LiquidGlassIcon>
                 </summary>
-                <div className={styles.researchDetail}>
+                <div className={styles.researchDetail} data-disclosure-content>
                   <p>{direction.detail}</p>
                   <span>{direction.tags}</span>
                 </div>
@@ -261,7 +291,7 @@ export default function HomeLandingPage(): JSX.Element {
           aria-labelledby="work-heading"
         >
           <div className={styles.container}>
-            <div className={styles.sectionHeading}>
+            <div className={styles.sectionHeading} data-motion-reveal>
               <p className={styles.eyebrow}>03 / Research meets reality</p>
               <div>
                 <h2 id="work-heading">
@@ -272,7 +302,7 @@ export default function HomeLandingPage(): JSX.Element {
               </div>
             </div>
             <div className={styles.workGrid}>
-              <div className={styles.workCopy}>
+              <div className={styles.workCopy} data-motion-reveal>
                 <span className={styles.workLabel}>
                   <span className={styles.statusDot} /> Our first proving ground
                 </span>
@@ -294,12 +324,21 @@ export default function HomeLandingPage(): JSX.Element {
                   className={styles.textLink}
                   href={`${CONTACT_HREF}?subject=Learning%20research%20partnership`}
                 >
-                  Partner with us <ArrowUpRight size={17} aria-hidden="true" />
+                  Partner with us{" "}
+                  <LiquidGlassIcon size="sm" tone="dark">
+                    <ArrowUpRight aria-hidden="true" />
+                  </LiquidGlassIcon>
                 </a>
               </div>
-              <div className={styles.learningExample}>
+              <div
+                className={styles.learningExample}
+                data-motion-reveal
+                data-motion-delay="0.12"
+              >
                 <div className={styles.exampleHeader}>
-                  <StarMark />
+                  <LiquidGlassIcon size="sm">
+                    <StarMark />
+                  </LiquidGlassIcon>
                   <span>A moment of learning</span>
                   <span>Illustrative exchange</span>
                 </div>
@@ -312,7 +351,10 @@ export default function HomeLandingPage(): JSX.Element {
                   </p>
                   <div className={styles.tutorResponse}>
                     <p className={styles.speaker}>
-                      <StarMark /> GlowingStar
+                      <LiquidGlassIcon size="sm">
+                        <StarMark />
+                      </LiquidGlassIcon>{" "}
+                      GlowingStar
                     </p>
                     <p>
                       Let’s start with a different question.
@@ -327,9 +369,13 @@ export default function HomeLandingPage(): JSX.Element {
                 </div>
                 <div className={styles.learningLoop}>
                   <span>Question</span>
-                  <ArrowRight size={14} aria-hidden="true" />
+                  <LiquidGlassIcon size="sm">
+                    <ArrowRight aria-hidden="true" />
+                  </LiquidGlassIcon>
                   <span>Reflect</span>
-                  <ArrowRight size={14} aria-hidden="true" />
+                  <LiquidGlassIcon size="sm">
+                    <ArrowRight aria-hidden="true" />
+                  </LiquidGlassIcon>
                   <span>Understand</span>
                 </div>
               </div>
@@ -351,12 +397,12 @@ export default function HomeLandingPage(): JSX.Element {
         >
           <p className={styles.eyebrow}>04 / The people behind the work</p>
           <div>
-            <h2 id="about-heading">
+            <h2 id="about-heading" data-motion-reveal>
               Researchers. Builders.
               <br />
               <em>Learners, always.</em>
             </h2>
-            <p className={styles.aboutDescription}>
+            <p className={styles.aboutDescription} data-motion-reveal>
               We bring together perspectives from AI, education, and human
               development. The people building our learning systems also help
               ask the questions those systems need to answer.
@@ -364,7 +410,11 @@ export default function HomeLandingPage(): JSX.Element {
             <p className={styles.affiliationsLabel}>
               Our team’s academic and professional backgrounds include
             </p>
-            <ul className={styles.affiliations} aria-label="Team backgrounds">
+            <ul
+              className={styles.affiliations}
+              aria-label="Team backgrounds"
+              data-motion-reveal
+            >
               <li>Harvard</li>
               <li>MIT</li>
               <li>Stanford</li>
@@ -385,13 +435,17 @@ export default function HomeLandingPage(): JSX.Element {
           <div className={`${styles.container} ${styles.contactInner}`}>
             <div>
               <p className={styles.eyebrow}>The frontier is open</p>
-              <h2 id="contact-heading">
+              <h2 id="contact-heading" data-motion-reveal>
                 Let’s advance
                 <br />
                 <em>human potential.</em>
               </h2>
             </div>
-            <div className={styles.contactCopy}>
+            <div
+              className={styles.contactCopy}
+              data-motion-reveal
+              data-motion-delay="0.1"
+            >
               <p>
                 If you’re asking what AI could make possible for human learning,
                 we’d like to meet you.
@@ -402,7 +456,9 @@ export default function HomeLandingPage(): JSX.Element {
               </p>
               <a className={styles.primaryLink} href={CONTACT_HREF}>
                 Start a conversation{" "}
-                <ArrowUpRight size={18} aria-hidden="true" />
+                <LiquidGlassIcon tone="dark">
+                  <ArrowUpRight aria-hidden="true" />
+                </LiquidGlassIcon>
               </a>
               <a className={styles.emailLink} href={CONTACT_HREF}>
                 support@glowingstar.ai
@@ -419,7 +475,10 @@ export default function HomeLandingPage(): JSX.Element {
             href="/"
             aria-label="GlowingStar home"
           >
-            <StarMark /> GlowingStar
+            <LiquidGlassIcon>
+              <StarMark />
+            </LiquidGlassIcon>{" "}
+            GlowingStar
           </Link>
           <p>A frontier lab for human learning.</p>
         </div>
@@ -428,13 +487,16 @@ export default function HomeLandingPage(): JSX.Element {
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <a href={CONTACT_HREF}>
-            Contact <ArrowUpRight size={13} aria-hidden="true" />
+            Contact{" "}
+            <LiquidGlassIcon size="sm">
+              <ArrowUpRight aria-hidden="true" />
+            </LiquidGlassIcon>
           </a>
         </nav>
         <span className={styles.copyright}>
           © {new Date().getFullYear()} GlowingStar, Inc.
         </span>
       </footer>
-    </div>
+    </HomeMotion>
   );
 }

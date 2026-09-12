@@ -38,3 +38,9 @@ These are references for narrative organization and general visual principles. T
 Research directions describe aspirations and open questions. They should not imply published results, measured learning gains, validated interventions, or a completed research program. Product descriptions should reflect functionality supported by the current platform. Team credentials should remain grounded in existing information.
 
 The abstract artwork is an original illustration of an expanding learning frontier. It is decorative and conceptual, not a chart, benchmark, experiment, or scientific result. The visual system uses warm neutrals, clear type hierarchy, generous space, and restrained separators to keep attention on the mission and the work.
+
+## Motion and icon materials
+
+The follow-up uses the existing Motion dependency for staggered hero entrances, one-time scroll reveals, reading progress, disclosure feedback, and mobile navigation. The learning illustration responds to pointer movement and page scrolling with small, bounded movements. Content remains visible in server-rendered HTML, and motion preferences are observed throughout the session. See [Motion's React animation documentation](https://motion.dev/docs/react-use-animate).
+
+Icons sit in reusable liquid glass surfaces with translucent gold-tinted backgrounds, layered rim highlights, hover reflections, and blur where supported. A solid fallback preserves clarity in browsers without backdrop filtering. Light and dark versions match their surrounding sections.

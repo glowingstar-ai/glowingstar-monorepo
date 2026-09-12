@@ -3,6 +3,9 @@
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useAnimate, stagger } from "framer-motion";
+import LiquidGlassIcon from "./LiquidGlassIcon";
+import useReducedEffects from "./useReducedEffects";
 import styles from "./home.module.css";
 
 const links = [
@@ -33,6 +36,28 @@ export default function HomeNavigation(): JSX.Element {
   const [open, setOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const [navigationRef, animate] = useAnimate<HTMLElement>();
+  const reducedMotion = useReducedEffects();
+
+  useEffect(() => {
+    if (!open || reducedMotion || !navigationRef.current) return;
+    const links = Array.from(navigationRef.current.querySelectorAll("a"));
+    const controls = animate(
+      links,
+      { opacity: [0, 1], y: [-6, 0] },
+      {
+        duration: 0.26,
+        delay: stagger(0.035),
+        ease: [0.22, 1, 0.36, 1],
+      },
+    );
+    return () => {
+      controls.stop();
+      if (links.some((link) => link.isConnected)) {
+        animate(links, { opacity: 1, y: 0 }, { duration: 0 }).complete();
+      }
+    };
+  }, [open, reducedMotion, animate, navigationRef]);
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 761px)");
@@ -73,7 +98,10 @@ export default function HomeNavigation(): JSX.Element {
           aria-label="GlowingStar home"
           onClick={() => setOpen(false)}
         >
-          <StarMark /> GlowingStar
+          <LiquidGlassIcon size="lg">
+            <StarMark />
+          </LiquidGlassIcon>{" "}
+          GlowingStar
         </Link>
         <button
           ref={toggleRef}
@@ -84,9 +112,12 @@ export default function HomeNavigation(): JSX.Element {
           aria-label={open ? "Close navigation" : "Open navigation"}
           onClick={() => setOpen(!open)}
         >
-          {open ? <X size={23} /> : <Menu size={23} />}
+          <LiquidGlassIcon size="lg">
+            {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          </LiquidGlassIcon>
         </button>
         <nav
+          ref={navigationRef}
           id="home-navigation"
           className={styles.navigation}
           data-open={open}
@@ -102,7 +133,10 @@ export default function HomeNavigation(): JSX.Element {
             href="#contact"
             onClick={() => setOpen(false)}
           >
-            Get in touch <ArrowUpRight size={15} aria-hidden="true" />
+            Get in touch{" "}
+            <LiquidGlassIcon size="sm">
+              <ArrowUpRight aria-hidden="true" />
+            </LiquidGlassIcon>
           </a>
         </nav>
       </div>

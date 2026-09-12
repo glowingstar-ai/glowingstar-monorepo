@@ -1,5 +1,15 @@
 # Development log
 
+## 2026-09-12: Motion and liquid glass follow-up
+
+- Task: User-requested motion and icon refinement for PR #72. No Linear ticket was supplied.
+- Status: Implementation and validation complete for PR #72.
+- Added Motion entrances, scroll reveals, an input-driven learning illustration, research disclosure feedback, and mobile navigation animation.
+- Added reusable liquid glass icon surfaces with light/dark treatments and browser blur fallbacks.
+- Retained visible server-rendered content and subscribed to reduced-motion preference changes during the session.
+- Validation: production build, TypeScript, scoped lint, formatting, and whitespace checks passed. The full build retains only the existing Saint Paul hook warnings.
+- Browser checks covered responsive widths, pointer/scroll transforms, complete entrance opacity, rapid menu dismissal/reopening, keyboard research disclosure, and navigation to the manifesto and back. Final production navigation produced no browser errors. Verified all 20 animation targets remain visible in the initial HTML.
+
 ## 2026-09-12: Frontier human learning landing page
 
 - Task: User-requested landing page redesign. No Linear ticket was supplied.

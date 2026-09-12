@@ -122,6 +122,15 @@
 .menuToggle {
   display: none;
 }
+.readingProgress {
+  position: fixed;
+  z-index: 40;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, #896522, #d8bd79);
+  transform-origin: left;
+  pointer-events: none;
+}
 .hero {
   position: relative;
   display: grid;
@@ -150,6 +159,10 @@
   color: var(--gold);
   letter-spacing: -6px;
 }
+.hero h1 > span,
+.hero h1 > em {
+  display: block;
+}
 .heroMission {
   max-width: 405px;
   margin-top: 33px;
@@ -164,7 +177,8 @@
   gap: 40px;
   min-height: 49px;
   margin-top: 31px;
-  padding: 13px 18px;
+  padding: 8px 10px 8px 18px;
+  border-radius: 5px;
   background: var(--ink);
   color: var(--paper);
   font-size: 12px;
@@ -184,6 +198,11 @@
   width: 100%;
   height: auto;
   max-height: 600px;
+}
+.fieldMotion {
+  position: relative;
+  width: 100%;
+  perspective: 900px;
 }
 .fieldCaption {
   position: absolute;
@@ -291,7 +310,7 @@
 }
 .researchItem summary {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 24px;
+  grid-template-columns: 60px 1fr 1fr 34px;
   gap: 24px;
   align-items: center;
   padding-block: 31px;
@@ -306,7 +325,7 @@
 }
 .researchNumber {
   align-self: start;
-  padding-top: 4px;
+  padding-top: 8px;
   color: var(--gold);
   font-size: 11px;
   font-family: var(--font-plex), monospace;
@@ -332,6 +351,9 @@
 }
 .expandIcon {
   transition: transform 180ms ease;
+}
+.expandControl {
+  justify-self: end;
 }
 .researchItem[open] .expandIcon {
   transform: rotate(45deg);
@@ -408,7 +430,7 @@
 .learningExample {
   background: #f2f0e6;
   color: var(--ink);
-  transform: rotate(-1deg);
+  rotate: -1deg;
 }
 .exampleHeader {
   display: flex;
@@ -478,6 +500,7 @@
 .learningLoop {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 10px;
   padding: 21px 32px;
   border-top: 1px solid #d8d6ca;
@@ -617,27 +640,6 @@
   font-size: 9px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .heroCopy,
-  .learningField {
-    animation: appear 800ms ease-out both;
-  }
-  .learningField {
-    animation-delay: 100ms;
-  }
-}
-
-@keyframes appear {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (max-width: 1100px) {
   .container {
     width: calc(100% - 72px);
@@ -664,7 +666,7 @@
     gap: 45px;
   }
   .researchItem summary {
-    grid-template-columns: 30px 1fr 1fr 20px;
+    grid-template-columns: 34px 1fr 1fr 34px;
     gap: 18px;
   }
   .researchDetail {
@@ -812,7 +814,7 @@
     margin-top: 35px;
   }
   .researchItem summary {
-    grid-template-columns: 24px 1fr 22px;
+    grid-template-columns: 34px 1fr 34px;
     column-gap: 12px;
     row-gap: 15px;
     padding-block: 25px;
@@ -829,7 +831,7 @@
     max-width: 100%;
     font-size: 13px;
   }
-  .expandIcon {
+  .expandControl {
     grid-column: 3;
     grid-row: 1;
   }
@@ -934,6 +936,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .readingProgress {
+    display: none;
+  }
   :global(html):has(.page) {
     scroll-behavior: auto;
   }
