@@ -37,10 +37,21 @@ These are references for narrative organization and general visual principles. T
 
 Research directions describe aspirations and open questions. They should not imply published results, measured learning gains, validated interventions, or a completed research program. Product descriptions should reflect functionality supported by the current platform. Team credentials should remain grounded in existing information.
 
-The abstract artwork is an original illustration of an expanding learning frontier. It is decorative and conceptual, not a chart, benchmark, experiment, or scientific result. The visual system uses warm neutrals, clear type hierarchy, generous space, and restrained separators to keep attention on the mission and the work.
+The abstract artwork is an original orbital sculpture representing human potential. It is decorative and conceptual, not a chart, benchmark, experiment, or scientific result. The visual system uses warm neutrals, clear type hierarchy, generous space, and restrained separators to keep attention on the mission and the work.
 
 ## Motion and icon materials
 
-The follow-up uses the existing Motion dependency for staggered hero entrances, one-time scroll reveals, reading progress, disclosure feedback, and mobile navigation. The learning illustration runs a seamless 16-second loop: its gold contours breathe and twist while the inner dashed path flows toward agency. Labels and reference points remain stationary. A glass playback control pauses and resumes at the same phase. The animation stops when offscreen, when the browser tab is hidden, or when reduced motion is enabled. Content remains visible in server-rendered HTML, and motion preferences are observed throughout the session. See [Motion's React animation documentation](https://motion.dev/docs/react-use-animate).
+The page uses the existing Motion dependency for staggered hero entrances, one-time scroll reveals, reading progress, disclosure feedback, and mobile navigation. The hero is a Three.js sculpture with three sculpted metal bands around a pearl core, procedural studio reflections, and real depth and shadows. Motion drives a seamless 24-second rotation with gentle precession. Labels remain stationary. A glass playback control pauses and resumes at the same phase. The animation stops when offscreen, when the browser tab is hidden, or when reduced motion is enabled. Content remains visible in server-rendered HTML, and motion preferences are observed throughout the session. See [Motion's React animation documentation](https://motion.dev/docs/react-use-animate).
 
 Icons sit in reusable liquid glass surfaces with translucent gold-tinted backgrounds, layered rim highlights, hover reflections, and blur where supported. A solid fallback preserves clarity in browsers without backdrop filtering. Light and dark versions match their surrounding sections.
+
+## 3D library selection
+
+| Library | Fit for this page |
+| --- | --- |
+| [Three.js](https://threejs.org/docs/pages/WebGLRenderer.html) | Selected for direct control of custom geometry, physical materials, lighting, and the existing Motion playback lifecycle. |
+| [React Three Fiber](https://r3f.docs.pmnd.rs/getting-started/installation) and [Drei](https://github.com/pmndrs/drei) | Useful when expanding to several reusable React scenes. Fiber 8 supports this project's React 18; Fiber 9 requires React 19. |
+| [Spline](https://github.com/splinetool/react-spline) | Suitable for an editor-led scene design workflow with React/Next.js embedding. This sculpture is defined in source and does not require an external scene. |
+| [OGL](https://github.com/oframe/ogl) | A smaller WebGL abstraction suited to custom shader effects, with fewer ready-made materials than Three.js. |
+
+The renderer is dynamically imported when the artwork enters view. An SVG still is present in the initial HTML and remains available if WebGL cannot initialize or its context is lost. Device pixel ratio is capped at 1.75. Geometry, materials, environment maps, shadows, and the renderer are disposed on unmount. The sculpture uses no downloaded models or textures. See Three.js guidance on [on-demand rendering](https://threejs.org/manual/en/rendering-on-demand.html) and [resource cleanup](https://threejs.org/manual/en/cleanup.html).

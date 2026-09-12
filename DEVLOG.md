@@ -1,5 +1,15 @@
 # Development log
 
+## 2026-09-12: 3D learning sculpture
+
+- Task: User-requested replacement of the hero ribbon with a new animated 3D form. No Linear ticket was supplied.
+- Status: Implementation and validation complete for PR #72.
+- Replaced the ribbon with a Three.js orbital sculpture around a pearl core, with real lighting and depth, a seamless 24-second Motion loop, and glass playback controls.
+- Compared Three.js, React Three Fiber/Drei, Spline, and OGL. Selected direct Three.js for this React 18 page; added a dynamically loaded renderer and server-rendered SVG fallback.
+- Preserved saved-phase pause/resume, offscreen and hidden-tab stopping, and live reduced-motion support. Added capped pixel density, resize handling, context-loss fallback, and GPU resource cleanup.
+- Validation: production build, TypeScript, scoped ESLint, Prettier, and whitespace checks pass. All 24 static pages generated. Existing Saint Paul hook warnings remain unchanged.
+- Browser review confirmed actual WebGL rendering and rotation, stable paused frames, keyboard resume, offscreen stopping, 320px and 390px layouts without overflow, and manifesto navigation and return. Final renderer produced no browser warnings or errors. Reviewed the fallback and resource lifecycle; smoothed surface normals at the band seams.
+
 ## 2026-09-12: Continuous learning-field animation
 
 - Task: User-requested infinite animation for the gold hero ribbon in PR #72. No Linear ticket was supplied.

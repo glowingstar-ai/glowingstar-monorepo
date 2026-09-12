@@ -194,14 +194,47 @@
   min-width: 0;
   margin: -28px -35px -5px -35px;
 }
-.fieldSvg {
-  width: 100%;
-  height: auto;
-  max-height: 600px;
-}
 .fieldMotion {
   position: relative;
   width: 100%;
+  aspect-ratio: 620 / 680;
+  max-height: 600px;
+  isolation: isolate;
+}
+.sculptureCanvas,
+.sculptureFallback,
+.sculptureAnnotations {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.sculptureCanvas {
+  opacity: 0;
+}
+.fieldMotion[data-sculpture-renderer="webgl"] .sculptureCanvas {
+  opacity: 1;
+}
+.fieldMotion[data-sculpture-renderer="webgl"] .sculptureFallback {
+  visibility: hidden;
+}
+.sculptureAtmosphere {
+  position: absolute;
+  inset: 5% 0 9%;
+  z-index: -1;
+  background: radial-gradient(ellipse at 50% 46%, #ebd5a63b, transparent 64%);
+}
+.sculptureAtmosphere::after {
+  position: absolute;
+  content: "";
+  left: 26%;
+  right: 26%;
+  height: 5%;
+  bottom: 2%;
+  border-radius: 50%;
+  background: #8e784520;
+  filter: blur(15px);
 }
 .fieldCaption {
   position: absolute;
@@ -788,7 +821,7 @@
     justify-self: center;
     margin: -5px 0 15px;
   }
-  .fieldSvg {
+  .fieldMotion {
     margin-block: -15px;
   }
   .fieldCaption {

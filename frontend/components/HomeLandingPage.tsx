@@ -10,12 +10,9 @@ import {
 import Link from "next/link";
 import HomeNavigation, { StarMark } from "@/components/home/HomeNavigation";
 import styles from "@/components/home/home.module.css";
-import HomeMotion, { MovingLearningField } from "@/components/home/HomeMotion";
+import HomeMotion from "@/components/home/HomeMotion";
+import LearningSculpture from "@/components/home/LearningSculpture";
 import LiquidGlassIcon from "@/components/home/LiquidGlassIcon";
-import {
-  LEARNING_FIELD_CONTOURS,
-  learningFieldPath,
-} from "@/components/home/learning-field";
 
 const CONTACT_HREF = "mailto:support@glowingstar.ai";
 
@@ -55,96 +52,6 @@ const researchDirections = [
   },
 ];
 
-/** An abstract field of expanding possibilities, not a plot of study results. */
-function LearningField(): JSX.Element {
-  return (
-    <div className={styles.learningField}>
-      <MovingLearningField>
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 620 680"
-          fill="none"
-          className={styles.fieldSvg}
-        >
-          <defs>
-            <radialGradient id="gs-field-glow">
-              <stop stopColor="#e4b344" stopOpacity="0.3" />
-              <stop offset="1" stopColor="#e4b344" stopOpacity="0" />
-            </radialGradient>
-            <linearGradient
-              id="gs-field-line"
-              x1="140"
-              y1="570"
-              x2="460"
-              y2="110"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop stopColor="#ab741b" stopOpacity="0.15" />
-              <stop offset="0.48" stopColor="#a96f16" stopOpacity="0.8" />
-              <stop offset="1" stopColor="#d5a63c" stopOpacity="0.45" />
-            </linearGradient>
-          </defs>
-          <ellipse
-            cx="325"
-            cy="337"
-            rx="293"
-            ry="305"
-            fill="url(#gs-field-glow)"
-          />
-          <g stroke="#b5aa8d" strokeWidth="0.7" opacity="0.38">
-            <path
-              d="M50 170H580M50 340H580M50 510H580M150 70V610M320 70V610M490 70V610"
-              strokeDasharray="2 7"
-            />
-            <path d="M44 170h12m-6-6v12M314 70h12m-6-6v12M484 610h12m-6-6v12M574 510h12m-6-6v12" />
-          </g>
-          <g data-field-contours stroke="url(#gs-field-line)" strokeWidth="1.1">
-            {Array.from({ length: LEARNING_FIELD_CONTOURS }, (_, index) => (
-              <path key={index} d={learningFieldPath(index)} />
-            ))}
-          </g>
-          <path
-            data-field-trace
-            d="M205 514C158 366 308 429 359 281S459 203 467 181"
-            stroke="#9b6a18"
-            strokeWidth="1.2"
-            strokeDasharray="3 6"
-          />
-          <g fill="#f8f7f1" stroke="#9b6a18" strokeWidth="1.3">
-            <circle cx="205" cy="514" r="5" />
-            <circle cx="359" cy="281" r="5" />
-            <circle cx="467" cy="181" r="5" />
-          </g>
-          <circle
-            cx="359"
-            cy="281"
-            r="13"
-            stroke="#9b6a18"
-            strokeOpacity="0.24"
-          />
-          <g
-            fill="#77613c"
-            fontFamily="monospace"
-            fontSize="10"
-            letterSpacing="1.7"
-          >
-            <text x="95" y="551">
-              CURIOSITY
-            </text>
-            <text x="379" y="277">
-              UNDERSTANDING
-            </text>
-            <text x="485" y="169">
-              AGENCY
-            </text>
-          </g>
-          <path d="M307 343h26m-13-13v26" stroke="#ad7b24" strokeWidth="1" />
-        </svg>
-      </MovingLearningField>
-    </div>
-  );
-}
-
 export default function HomeLandingPage(): JSX.Element {
   return (
     <HomeMotion>
@@ -178,7 +85,7 @@ export default function HomeLandingPage(): JSX.Element {
               </LiquidGlassIcon>
             </a>
           </div>
-          <LearningField />
+          <LearningSculpture />
           <div className={styles.heroFootnote}>
             <span>Human curiosity. Scientific rigor. Shared progress.</span>
             <span className={styles.heroIndex}>A new frontier / 001</span>
