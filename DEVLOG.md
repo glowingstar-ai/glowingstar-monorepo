@@ -1,5 +1,14 @@
 # Development log
 
+## 2026-09-12: Continuous learning-field animation
+
+- Task: User-requested infinite animation for the gold hero ribbon in PR #72. No Linear ticket was supplied.
+- Status: Implementation and validation complete for PR #72.
+- Added a seamless 16-second Motion loop for the ribbon contours and inner dashed path, preserving stationary labels and reference points.
+- Added a liquid glass pause/play control. Playback stops offscreen, in hidden tabs, and when reduced motion is enabled, then resumes at the saved phase.
+- Validation: production build, TypeScript, scoped lint, formatting, and whitespace checks passed. Existing Saint Paul hook warnings remain unchanged.
+- Browser checks verified autonomous movement, stationary labels, pause/play by mouse and keyboard, offscreen stopping, 320px and 390px layouts, and navigation to the manifesto and back without runtime errors. Sampled the full geometry cycle for finite coordinates and seamless boundaries; verified Motion's saved-time resume and frame-driver cleanup.
+
 ## 2026-09-12: Motion and liquid glass follow-up
 
 - Task: User-requested motion and icon refinement for PR #72. No Linear ticket was supplied.

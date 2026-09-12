@@ -12,6 +12,10 @@ import HomeNavigation, { StarMark } from "@/components/home/HomeNavigation";
 import styles from "@/components/home/home.module.css";
 import HomeMotion, { MovingLearningField } from "@/components/home/HomeMotion";
 import LiquidGlassIcon from "@/components/home/LiquidGlassIcon";
+import {
+  LEARNING_FIELD_CONTOURS,
+  learningFieldPath,
+} from "@/components/home/learning-field";
 
 const CONTACT_HREF = "mailto:support@glowingstar.ai";
 
@@ -54,9 +58,14 @@ const researchDirections = [
 /** An abstract field of expanding possibilities, not a plot of study results. */
 function LearningField(): JSX.Element {
   return (
-    <div className={styles.learningField} aria-hidden="true">
+    <div className={styles.learningField}>
       <MovingLearningField>
-        <svg viewBox="0 0 620 680" fill="none" className={styles.fieldSvg}>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 620 680"
+          fill="none"
+          className={styles.fieldSvg}
+        >
           <defs>
             <radialGradient id="gs-field-glow">
               <stop stopColor="#e4b344" stopOpacity="0.3" />
@@ -90,15 +99,9 @@ function LearningField(): JSX.Element {
             <path d="M44 170h12m-6-6v12M314 70h12m-6-6v12M484 610h12m-6-6v12M574 510h12m-6-6v12" />
           </g>
           <g data-field-contours stroke="url(#gs-field-line)" strokeWidth="1.1">
-            {Array.from({ length: 34 }, (_, index) => {
-              const spread = index * 5.3;
-              return (
-                <path
-                  key={index}
-                  d={`M ${295 - spread * 0.23} ${558 + spread * 0.08} C ${85 - spread * 0.23} ${444 - spread * 0.13}, ${159 - spread * 0.37} ${223 - spread * 0.37}, ${304 + spread * 0.41} ${145 - spread * 0.2} C ${456 + spread * 0.7} ${65 + spread * 0.32}, ${559 + spread * 0.2} ${280 + spread * 0.79}, ${415 - spread * 0.22} ${391 + spread * 0.48} C ${348 - spread * 0.14} ${446 + spread * 0.4}, ${249 + spread * 0.12} ${457 + spread * 0.4}, ${295 - spread * 0.23} ${558 + spread * 0.08}`}
-                />
-              );
-            })}
+            {Array.from({ length: LEARNING_FIELD_CONTOURS }, (_, index) => (
+              <path key={index} d={learningFieldPath(index)} />
+            ))}
           </g>
           <path
             data-field-trace
@@ -138,9 +141,6 @@ function LearningField(): JSX.Element {
           <path d="M307 343h26m-13-13v26" stroke="#ad7b24" strokeWidth="1" />
         </svg>
       </MovingLearningField>
-      <span className={styles.fieldCaption}>
-        An open frontier. A human one.
-      </span>
     </div>
   );
 }

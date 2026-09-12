@@ -3,18 +3,20 @@
 import {
   LazyMotion,
   MotionConfig,
+  animate as animateField,
   domAnimation,
   inView,
   m,
   stagger,
   useAnimate,
-  useMotionValue,
+  useInView,
   useScroll,
-  useSpring,
-  useTransform,
 } from "framer-motion";
-import { useEffect, type PointerEvent, type ReactNode } from "react";
+import { Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import styles from "./home.module.css";
+import LiquidGlassIcon from "./LiquidGlassIcon";
+import { LEARNING_FIELD_DURATION, learningFieldPath } from "./learning-field";
 import useReducedEffects from "./useReducedEffects";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -149,47 +151,95 @@ export default function HomeMotion({
   );
 }
 
-/** Small, input-driven movements instead of an always-running background loop. */
+/** A continuous ribbon loop with stationary annotations and explicit playback. */
 export function MovingLearningField({
   children,
 }: {
   children: ReactNode;
 }): JSX.Element {
   const reducedMotion = useReducedEffects();
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const rotateX = useSpring(pointerY, { stiffness: 100, damping: 24 });
-  const rotateY = useSpring(pointerX, { stiffness: 100, damping: 24 });
-  const { scrollY } = useScroll();
-  const lift = useTransform(scrollY, [0, 700], [0, -28]);
+  const field = useRef<HTMLDivElement>(null);
+  const elapsed = useRef(0);
+  const inViewport = useInView(field, { amount: 0.15 });
+  const [paused, setPaused] = useState(false);
+  const [pageVisible, setPageVisible] = useState(false);
 
-  const resetPointer = (): void => {
-    pointerX.set(0);
-    pointerY.set(0);
-  };
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>): void => {
-    if (reducedMotion || event.pointerType !== "mouse") return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    pointerX.set(((event.clientX - bounds.left) / bounds.width - 0.5) * 9);
-    pointerY.set(-((event.clientY - bounds.top) / bounds.height - 0.5) * 9);
-  };
+  useEffect(() => {
+    const updateVisibility = (): void => {
+      setPageVisible(document.visibilityState === "visible");
+    };
+    updateVisibility();
+    document.addEventListener("visibilitychange", updateVisibility);
+    return () =>
+      document.removeEventListener("visibilitychange", updateVisibility);
+  }, []);
+
+  useEffect(() => {
+    if (
+      !field.current ||
+      reducedMotion ||
+      paused ||
+      !inViewport ||
+      !pageVisible
+    ) {
+      return;
+    }
+
+    const contours = Array.from(
+      field.current.querySelectorAll<SVGPathElement>(
+        "[data-field-contours] path",
+      ),
+    );
+    const trace =
+      field.current.querySelector<SVGPathElement>("[data-field-trace]");
+    // One Motion clock drives every contour, so the ribbon never drifts apart.
+    const playback = animateField(0, 1, {
+      duration: LEARNING_FIELD_DURATION,
+      ease: "linear",
+      repeat: Infinity,
+      onUpdate: (progress) => {
+        const phase = progress * Math.PI * 2;
+        contours.forEach((path, index) => {
+          path.setAttribute("d", learningFieldPath(index, phase));
+        });
+        // A whole number of dash periods makes the flowing trace seamless too.
+        trace?.setAttribute("stroke-dashoffset", String(-progress * 72));
+      },
+    });
+    playback.time = elapsed.current;
+
+    return () => {
+      elapsed.current = playback.time % LEARNING_FIELD_DURATION;
+      // Stop the frame driver offscreen; recreate at the saved phase on return.
+      playback.stop();
+    };
+  }, [inViewport, pageVisible, paused, reducedMotion]);
 
   return (
-    <div
-      className={styles.fieldMotion}
-      onPointerMove={onPointerMove}
-      onPointerLeave={resetPointer}
-      onPointerCancel={resetPointer}
-    >
-      <m.div
-        style={{
-          rotateX: reducedMotion ? 0 : rotateX,
-          rotateY: reducedMotion ? 0 : rotateY,
-          y: reducedMotion ? 0 : lift,
-        }}
-      >
+    <>
+      <div ref={field} className={styles.fieldMotion}>
         {children}
-      </m.div>
-    </div>
+      </div>
+      <div className={styles.fieldCaption}>
+        <span>An open frontier. A human one.</span>
+        {!reducedMotion && (
+          <button
+            type="button"
+            className={styles.fieldPlayback}
+            onClick={() => setPaused((value) => !value)}
+            aria-label={
+              paused
+                ? "Play illustration animation"
+                : "Pause illustration animation"
+            }
+            title={paused ? "Play animation" : "Pause animation"}
+          >
+            <LiquidGlassIcon size="sm">
+              {paused ? <Play /> : <Pause />}
+            </LiquidGlassIcon>
+          </button>
+        )}
+      </div>
+    </>
   );
 }
