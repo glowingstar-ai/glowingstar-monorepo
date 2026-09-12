@@ -1,5 +1,13 @@
 # Development log
 
+## 2026-09-12: Readable landing page typography
+
+- Task: User-requested review and enlargement of small landing-page text. No Linear ticket was supplied.
+- Status: Implementation and production validation complete for PR #72.
+- Introduced rem-based 18px body, 16px control, and 14px metadata sizes; removed 7px to 13px labels and mobile font shrinking. Increased manifesto body and label sizes and label contrast.
+- Reflowed mobile research descriptions, card headings, and narrow concept/learning controls; moved the hero footnote into normal flow and raised the navigation/layout breakpoint to 1000px. Preserved the page's visual hierarchy and 3D interactions.
+- Validation: production build, TypeScript, formatting, and whitespace checks pass; all 24 pages generated with only existing Saint Paul hook warnings. Browser text audits at 320, 390, 768, 1000, 1001, and 1260px found a 14px minimum with no text outside the viewport or horizontal overflow. Verified expanded research text, narrow concept controls, learning-step keyboard selection, navigation breakpoint changes, and manifesto at 320px. Final production WebGL rendering and concept selection work without new console warnings or errors.
+
 ## 2026-09-12: Smiling gold star mascot
 
 - Task: User-requested brand icon update based on a rounded, smiling five-point gold star reference. No Linear ticket was supplied.

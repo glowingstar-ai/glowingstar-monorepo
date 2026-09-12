@@ -163,7 +163,7 @@ export default function ManifestoLandingPage(): JSX.Element {
               className="inline-flex items-center gap-3"
             >
               <SculptedIcon kind="star" size={40} />
-              <p className="font-heading text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
+              <p className="font-heading text-sm leading-6 uppercase tracking-[0.12em] text-[#17120f]/70">
                 Manifesto
               </p>
             </Link>
@@ -184,7 +184,7 @@ export default function ManifestoLandingPage(): JSX.Element {
                 {section.paragraphs.map((paragraph) => (
                   <p
                     key={paragraph}
-                    className="text-base leading-8 text-[#17120f]/78 sm:text-[1.05rem] sm:leading-9"
+                    className="text-lg leading-8 text-[#17120f]/78"
                   >
                     {paragraph}
                   </p>
@@ -195,7 +195,7 @@ export default function ManifestoLandingPage(): JSX.Element {
 
           <footer className="space-y-8 border-t border-[#17120f]/10 pt-12">
             <section className="rounded-[2rem] border border-[#17120f]/12 bg-[linear-gradient(180deg,rgba(252,247,239,0.86),rgba(245,237,225,0.92))] px-6 py-8 shadow-[0_20px_60px_rgba(93,66,35,0.08)] sm:px-8">
-              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/58">
+              <p className="text-sm leading-6 uppercase tracking-[0.12em] text-[#17120f]/70">
                 Team backgrounds
               </p>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -218,13 +218,13 @@ export default function ManifestoLandingPage(): JSX.Element {
             </section>
 
             <section className="rounded-[2rem] border border-[#17120f]/10 bg-[linear-gradient(180deg,rgba(255,250,242,0.9),rgba(243,234,220,0.92))] px-6 py-8 shadow-[0_24px_70px_rgba(107,79,45,0.08)] sm:px-8">
-              <p className="text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
+              <p className="text-sm leading-6 uppercase tracking-[0.12em] text-[#17120f]/70">
                 GlowingStar
               </p>
               <h2 className="mt-4 font-heading text-2xl text-[#17120f] sm:text-[2rem]">
                 Explore the frontier with us
               </h2>
-              <p className="mt-4 max-w-2xl text-base leading-8 text-[#17120f]/72 sm:text-[1.05rem]">
+              <p className="mt-4 max-w-2xl text-lg leading-8 text-[#17120f]/72">
                 We welcome researchers, educators, builders, and institutions
                 who want to help advance human learning. Tell us what you’re
                 exploring and where our work might meet.
@@ -232,7 +232,7 @@ export default function ManifestoLandingPage(): JSX.Element {
               <div className="mt-6">
                 <a
                   href="mailto:support@glowingstar.ai"
-                  className="inline-flex min-h-12 items-center gap-3 rounded-full border border-[#17120f]/10 bg-[#17120f] px-6 py-3 text-sm font-semibold text-[#f6efe4] transition hover:bg-[#2b211b]"
+                  className="inline-flex min-h-12 max-w-full items-center gap-3 rounded-full border border-[#17120f]/10 bg-[#17120f] px-6 py-3 text-base font-semibold text-[#f6efe4] transition hover:bg-[#2b211b]"
                 >
                   <span>Start a conversation</span>
                   <ArrowUpRight

@@ -1,11 +1,13 @@
 .experience {
   --learning-gold: #aa8440;
+  container: learning-experience / inline-size;
   min-width: 0;
   padding: 4px 4px 0;
 }
 
 .heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   margin-bottom: 22px;
@@ -14,7 +16,7 @@
 
 .heading p {
   color: #efeee4;
-  font-size: 12px;
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -23,16 +25,18 @@
   margin-top: 3px;
   color: #b4b9aa;
   font-family: var(--font-plex), monospace;
-  font-size: 9px;
-  letter-spacing: 0.3px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
 }
 
 .headingIndex {
   margin-left: auto;
   color: #c2b48f;
   font-family: var(--font-plex), monospace;
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
 }
 
 .perspective {
@@ -60,6 +64,8 @@
 
 .card {
   position: relative;
+  min-width: 0;
+  overflow-wrap: break-word;
   padding: 22px 24px;
   border: 1px solid #d6d0bd;
   border-radius: 8px;
@@ -109,9 +115,10 @@
 
 .cardHeading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 12px;
   margin-bottom: 12px;
 }
 
@@ -120,47 +127,52 @@
   align-items: center;
   gap: 6px;
   color: #676448;
-  font-size: 9px;
+  font-size: 0.875rem;
   font-weight: 500;
-  letter-spacing: 1px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .cardIndex {
   color: #726950;
   font-family: var(--font-plex), monospace;
-  font-size: 8px;
+  font-size: 0.875rem;
   line-height: 1.5;
-  letter-spacing: 0.75px;
+  letter-spacing: 0.025em;
   text-transform: uppercase;
 }
 
 .learnerQuestion {
-  font-size: clamp(17px, 1.55vw, 21px);
-  line-height: 1.5;
-  letter-spacing: -0.55px;
+  font-size: clamp(1.125rem, 1rem + 0.3vw, 1.3125rem);
+  line-height: 1.6;
+  letter-spacing: -0.02em;
 }
 
 .tutorResponse {
   font-family: var(--font-playfair), Georgia, serif;
-  font-size: clamp(18px, 1.55vw, 21px);
-  line-height: 1.55;
-  letter-spacing: -0.35px;
+  font-size: clamp(1.125rem, 1rem + 0.3vw, 1.3125rem);
+  line-height: 1.6;
+  letter-spacing: -0.015em;
 }
 
 .practiceIcon {
   flex-shrink: 0;
 }
 
+.understand > div:last-child {
+  min-width: 0;
+}
+
 .practicePrompt {
   margin-top: 6px;
-  font-size: 12px;
+  font-size: 1rem;
   line-height: 1.6;
 }
 
 .stepControls {
   display: grid;
-  grid-template-columns: 1fr 1fr 1.2fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr);
   gap: 5px;
   margin-top: 16px;
   padding: 5px;
@@ -176,13 +188,14 @@
   gap: 7px;
   min-width: 0;
   min-height: 44px;
-  padding: 6px 5px;
+  padding: 10px 5px;
   border: 1px solid transparent;
   border-radius: 5px;
   background: transparent;
   color: #c7cbbc;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 1rem;
+  line-height: 1.5;
   cursor: pointer;
 }
 
@@ -206,60 +219,48 @@
 .stepNumber {
   display: grid;
   place-items: center;
-  width: 17px;
-  height: 17px;
+  width: 1.5rem;
+  height: 1.5rem;
   flex-shrink: 0;
   border: 1px solid currentColor;
   border-radius: 50%;
   font-family: var(--font-plex), monospace;
-  font-size: 8px;
-  opacity: 0.7;
+  font-size: 0.875rem;
+  line-height: 1;
 }
 
 .stepNote {
-  min-height: 42px;
+  min-height: 3.4em;
   margin-top: 13px;
   padding-inline: 8px;
   color: #b9bfae;
-  font-size: 10px;
+  font-size: 1rem;
   line-height: 1.7;
   text-align: center;
   text-wrap: balance;
 }
 
-@media (max-width: 1000px) and (min-width: 761px) {
+@container learning-experience (max-width: 30rem) {
   .card {
     padding-inline: 18px;
   }
 
-  .cardHeading {
-    gap: 6px;
-  }
-
-  .cardIndex {
-    font-size: 7px;
-  }
-
-  .stepNumber {
-    display: none;
+  .stepButton {
+    flex-direction: column;
+    gap: 5px;
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 62.5rem) {
   .experience {
     max-width: 520px;
     width: 100%;
     justify-self: center;
     padding-inline: 0;
   }
-
-  .learnerQuestion,
-  .tutorResponse {
-    font-size: 19px;
-  }
 }
 
-@media (max-width: 380px) {
+@container learning-experience (max-width: 20.625rem) {
   .perspective {
     padding-inline: 4px;
   }
@@ -282,34 +283,19 @@
     padding-inline: 12px;
   }
 
-  .cardHeading {
-    gap: 5px;
-  }
-
-  .cardIndex {
-    font-size: 7px;
-  }
-
-  .learnerQuestion,
-  .tutorResponse {
-    font-size: 17px;
-  }
-
   .stepControls {
-    gap: 2px;
-    padding: 3px;
+    grid-template-columns: 1fr;
   }
 
   .stepButton {
-    gap: 4px;
-    padding-inline: 2px;
-    font-size: 9px;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding-inline: 14px;
   }
 
-  .stepNumber {
-    width: 14px;
-    height: 14px;
-    font-size: 7px;
+  .stepNote {
+    min-height: 5.1em;
   }
 }
 

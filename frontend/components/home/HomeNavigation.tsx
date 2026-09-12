@@ -44,7 +44,7 @@ export default function HomeNavigation(): JSX.Element {
   }, [open, reducedMotion, animate, navigationRef]);
 
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 761px)");
+    const desktop = window.matchMedia("(min-width: 62.5625rem)");
     const closeOnResize = (): void => setOpen(false);
     desktop.addEventListener("change", closeOnResize);
     return () => desktop.removeEventListener("change", closeOnResize);

@@ -39,6 +39,12 @@ Research directions describe aspirations and open questions. They should not imp
 
 The abstract artwork is an original orbital sculpture representing human potential. It is decorative and conceptual, not a chart, benchmark, experiment, or scientific result. The visual system uses warm neutrals, clear type hierarchy, generous space, and restrained separators to keep attention on the mission and the work.
 
+## Readable type scale
+
+The page uses rem-based sizes with a default 18px for body paragraphs, 16px for navigation, actions, and explanatory controls, and a 14px minimum for short labels, numbers, and footnotes. Body line heights are unitless and generally 1.65 to 1.85. Fluid headings retain rem bounds. Mobile layouts rearrange content instead of reducing the reading size: research descriptions span the available width, card headings wrap, compact controls become vertical, and the navigation collapses at 1000px. The hero footnote stays in document flow so wrapping cannot collide with adjacent content. Manifesto paragraphs use 18px with 14px labels and stronger label contrast.
+
+The sizing follows [USWDS typography guidance](https://designsystem.digital.gov/components/typography/), which recommends at least 16px for most text and sparing use of smaller companion text. Relative units, flexible containers, and unclipped controls support the enlargement goal described by [WCAG's Resize Text guidance](https://www.w3.org/WAI/WCAG21/Understanding/resize-text). These choices are not a claim of a complete accessibility audit.
+
 ## Motion and icon materials
 
 The page uses the existing Motion dependency for staggered hero entrances, one-time scroll reveals, reading progress, disclosure feedback, and mobile navigation. The hero is a Three.js sculpture with three sculpted metal bands around a pearl core, procedural studio reflections, and real depth and shadows. Motion drives a seamless 24-second rotation with gentle precession. A glass playback control pauses and resumes at the same phase. The animation stops when offscreen, when the browser tab is hidden, or when reduced motion is enabled. Content remains visible in server-rendered HTML, and motion preferences are observed throughout the session. See [Motion's React animation documentation](https://motion.dev/docs/react-use-animate).
