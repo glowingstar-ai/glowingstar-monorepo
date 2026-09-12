@@ -171,8 +171,9 @@ export function createLearningSculpture(
     environment?.dispose();
     pmrem?.dispose();
     key?.shadow.map?.dispose();
+    // Dispose GPU resources without deliberately losing a potentially reused
+    // canvas context during client navigation or React effect cleanup.
     renderer.dispose();
-    renderer.forceContextLoss();
   };
 
   try {
