@@ -1,0 +1,111 @@
+"use client";
+
+import { ArrowUpRight, Menu, X } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import styles from "./home.module.css";
+
+const links = [
+  { href: "#mission", label: "Mission" },
+  { href: "#research", label: "Research" },
+  { href: "#work", label: "Our work" },
+  { href: "#about", label: "About" },
+];
+
+export function StarMark(): JSX.Element {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      width="28"
+      height="28"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M16 1.5 19.1 11l8.6-5.7L22 13.9l9.5 2.1L22 19.1l5.7 8.6-8.6-5.7-3.1 9.5-2.1-9.5-8.6 5.7 5.7-8.6L1.5 16l9.5-2.1-5.7-8.6 8.6 5.7L16 1.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export default function HomeNavigation(): JSX.Element {
+  const [open, setOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 761px)");
+    const closeOnResize = (): void => setOpen(false);
+    desktop.addEventListener("change", closeOnResize);
+    return () => desktop.removeEventListener("change", closeOnResize);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    const onPointerDown = (event: PointerEvent): void => {
+      if (
+        event.target instanceof Node &&
+        !headerRef.current?.contains(event.target)
+      )
+        setOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [open]);
+
+  return (
+    <header className={styles.header} ref={headerRef}>
+      <div className={`${styles.container} ${styles.headerInner}`}>
+        <Link
+          className={styles.wordmark}
+          href="/"
+          aria-label="GlowingStar home"
+          onClick={() => setOpen(false)}
+        >
+          <StarMark /> GlowingStar
+        </Link>
+        <button
+          ref={toggleRef}
+          type="button"
+          className={styles.menuToggle}
+          aria-expanded={open}
+          aria-controls="home-navigation"
+          aria-label={open ? "Close navigation" : "Open navigation"}
+          onClick={() => setOpen(!open)}
+        >
+          {open ? <X size={23} /> : <Menu size={23} />}
+        </button>
+        <nav
+          id="home-navigation"
+          className={styles.navigation}
+          data-open={open}
+          aria-label="Main navigation"
+        >
+          {links.map((link) => (
+            <a key={link.href} href={link.href} onClick={() => setOpen(false)}>
+              {link.label}
+            </a>
+          ))}
+          <a
+            className={styles.navContact}
+            href="#contact"
+            onClick={() => setOpen(false)}
+          >
+            Get in touch <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
+        </nav>
+      </div>
+    </header>
+  );
+}

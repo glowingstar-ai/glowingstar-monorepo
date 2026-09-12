@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | GlowingStar",
   },
   description:
-    "GlowingStar builds an AI tutoring platform for schools and universities and instruments every session, so institutions see measured learning outcomes.",
+    "GlowingStar is a frontier lab for human learning. We work to ensure that as machines get smarter, humans do too.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",

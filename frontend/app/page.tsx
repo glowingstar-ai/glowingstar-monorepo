@@ -2,9 +2,24 @@ import type { Metadata } from "next";
 import HomeLandingPage from "@/components/HomeLandingPage";
 
 export const metadata: Metadata = {
-  title: "GlowingStar | AI learning programs with the evidence built in",
+  title: { absolute: "GlowingStar | Frontier Lab for Human Learning" },
   description:
-    "GlowingStar builds an AI tutoring platform for schools and universities and instruments every session, from assessments to conversations to student confidence, so institutions see measured learning outcomes.",
+    "We work to ensure that as machines get smarter, humans do too. GlowingStar is a frontier lab for human learning, bringing research and applied AI together to advance human potential.",
+  alternates: { canonical: "https://glowingstar.ai" },
+  openGraph: {
+    title: "GlowingStar | Frontier Lab for Human Learning",
+    description:
+      "We work to ensure that as machines get smarter, humans do too.",
+    url: "https://glowingstar.ai",
+    siteName: "GlowingStar",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "GlowingStar | Frontier Lab for Human Learning",
+    description:
+      "We work to ensure that as machines get smarter, humans do too.",
+  },
 };
 
 const organizationStructuredData = {
@@ -14,7 +29,7 @@ const organizationStructuredData = {
   url: "https://glowingstar.ai",
   logo: "https://glowingstar.ai/logo.png",
   description:
-    "GlowingStar builds an AI tutoring platform for schools and universities and instruments every session, so institutions see measured learning outcomes instead of vendor claims.",
+    "GlowingStar is a frontier lab for human learning. We work to ensure that as machines get smarter, humans do too.",
   contactPoint: {
     "@type": "ContactPoint",
     email: "support@glowingstar.ai",
