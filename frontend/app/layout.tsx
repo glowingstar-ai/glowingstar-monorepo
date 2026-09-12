@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   description:
     "GlowingStar is a frontier lab for human learning. We work to ensure that as machines get smarter, humans do too.",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
+    icon: "/glowingstar-mascot.png",
+    shortcut: "/glowingstar-mascot.png",
   },
 };
 

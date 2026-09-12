@@ -1,4 +1,5 @@
 import { useId } from "react";
+import Image from "next/image";
 import styles from "./sculpted-icon.module.css";
 
 export type SculptedIconKind =
@@ -16,25 +17,6 @@ type SculptedIconProps = {
   className?: string;
 };
 
-const starPoints = [
-  [40, 7],
-  [47, 28],
-  [64, 15],
-  [51, 33],
-  [73, 39],
-  [51, 46],
-  [64, 63],
-  [47, 51],
-  [40, 72],
-  [34, 51],
-  [16, 63],
-  [29, 46],
-  [7, 39],
-  [29, 33],
-  [16, 15],
-  [34, 28],
-];
-
 /** Small, server-rendered sculptures share the hero's gold and pearl materials. */
 export default function SculptedIcon({
   kind,
@@ -44,14 +26,33 @@ export default function SculptedIcon({
 }: SculptedIconProps): JSX.Element {
   const id = useId().replace(/:/g, "");
   const paint = (name: string): string => `url(#sculpture-${id}-${name})`;
-  const starOutline = starPoints.map((point) => point.join(",")).join(" ");
+  const classes = [styles.sculpture, styles[tone], styles[kind], className]
+    .filter(Boolean)
+    .join(" ");
+
+  if (kind === "star") {
+    return (
+      <span
+        aria-hidden="true"
+        className={classes}
+        style={{ width: size, height: size }}
+      >
+        <Image
+          src="/glowingstar-mascot.png"
+          alt=""
+          width={size}
+          height={size}
+          className={styles.mascot}
+          unoptimized
+        />
+      </span>
+    );
+  }
 
   return (
     <span
       aria-hidden="true"
-      className={[styles.sculpture, styles[tone], styles[kind], className]
-        .filter(Boolean)
-        .join(" ")}
+      className={classes}
       style={{ width: size, height: size }}
     >
       <svg
@@ -123,38 +124,13 @@ export default function SculptedIcon({
         <ellipse
           className={styles.shadow}
           cx="41"
-          cy={kind === "star" ? 72 : 71}
-          rx={kind === "star" ? 21 : 29}
+          cy="71"
+          rx="29"
           ry="6"
           fill={paint("shadow")}
         />
 
         <g className={styles.object} strokeLinejoin="round">
-          {kind === "star" && (
-            <>
-              <polygon
-                points={starOutline}
-                transform="translate(0 2.3)"
-                fill={paint("edge")}
-              />
-              <polygon points={starOutline} fill={paint("gold")} />
-              {starPoints.map((point, index) => (
-                <path
-                  key={index}
-                  d={`M40 39L${point.join(" ")}L${starPoints[(index + 1) % starPoints.length].join(" ")}Z`}
-                  fill={paint(index % 2 === 0 ? "light" : "edge")}
-                  opacity={index % 2 === 0 ? 0.93 : 0.32}
-                />
-              ))}
-              <polygon
-                points={starOutline}
-                stroke="#f9e9b4"
-                strokeWidth=".55"
-              />
-              <path d="M40 7V39L7 39" stroke="#fff9df" strokeWidth=".7" />
-            </>
-          )}
-
           {kind === "understanding" && (
             <>
               <path d="M28 18 45 28 28 38 11 28Z" fill={paint("light")} />

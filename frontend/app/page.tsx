@@ -27,7 +27,7 @@ const organizationStructuredData = {
   "@type": "Organization",
   name: "GlowingStar, Inc.",
   url: "https://glowingstar.ai",
-  logo: "https://glowingstar.ai/logo.png",
+  logo: "https://glowingstar.ai/glowingstar-mascot.png",
   description:
     "GlowingStar is a frontier lab for human learning. We work to ensure that as machines get smarter, humans do too.",
   contactPoint: {

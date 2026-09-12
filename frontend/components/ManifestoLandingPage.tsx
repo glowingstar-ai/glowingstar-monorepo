@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { teamLogoList } from "@/lib/site-content";
+import SculptedIcon from "./home/SculptedIcon";
 
 type ManifestoSection = {
   heading: string;
@@ -161,14 +162,7 @@ export default function ManifestoLandingPage(): JSX.Element {
               aria-label="GlowingStar home"
               className="inline-flex items-center gap-3"
             >
-              <Image
-                src="/logo.png"
-                alt="GlowingStar"
-                width={40}
-                height={40}
-                priority
-                className="h-10 w-10 object-contain drop-shadow-[0_4px_12px_rgba(235,179,43,0.18)]"
-              />
+              <SculptedIcon kind="star" size={40} />
               <p className="font-heading text-xs uppercase tracking-[0.34em] text-[#17120f]/45">
                 Manifesto
               </p>

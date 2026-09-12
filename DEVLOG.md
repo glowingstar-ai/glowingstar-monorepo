@@ -1,5 +1,13 @@
 # Development log
 
+## 2026-09-12: Smiling gold star mascot
+
+- Task: User-requested brand icon update based on a rounded, smiling five-point gold star reference. No Linear ticket was supplied.
+- Status: Implementation and production validation complete for PR #72.
+- Generated a transparent gold mascot with the built-in imagegen tool and resized it to a 256px, approximately 59 KB PNG. Replaced homepage star instances, the manifesto brand mark, favicon, and Organization logo metadata. Preserved the existing glass containers, hover motion, and reduced-motion handling.
+- Documented the final asset and generation prompt in `docs/frontier-human-learning-landing.md`.
+- Validation: production build and TypeScript pass with all 24 pages generated; scoped ESLint, Prettier, and whitespace checks pass. Verified all five homepage images load, the 40px manifesto mark, 23px to 68px sizes, ivory and dark backgrounds, favicon reference, and 390px mobile layout without overflow. No new browser console warnings or errors. Existing Saint Paul hook warnings remain unchanged.
+
 ## 2026-09-12: Connected 3D learning interface
 
 - Task: User-requested clarification of the moving sculpture's labels and expansion of suitable 3D visuals throughout the landing page, including the GlowingStar icon. No Linear ticket was supplied.
